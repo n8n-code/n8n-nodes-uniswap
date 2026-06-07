@@ -55,11 +55,11 @@ export class UniswapApi implements ICredentialType {
 
 	test: ICredentialTestRequest = {
 			"request": {
-				"baseURL": "={{ $credentials.baseUrl }}",
+				"baseURL": "={{ $credentials.url }}",
 				"url": "/orders",
 				"method": "GET",
 				"headers": {
-					"x-api-key": "={{ $credentials.apikey }}"
+					"x-api-key": "={{ $credentials.apiKey }}"
 				}
 			}
 		};
