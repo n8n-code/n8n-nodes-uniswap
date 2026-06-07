@@ -1,0 +1,62 @@
+{
+  "name": "@n8n-dev/n8n-nodes-uniswap",
+  "version": "1.0.0",
+  "description": "Uniswap decentralized trading protocol for automated liquidity provision and token swaps across multiple blockchains",
+  "license": "MIT",
+  "homepage": "https://n8n-code.github.io/n8n-dev/#/n8n-nodes-uniswap",
+  "keywords": [
+    "n8n",
+    "n8n-community-node",
+    "n8n-node",
+    "n8n-community-node-package",
+    "openapi",
+    "swagger",
+    "api",
+    "automation",
+    "workflow",
+    "uniswap"
+  ],
+  "author": {
+    "name": "kelvinzer0",
+    "email": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/n8n-code/n8n-nodes-uniswap.git"
+  },
+  "scripts": {
+    "build": "n8n-node build",
+    "build:watch": "tsc --watch",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "release": "n8n-node release",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": [
+      "dist/credentials/UniswapApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Uniswap/Uniswap.node.js"
+    ]
+  },
+  "dependencies": {
+    "n8n-workflow": "*"
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "*",
+    "eslint": "*",
+    "prettier": "3.8.3",
+    "release-it": "20.2.0",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
