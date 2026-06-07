@@ -503,6 +503,31 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Liquidity Provisioning"
+					],
+					"operation": [
+						"Check Lp Approval"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /lp/create",
 			"name": "operation",
 			"type": "notice",
@@ -1047,6 +1072,31 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Liquidity Provisioning"
+					],
+					"operation": [
+						"Create Position"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /lp/increase",
 			"name": "operation",
 			"type": "notice",
@@ -1516,6 +1566,31 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Liquidity Provisioning"
+					],
+					"operation": [
+						"Increase Position"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /lp/decrease",
 			"name": "operation",
 			"type": "notice",
@@ -1960,6 +2035,31 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Liquidity Provisioning"
+					],
+					"operation": [
+						"Decrease Position"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /lp/claim_fees",
 			"name": "operation",
 			"type": "notice",
@@ -2240,6 +2340,31 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Liquidity Provisioning"
+					],
+					"operation": [
+						"Claim Fees"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /lp/create_classic",
 			"name": "operation",
 			"type": "notice",
@@ -2486,6 +2611,31 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Liquidity Provisioning"
+					],
+					"operation": [
+						"Create Classic Position"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {

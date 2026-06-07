@@ -151,6 +151,31 @@ export const swapBatchingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swap Batching"
+					],
+					"operation": [
+						"Wallet Encode 7702"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /swap_5792",
 			"name": "operation",
 			"type": "notice",
@@ -319,6 +344,31 @@ export const swapBatchingDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swap Batching"
+					],
+					"operation": [
+						"Create Swap 5792 Transaction"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {
@@ -572,6 +622,31 @@ export const swapBatchingDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swap Batching"
+					],
+					"operation": [
+						"Create Swap 7702 Transaction"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {

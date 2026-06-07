@@ -549,6 +549,31 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /quote",
 			"name": "operation",
 			"type": "notice",
@@ -1408,6 +1433,31 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Aggregator Quote"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /order",
 			"name": "operation",
 			"type": "notice",
@@ -1556,6 +1606,31 @@ export const swappingDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Post Order"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {
@@ -1891,6 +1966,31 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Get Order"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /swap",
 			"name": "operation",
 			"type": "notice",
@@ -2203,6 +2303,31 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Create Swap Transaction"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "GET /swaps",
 			"name": "operation",
 			"type": "notice",
@@ -2381,6 +2506,31 @@ export const swappingDescription: INodeProperties[] = [
 					"property": "chainId",
 					"value": "={{ $value }}",
 					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Get Swaps"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {
@@ -2842,6 +2992,31 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Get Limit Order Quote"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /swap_4337",
 			"name": "operation",
 			"type": "notice",
@@ -3036,6 +3211,31 @@ export const swappingDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Create Swap 4337 Transaction"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {

@@ -181,6 +181,31 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Chained Swapping"
+					],
+					"operation": [
+						"Create Plan"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "GET /plan/{planId}",
 			"name": "operation",
 			"type": "notice",
@@ -229,6 +254,31 @@ export const chainedSwappingDescription: INodeProperties[] = [
 					"property": "forceRefresh",
 					"value": "={{ $value }}",
 					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Chained Swapping"
+					],
+					"operation": [
+						"Get Plan"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {
@@ -292,6 +342,31 @@ export const chainedSwappingDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Chained Swapping"
+					],
+					"operation": [
+						"Update Plan"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {

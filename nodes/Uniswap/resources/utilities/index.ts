@@ -269,6 +269,31 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Permissions"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "GET /swappable_tokens",
 			"name": "operation",
 			"type": "notice",
@@ -419,6 +444,31 @@ export const utilitiesDescription: INodeProperties[] = [
 					"property": "tokenInChainId",
 					"value": "={{ $value }}",
 					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Swappable Tokens"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {
@@ -708,6 +758,31 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Pool Info"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "POST /wallet/check_delegation",
 			"name": "operation",
 			"type": "notice",
@@ -764,6 +839,31 @@ export const utilitiesDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Wallet Check Delegation"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {
@@ -1030,6 +1130,31 @@ export const utilitiesDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Encode 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Api Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
 				}
 			},
 			"displayOptions": {
