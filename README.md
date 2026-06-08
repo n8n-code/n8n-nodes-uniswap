@@ -1,5 +1,7 @@
 # @n8n-dev/n8n-nodes-uniswap
 
+![uniswap Banner](banner.svg)
+
 [![npm version](https://img.shields.io/npm/v/@n8n-dev/n8n-nodes-uniswap.svg)](https://www.npmjs.com/package/@n8n-dev/n8n-nodes-uniswap)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
