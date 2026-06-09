@@ -236,7 +236,7 @@ export const swappingDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -430,7 +430,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Token Out Chain Id",
+			"displayName": "Token Out Chain ID",
 			"name": "tokenOutChainId",
 			"type": "options",
 			"default": 1,
@@ -549,7 +549,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -766,7 +766,7 @@ export const swappingDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Token In Chain Id",
+			"displayName": "Token In Chain ID",
 			"name": "tokenInChainId",
 			"type": "options",
 			"default": 1,
@@ -886,7 +886,7 @@ export const swappingDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Token Out Chain Id",
+			"displayName": "Token Out Chain ID",
 			"name": "tokenOutChainId",
 			"type": "options",
 			"default": 1,
@@ -1231,15 +1231,15 @@ export const swappingDescription: INodeProperties[] = [
 			"description": "The hook options to use for V4 pool quotes. `V4_HOOKS_INCLUSIVE` will get quotes for V4 pools with or without hooks. `V4_HOOKS_ONLY` will only get quotes for V4 pools with hooks. `V4_NO_HOOKS` will only get quotes for V4 pools without hooks. Defaults to `V4_HOOKS_INCLUSIVE` if `V4` is included in `protocols` and `hookOptions` is not set. This field is ignored if `V4` is not passed in `protocols`.",
 			"options": [
 				{
-					"name": "V 4 HOOKS INCLUSIVE",
+					"name": "v4 HOOKS INCLUSIVE",
 					"value": "V4_HOOKS_INCLUSIVE"
 				},
 				{
-					"name": "V 4 HOOKS ONLY",
+					"name": "v4 HOOKS ONLY",
 					"value": "V4_HOOKS_ONLY"
 				},
 				{
-					"name": "V 4 NO HOOKS",
+					"name": "v4 NO HOOKS",
 					"value": "V4_NO_HOOKS"
 				}
 			],
@@ -1433,7 +1433,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -1568,11 +1568,11 @@ export const swappingDescription: INodeProperties[] = [
 					"value": "DUTCH_LIMIT"
 				},
 				{
-					"name": "DUTCH V 2",
+					"name": "DUTCH v2",
 					"value": "DUTCH_V2"
 				},
 				{
-					"name": "DUTCH V 3",
+					"name": "DUTCH v3",
 					"value": "DUTCH_V3"
 				},
 				{
@@ -1620,7 +1620,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -1671,11 +1671,11 @@ export const swappingDescription: INodeProperties[] = [
 			"type": "options",
 			"options": [
 				{
-					"name": "Dutch V 2",
+					"name": "Dutch v2",
 					"value": "Dutch_V2"
 				},
 				{
-					"name": "Dutch V 3",
+					"name": "Dutch v3",
 					"value": "Dutch_V3"
 				},
 				{
@@ -1707,7 +1707,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Order Id",
+			"displayName": "Order ID",
 			"name": "orderId",
 			"description": "A transaction hash for an order. `orderId` or `orderIds` must be provided, but not both.",
 			"default": "",
@@ -1966,7 +1966,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -2303,7 +2303,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -2401,11 +2401,11 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
 			"default": 1,
 			"type": "options",
+			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
 			"options": [
 				{
 					"name": "1",
@@ -2520,7 +2520,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -2753,7 +2753,7 @@ export const swappingDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Token In Chain Id",
+			"displayName": "Token In Chain ID",
 			"name": "tokenInChainId",
 			"type": "options",
 			"default": 1,
@@ -2873,7 +2873,7 @@ export const swappingDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Token Out Chain Id",
+			"displayName": "Token Out Chain ID",
 			"name": "tokenOutChainId",
 			"type": "options",
 			"default": 1,
@@ -2992,7 +2992,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -3225,7 +3225,7 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",

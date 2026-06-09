@@ -53,13 +53,60 @@ That's it. No configuration files. No code. It just works.
 
 ## Resources
 
-| Resource | Operations |
-|----------|------------|
-| Swapping | POST Check swap approvals, POST Get a quote, POST Create a gasless order, GET Get gasless order status, POST Create swap calldata, GET Get swap status, POST Get a limit order quote, POST Create swap ERC-4337 UserOperation |
-| Utilities | POST Check token KYC permissions, GET Get bridgable tokens, POST Get pool state, POST Get wallet delegations, POST Encode ERC-4337 UserOperation |
-| Liquidity Provisioning | POST Check LP token approvals, POST Create a V3 or V4 LP position, POST Increase an LP position, POST Decrease an LP position, POST Claim LP position fees, POST Create a classic (V2) LP position |
-| Swap Batching | POST Encode wallet transactions, POST Create swap EIP 5792 calldata, POST Create swap EIP 7702 calldata |
-| Chained Swapping | POST Create an execution plan, GET Get an execution plan, PATCH Update an execution plan |
+<details>
+<summary><b>Swapping</b> (8 operations)</summary>
+
+- Post Check swap approvals
+- Post Get a quote
+- Post Create a gasless order
+- Get gasless order status
+- Post Create swap calldata
+- Get swap status
+- Post Get a limit order quote
+- Post Create swap ERC 4337 UserOperation
+
+</details>
+
+<details>
+<summary><b>Utilities</b> (5 operations)</summary>
+
+- Post Check token KYC permissions
+- Get bridgable tokens
+- Post Get pool state
+- Post Get wallet delegations
+- Post Encode ERC 4337 UserOperation
+
+</details>
+
+<details>
+<summary><b>Liquidity Provisioning</b> (6 operations)</summary>
+
+- Post Check LP token approvals
+- Post Create a V3 or V4 LP position
+- Post Increase an LP position
+- Post Decrease an LP position
+- Post Claim LP position fees
+- Post Create a classic V2 LP position
+
+</details>
+
+<details>
+<summary><b>Swap Batching</b> (3 operations)</summary>
+
+- Post Encode wallet transactions
+- Post Create swap EIP 5792 calldata
+- Post Create swap EIP 7702 calldata
+
+</details>
+
+<details>
+<summary><b>Chained Swapping</b> (3 operations)</summary>
+
+- Post Create an execution plan
+- Get an execution plan
+- Patch Update an execution plan
+
+</details>
 
 ---
 

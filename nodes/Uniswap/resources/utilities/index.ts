@@ -150,7 +150,7 @@ export const utilitiesDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -269,7 +269,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -338,12 +338,12 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Token In Chain Id",
+			"displayName": "Token In Chain ID",
 			"name": "tokenInChainId",
 			"required": true,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
 			"default": 1,
 			"type": "options",
+			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
 			"options": [
 				{
 					"name": "1",
@@ -458,7 +458,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -510,15 +510,15 @@ export const utilitiesDescription: INodeProperties[] = [
 			"description": "The protocol of the pool.",
 			"options": [
 				{
-					"name": "V 2",
+					"name": "v2",
 					"value": "V2"
 				},
 				{
-					"name": "V 3",
+					"name": "v3",
 					"value": "V3"
 				},
 				{
-					"name": "V 4",
+					"name": "v4",
 					"value": "V4"
 				}
 			],
@@ -591,7 +591,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -758,7 +758,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -853,7 +853,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -950,7 +950,7 @@ export const utilitiesDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -1069,7 +1069,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Paymaster Url",
+			"displayName": "Paymaster URL",
 			"name": "paymasterUrl",
 			"type": "string",
 			"default": "",
@@ -1144,7 +1144,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",

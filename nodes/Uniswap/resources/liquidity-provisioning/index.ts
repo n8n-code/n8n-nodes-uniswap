@@ -142,15 +142,15 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"description": "The protocol of the pool.",
 			"options": [
 				{
-					"name": "V 2",
+					"name": "v2",
 					"value": "V2"
 				},
 				{
-					"name": "V 3",
+					"name": "v3",
 					"value": "V3"
 				},
 				{
-					"name": "V 4",
+					"name": "v4",
 					"value": "V4"
 				}
 			],
@@ -175,7 +175,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -478,7 +478,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "V 3 Nft Token Id",
+			"displayName": "v3 Nft Token ID",
 			"name": "v3NftTokenId",
 			"type": "number",
 			"default": 0,
@@ -503,7 +503,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -623,7 +623,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -750,15 +750,15 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"description": "The protocol of the pool.",
 			"options": [
 				{
-					"name": "V 2",
+					"name": "v2",
 					"value": "V2"
 				},
 				{
-					"name": "V 3",
+					"name": "v3",
 					"value": "V3"
 				},
 				{
-					"name": "V 4",
+					"name": "v4",
 					"value": "V4"
 				}
 			],
@@ -1072,7 +1072,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -1142,7 +1142,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -1269,15 +1269,15 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"description": "The protocol of the pool.",
 			"options": [
 				{
-					"name": "V 2",
+					"name": "v2",
 					"value": "V2"
 				},
 				{
-					"name": "V 3",
+					"name": "v3",
 					"value": "V3"
 				},
 				{
-					"name": "V 4",
+					"name": "v4",
 					"value": "V4"
 				}
 			],
@@ -1351,7 +1351,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Nft Token Id",
+			"displayName": "Nft Token ID",
 			"name": "nftTokenId",
 			"type": "string",
 			"default": "",
@@ -1477,7 +1477,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "V 4 Batch Permit Data",
+			"displayName": "v4 Batch Permit Data",
 			"name": "v4BatchPermitData",
 			"type": "json",
 			"default": "{}",
@@ -1566,7 +1566,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -1636,7 +1636,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -1763,15 +1763,15 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"description": "The protocol of the pool.",
 			"options": [
 				{
-					"name": "V 2",
+					"name": "v2",
 					"value": "V2"
 				},
 				{
-					"name": "V 3",
+					"name": "v3",
 					"value": "V3"
 				},
 				{
-					"name": "V 4",
+					"name": "v4",
 					"value": "V4"
 				}
 			],
@@ -1845,7 +1845,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Nft Token Id",
+			"displayName": "Nft Token ID",
 			"name": "nftTokenId",
 			"type": "string",
 			"default": "",
@@ -2035,7 +2035,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -2087,15 +2087,15 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"description": "The protocol of the pool.",
 			"options": [
 				{
-					"name": "V 2",
+					"name": "v2",
 					"value": "V2"
 				},
 				{
-					"name": "V 3",
+					"name": "v3",
 					"value": "V3"
 				},
 				{
-					"name": "V 4",
+					"name": "v4",
 					"value": "V4"
 				}
 			],
@@ -2145,7 +2145,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Chain Id",
+			"displayName": "Chain ID",
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
@@ -2265,7 +2265,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 		},
 		{
 			"required": true,
-			"displayName": "Token Id",
+			"displayName": "Token ID",
 			"name": "tokenId",
 			"type": "string",
 			"default": "",
@@ -2340,7 +2340,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -2625,7 +2625,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",

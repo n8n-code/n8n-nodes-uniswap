@@ -181,7 +181,7 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -225,7 +225,7 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Plan Id",
+			"displayName": "Plan ID",
 			"name": "planId",
 			"required": true,
 			"description": "The unique identifier of the plan to retrieve.",
@@ -268,7 +268,7 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",
@@ -312,7 +312,7 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Plan Id",
+			"displayName": "Plan ID",
 			"name": "planId",
 			"required": true,
 			"description": "The unique identifier of the plan to update.",
@@ -356,7 +356,7 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Api Key (Header)",
+			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
 			"default": "",

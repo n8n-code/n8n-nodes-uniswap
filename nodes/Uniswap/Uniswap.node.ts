@@ -7,14 +7,14 @@ import { chainedSwappingDescription } from './resources/chained-swapping';
 
 export class Uniswap implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'uniswap',
+		displayName: 'Uniswap',
 		name: 'N8nDevUniswap',
 		icon: { light: 'file:./uniswap.svg', dark: 'file:./uniswap.dark.svg' },
 		group: ['input'],
 		version: 1,
 		subtitle: '={{\$parameter["operation"] + ": " + \$parameter["resource"]}}',
-		description: 'Uniswap decentralized trading protocol for automated liquidity provision and token swaps across multiple blockchains',
-		defaults: { name: 'uniswap' },
+		description: 'Uniswap protocol for automated liquidity and token swaps across blockchains.',
+		defaults: { name: 'Uniswap' },
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],

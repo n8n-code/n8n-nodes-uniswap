@@ -8,7 +8,7 @@ import type {
 export class UniswapApi implements ICredentialType {
 	name = 'N8nDevUniswapApi';
 
-	displayName = 'uniswap API';
+	displayName = 'Uniswap API';
 
 	icon: Icon = { light: 'file:../nodes/Uniswap/uniswap.svg', dark: 'file:../nodes/Uniswap/uniswap.dark.svg' };
 
@@ -22,7 +22,7 @@ export class UniswapApi implements ICredentialType {
 			default: 'https://trade-api.gateway.uniswap.org/v1',
 			required: true,
 			placeholder: 'https://trade-api.gateway.uniswap.org/v1',
-			description: 'The base URL of your uniswap API server',
+			description: 'The base URL of your Uniswap API server',
 		},
 		{
 			displayName: 'API Key',
