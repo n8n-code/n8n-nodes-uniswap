@@ -291,6 +291,10 @@ export const swappingDescription: INodeProperties[] = [
 					"value": 4326
 				},
 				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
 					"name": "8453",
 					"value": 8453
 				},
@@ -483,6 +487,10 @@ export const swappingDescription: INodeProperties[] = [
 				{
 					"name": "4326",
 					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
 				},
 				{
 					"name": "8453",
@@ -821,6 +829,10 @@ export const swappingDescription: INodeProperties[] = [
 					"value": 4326
 				},
 				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
 					"name": "8453",
 					"value": 8453
 				},
@@ -939,6 +951,10 @@ export const swappingDescription: INodeProperties[] = [
 				{
 					"name": "4326",
 					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
 				},
 				{
 					"name": "8453",
@@ -2456,6 +2472,10 @@ export const swappingDescription: INodeProperties[] = [
 					"value": 4326
 				},
 				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
 					"name": "8453",
 					"value": 8453
 				},
@@ -2504,6 +2524,31 @@ export const swappingDescription: INodeProperties[] = [
 				"send": {
 					"type": "query",
 					"property": "chainId",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Get Swaps"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Swapper",
+			"name": "swapper",
+			"description": "Filter by swapper address.",
+			"default": "",
+			"type": "string",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "swapper",
 					"value": "={{ $value }}",
 					"propertyInDotNotation": false
 				}
@@ -2808,6 +2853,10 @@ export const swappingDescription: INodeProperties[] = [
 					"value": 4326
 				},
 				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
 					"name": "8453",
 					"value": 8453
 				},
@@ -2926,6 +2975,10 @@ export const swappingDescription: INodeProperties[] = [
 				{
 					"name": "4326",
 					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
 				},
 				{
 					"name": "8453",

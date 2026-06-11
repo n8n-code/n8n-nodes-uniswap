@@ -230,6 +230,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 					"value": 4326
 				},
 				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
 					"name": "8453",
 					"value": 8453
 				},
@@ -676,6 +680,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 				{
 					"name": "4326",
 					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
 				},
 				{
 					"name": "8453",
@@ -1197,6 +1205,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 					"value": 4326
 				},
 				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
 					"name": "8453",
 					"value": 8453
 				},
@@ -1689,6 +1701,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 				{
 					"name": "4326",
 					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
 				},
 				{
 					"name": "8453",
@@ -2198,6 +2214,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 				{
 					"name": "4326",
 					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
 				},
 				{
 					"name": "8453",
