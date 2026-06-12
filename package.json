@@ -1,6 +1,6 @@
 {
   "name": "@n8n-dev/n8n-nodes-uniswap",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Uniswap protocol for automated liquidity and token swaps across blockchains.",
   "license": "MIT",
   "homepage": "https://n8n-code.github.io/n8n-dev/#/n8n-nodes-uniswap",

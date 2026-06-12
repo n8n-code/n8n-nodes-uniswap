@@ -6,32 +6,32 @@ import { swapBatchingDescription } from './resources/swap-batching';
 import { chainedSwappingDescription } from './resources/chained-swapping';
 
 export class Uniswap implements INodeType {
-	description: INodeTypeDescription = {
-		displayName: 'Uniswap',
-		name: 'N8nDevUniswap',
-		icon: { light: 'file:./uniswap.svg', dark: 'file:./uniswap.dark.svg' },
-		group: ['input'],
-		version: 1,
-		subtitle: '={{\$parameter["operation"] + ": " + \$parameter["resource"]}}',
-		description: 'Uniswap protocol for automated liquidity and token swaps across blockchains.',
-		defaults: { name: 'Uniswap' },
-		usableAsTool: true,
-		inputs: [NodeConnectionTypes.Main],
-		outputs: [NodeConnectionTypes.Main],
-		credentials: [
-			{
-				name: 'N8nDevUniswapApi',
-				required: true,
-			},
-		],
-		requestDefaults: {
-			baseURL: '={{\$credentials.url}}',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-		},
-		properties: [
+        description: INodeTypeDescription = {
+                displayName: 'Uniswap',
+                name: 'N8nDevUniswap',
+                icon: { light: 'file:./uniswap.svg', dark: 'file:./uniswap.dark.svg' },
+                group: ['input'],
+                version: 1,
+                subtitle: '={{\$parameter["operation"] + ": " + \$parameter["resource"]}}',
+                description: 'Uniswap protocol for automated liquidity and token swaps across blockchains.',
+                defaults: { name: 'Uniswap' },
+                usableAsTool: true,
+                inputs: [NodeConnectionTypes.Main],
+                outputs: [NodeConnectionTypes.Main],
+                credentials: [
+                        {
+                                name: 'N8nDevUniswapApi',
+                                required: true,
+                        },
+                ],
+                requestDefaults: {
+                        baseURL: '={{\$credentials.url}}',
+                        headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                        },
+                },
+                properties: [
 		{
 			"displayName": "Resource",
 			"name": "resource",
@@ -71,6 +71,6 @@ export class Uniswap implements INodeType {
 		...liquidityProvisioningDescription,
 		...swapBatchingDescription,
 		...chainedSwappingDescription
-		],
-	};
+                ],
+        };
 }

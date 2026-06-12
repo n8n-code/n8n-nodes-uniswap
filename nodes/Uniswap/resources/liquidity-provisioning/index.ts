@@ -1,7 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 export const liquidityProvisioningDescription: INodeProperties[] = [
-		{
+                {
 			"displayName": "Operation",
 			"name": "operation",
 			"type": "options",
@@ -232,6 +232,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 				{
 					"name": "4663",
 					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
 				},
 				{
 					"name": "8453",
@@ -684,6 +688,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 				{
 					"name": "4663",
 					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
 				},
 				{
 					"name": "8453",
@@ -1209,6 +1217,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 					"value": 4663
 				},
 				{
+					"name": "5042",
+					"value": 5042
+				},
+				{
 					"name": "8453",
 					"value": 8453
 				},
@@ -1705,6 +1717,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 				{
 					"name": "4663",
 					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
 				},
 				{
 					"name": "8453",
@@ -2218,6 +2234,10 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 				{
 					"name": "4663",
 					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
 				},
 				{
 					"name": "8453",
