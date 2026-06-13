@@ -2806,24 +2806,6 @@
           "EXPIRED"
         ]
       },
-      "SwapSponsorship": {
-        "x-internal": true,
-        "type": "object",
-        "description": "Present only when `swapper` is supplied and the transaction's gas fees were sponsored by Uniswap. Use this to display \"Sponsored by Uniswap\" in activity history.",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Display name of the sponsor."
-          },
-          "icon": {
-            "type": "string",
-            "description": "URL of the sponsor's logo or icon."
-          }
-        },
-        "required": [
-          "name"
-        ]
-      },
       "GetSwapsResponse": {
         "type": "object",
         "properties": {
@@ -2865,7 +2847,8 @@
                   "description": "Paymaster address from the userOperation receipt. Present only for userOperation queries when the receipt is available and a paymaster was used."
                 },
                 "sponsorship": {
-                  "$ref": "#/components/schemas/SwapSponsorship",
+                  "$ref": "#/components/schemas/SponsorMetadata",
+                  "description": "Present only when `swapper` is supplied and the transaction's gas fees were sponsored by Uniswap. Use this to display \"Sponsored by Uniswap\" in activity history.",
                   "x-internal": true
                 }
               }
