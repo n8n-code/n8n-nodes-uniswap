@@ -2382,9 +2382,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "Tx Hashes",
 			"name": "txHashes",
 			"description": "On-chain transaction hashes. At least one of `txHashes` or `userOpHashes` must be provided.",
-			"default": [
-				"0xc286f0adc6a9d6d26d6114df251d9b09d8bfafb2e00af5953193f6af92e110db"
-			],
+			"default": "[\n  \"0xc286f0adc6a9d6d26d6114df251d9b09d8bfafb2e00af5953193f6af92e110db\"\n]",
 			"type": "json",
 			"routing": {
 				"send": {
@@ -2409,9 +2407,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "User Op Hashes",
 			"name": "userOpHashes",
 			"description": "ERC-4337 UserOperation hashes. At least one of `txHashes` or `userOpHashes` must be provided.",
-			"default": [
-				"0xd47b609961a02483c9516d1f326244357e7e0b1d91569ebb4d119dff17e47330"
-			],
+			"default": "[\n  \"0xd47b609961a02483c9516d1f326244357e7e0b1d91569ebb4d119dff17e47330\"\n]",
 			"type": "json",
 			"routing": {
 				"send": {
