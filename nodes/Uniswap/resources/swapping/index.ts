@@ -109,6 +109,18 @@ export const swappingDescription: INodeProperties[] = [
 							"url": "=/swap_4337"
 						}
 					}
+				},
+				{
+					"name": "Check Approval 4337",
+					"value": "Check Approval 4337",
+					"action": "Create approval ERC-4337 UserOperation",
+					"description": "Builds and returns an ERC-4337 v0.8 UserOperation that performs the ERC-20 approval (and any required allowance reset) needed before a swap. When `requestGasSponsorship` is `true` and a `paymasterUrl` is supplied, the backend fills the UserOperation's paymaster fields server-side and returns `sponsorMetadata`; otherwise a plain unsponsored UserOperation is returned with paymaster fields and `signature` left for the client to populate.",
+					"routing": {
+						"request": {
+							"method": "POST",
+							"url": "=/check_approval_4337"
+						}
+					}
 				}
 			],
 			"default": ""
@@ -616,16 +628,16 @@ export const swappingDescription: INodeProperties[] = [
 			"type": "options",
 			"options": [
 				{
-					"name": "1 2",
-					"value": "1.2"
-				},
-				{
 					"name": "2 0",
 					"value": "2.0"
 				},
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 2 0",
+					"value": "2.2.0"
 				}
 			],
 			"routing": {
@@ -2049,16 +2061,16 @@ export const swappingDescription: INodeProperties[] = [
 			"type": "options",
 			"options": [
 				{
-					"name": "1 2",
-					"value": "1.2"
-				},
-				{
 					"name": "2 0",
 					"value": "2.0"
 				},
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 2 0",
+					"value": "2.2.0"
 				}
 			],
 			"routing": {
@@ -3120,16 +3132,16 @@ export const swappingDescription: INodeProperties[] = [
 			"type": "options",
 			"options": [
 				{
-					"name": "1 2",
-					"value": "1.2"
-				},
-				{
 					"name": "2 0",
 					"value": "2.0"
 				},
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 2 0",
+					"value": "2.2.0"
 				}
 			],
 			"routing": {
@@ -3322,6 +3334,558 @@ export const swappingDescription: INodeProperties[] = [
 					],
 					"operation": [
 						"Create Swap 4337 Transaction"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "POST /check_approval_4337",
+			"name": "operation",
+			"type": "notice",
+			"typeOptions": {
+				"theme": "info"
+			},
+			"default": "",
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"required": true,
+			"displayName": "Sender",
+			"name": "sender",
+			"type": "string",
+			"default": "",
+			"description": "Smart account address that will execute the UserOperation.",
+			"routing": {
+				"send": {
+					"property": "sender",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"required": true,
+			"displayName": "Token",
+			"name": "token",
+			"type": "string",
+			"default": "",
+			"description": "The token which will be sent, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"routing": {
+				"send": {
+					"property": "token",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"required": true,
+			"displayName": "Amount",
+			"name": "amount",
+			"type": "string",
+			"default": "",
+			"description": "The quantity of tokens denominated in the token's base units. (For example, for an ERC20 token one token is 1x10^18 base units. For one USDC token one token is 1x10^6 base units.) This value must be greater than 0.",
+			"routing": {
+				"send": {
+					"property": "amount",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"required": true,
+			"displayName": "Chain ID",
+			"name": "chainId",
+			"type": "options",
+			"default": 1,
+			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"options": [
+				{
+					"name": "1",
+					"value": 1
+				},
+				{
+					"name": "10",
+					"value": 10
+				},
+				{
+					"name": "56",
+					"value": 56
+				},
+				{
+					"name": "130",
+					"value": 130
+				},
+				{
+					"name": "137",
+					"value": 137
+				},
+				{
+					"name": "143",
+					"value": 143
+				},
+				{
+					"name": "196",
+					"value": 196
+				},
+				{
+					"name": "324",
+					"value": 324
+				},
+				{
+					"name": "480",
+					"value": 480
+				},
+				{
+					"name": "1868",
+					"value": 1868
+				},
+				{
+					"name": "4217",
+					"value": 4217
+				},
+				{
+					"name": "4326",
+					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
+				},
+				{
+					"name": "8453",
+					"value": 8453
+				},
+				{
+					"name": "10143",
+					"value": 10143
+				},
+				{
+					"name": "42161",
+					"value": 42161
+				},
+				{
+					"name": "42220",
+					"value": 42220
+				},
+				{
+					"name": "43114",
+					"value": 43114
+				},
+				{
+					"name": "59144",
+					"value": 59144
+				},
+				{
+					"name": "81457",
+					"value": 81457
+				},
+				{
+					"name": "7777777",
+					"value": 7777777
+				},
+				{
+					"name": "1301",
+					"value": 1301
+				},
+				{
+					"name": "84532",
+					"value": 84532
+				},
+				{
+					"name": "11155111",
+					"value": 11155111
+				}
+			],
+			"routing": {
+				"send": {
+					"property": "chainId",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Urgency",
+			"name": "urgency",
+			"type": "string",
+			"default": "",
+			"description": "The urgency impacts the estimated gas price of the transaction. The higher the urgency, the higher the gas price, and the faster the transaction is likely to be selected from the mempool. Send the bare string form (e.g. `\"normal\"`) for the common case, or the object form `{ level, overrides }` to supply caller caps for `maxPriorityFeePerGas`, `maxFeePerGas`, and `gasLimit`.",
+			"routing": {
+				"send": {
+					"property": "urgency",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Request Gas Sponsorship",
+			"name": "requestGasSponsorship",
+			"type": "boolean",
+			"default": false,
+			"description": "Opt in to gas sponsorship of the approval. When false a plain approval UserOperation is returned.",
+			"routing": {
+				"send": {
+					"property": "requestGasSponsorship",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Token Out",
+			"name": "tokenOut",
+			"type": "string",
+			"default": "",
+			"description": "The token which will be received, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"routing": {
+				"send": {
+					"property": "tokenOut",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Token Out Chain ID",
+			"name": "tokenOutChainId",
+			"type": "options",
+			"default": 1,
+			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"options": [
+				{
+					"name": "1",
+					"value": 1
+				},
+				{
+					"name": "10",
+					"value": 10
+				},
+				{
+					"name": "56",
+					"value": 56
+				},
+				{
+					"name": "130",
+					"value": 130
+				},
+				{
+					"name": "137",
+					"value": 137
+				},
+				{
+					"name": "143",
+					"value": 143
+				},
+				{
+					"name": "196",
+					"value": 196
+				},
+				{
+					"name": "324",
+					"value": 324
+				},
+				{
+					"name": "480",
+					"value": 480
+				},
+				{
+					"name": "1868",
+					"value": 1868
+				},
+				{
+					"name": "4217",
+					"value": 4217
+				},
+				{
+					"name": "4326",
+					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
+				},
+				{
+					"name": "8453",
+					"value": 8453
+				},
+				{
+					"name": "10143",
+					"value": 10143
+				},
+				{
+					"name": "42161",
+					"value": 42161
+				},
+				{
+					"name": "42220",
+					"value": 42220
+				},
+				{
+					"name": "43114",
+					"value": 43114
+				},
+				{
+					"name": "59144",
+					"value": 59144
+				},
+				{
+					"name": "81457",
+					"value": 81457
+				},
+				{
+					"name": "7777777",
+					"value": 7777777
+				},
+				{
+					"name": "1301",
+					"value": 1301
+				},
+				{
+					"name": "84532",
+					"value": 84532
+				},
+				{
+					"name": "11155111",
+					"value": 11155111
+				}
+			],
+			"routing": {
+				"send": {
+					"property": "tokenOutChainId",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Wallet Execution Context",
+			"name": "walletExecutionContext",
+			"type": "json",
+			"default": "{\n  \"properties\": {\n    \"walletInfo\": {}\n  }\n}",
+			"description": "Wallet execution context based on CAIP-25 Standard. Provides information about wallet capabilities and scopes.",
+			"routing": {
+				"send": {
+					"property": "walletExecutionContext",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Eip 7702 Auth",
+			"name": "eip7702Auth",
+			"type": "json",
+			"default": "{}",
+			"description": "Signed EIP-7702 authorization tuple.",
+			"routing": {
+				"send": {
+					"property": "eip7702Auth",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Paymaster URL",
+			"name": "paymasterUrl",
+			"type": "string",
+			"default": "",
+			"description": "When provided, selects the wallet flow: the backend fills the UserOperation's paymaster fields server-side against this paymaster.",
+			"routing": {
+				"send": {
+					"property": "paymasterUrl",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Paymaster Service Context",
+			"name": "paymasterServiceContext",
+			"type": "json",
+			"default": "{}",
+			"description": "Opaque ERC-7677 paymaster service context forwarded to the paymaster in the wallet flow.",
+			"routing": {
+				"send": {
+					"property": "paymasterServiceContext",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "API Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
 					]
 				}
 			}

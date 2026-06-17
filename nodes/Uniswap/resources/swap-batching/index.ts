@@ -202,16 +202,16 @@ export const swapBatchingDescription: INodeProperties[] = [
 			"type": "options",
 			"options": [
 				{
-					"name": "1 2",
-					"value": "1.2"
-				},
-				{
 					"name": "2 0",
 					"value": "2.0"
 				},
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 2 0",
+					"value": "2.2.0"
 				}
 			],
 			"routing": {
@@ -358,6 +358,56 @@ export const swapBatchingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Approval Only",
+			"name": "approvalOnly",
+			"type": "boolean",
+			"default": true,
+			"description": "Return only the ERC-20 approval call(s) for the quote's input token — no swap transaction. Required (and only supported) for UniswapX quotes, whose swap is an off-chain signed order.",
+			"routing": {
+				"send": {
+					"property": "approvalOnly",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swap Batching"
+					],
+					"operation": [
+						"Create Swap 5792 Transaction"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Request Gas Sponsorship",
+			"name": "requestGasSponsorship",
+			"type": "boolean",
+			"default": true,
+			"description": "Explicit opt-in to gas sponsorship for approval-only batches, mirroring /check_approval_4337. The swap flow still uses sponsorshipInfo.",
+			"routing": {
+				"send": {
+					"property": "requestGasSponsorship",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swap Batching"
+					],
+					"operation": [
+						"Create Swap 5792 Transaction"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
@@ -409,16 +459,16 @@ export const swapBatchingDescription: INodeProperties[] = [
 			"type": "options",
 			"options": [
 				{
-					"name": "1 2",
-					"value": "1.2"
-				},
-				{
 					"name": "2 0",
 					"value": "2.0"
 				},
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 2 0",
+					"value": "2.2.0"
 				}
 			],
 			"routing": {

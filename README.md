@@ -54,7 +54,7 @@ That's it. No configuration files. No code. It just works.
 ## Resources
 
 <details>
-<summary><b>Swapping</b> (8 operations)</summary>
+<summary><b>Swapping</b> (9 operations)</summary>
 
 - Post Check swap approvals
 - Post Get a quote
@@ -64,6 +64,7 @@ That's it. No configuration files. No code. It just works.
 - Get swap status
 - Post Get a limit order quote
 - Post Create swap ERC 4337 UserOperation
+- Post Create approval ERC 4337 UserOperation
 
 </details>
 

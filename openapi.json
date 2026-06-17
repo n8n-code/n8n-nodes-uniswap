@@ -1622,6 +1622,61 @@
         "x-internal": true
       }
     },
+    "/check_approval_4337": {
+      "post": {
+        "tags": [
+          "swapping"
+        ],
+        "summary": "Create approval ERC-4337 UserOperation",
+        "description": "Builds and returns an ERC-4337 v0.8 UserOperation that performs the ERC-20 approval (and any required allowance reset) needed before a swap. When `requestGasSponsorship` is `true` and a `paymasterUrl` is supplied, the backend fills the UserOperation's paymaster fields server-side and returns `sponsorMetadata`; otherwise a plain unsponsored UserOperation is returned with paymaster fields and `signature` left for the client to populate.",
+        "operationId": "check_approval_4337",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckApproval4337Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "UserOperation encoded successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckApproval4337Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/SwapUnauthorized401"
+          },
+          "404": {
+            "$ref": "#/components/responses/SwapNotFound404"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitedErr429"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErr500"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout504"
+          }
+        },
+        "x-internal": true
+      }
+    },
     "/plan": {
       "post": {
         "tags": [
@@ -2982,6 +3037,18 @@
               },
               {
                 "$ref": "#/components/schemas/BridgeQuote"
+              },
+              {
+                "$ref": "#/components/schemas/DutchQuote"
+              },
+              {
+                "$ref": "#/components/schemas/DutchQuoteV2"
+              },
+              {
+                "$ref": "#/components/schemas/DutchQuoteV3"
+              },
+              {
+                "$ref": "#/components/schemas/PriorityQuote"
               }
             ]
           },
@@ -2996,6 +3063,16 @@
           },
           "sponsorshipInfo": {
             "$ref": "#/components/schemas/SponsorshipInfo",
+            "x-internal": true
+          },
+          "approvalOnly": {
+            "type": "boolean",
+            "description": "Return only the ERC-20 approval call(s) for the quote's input token — no swap transaction. Required (and only supported) for UniswapX quotes, whose swap is an off-chain signed order.",
+            "x-internal": true
+          },
+          "requestGasSponsorship": {
+            "type": "boolean",
+            "description": "Explicit opt-in to gas sponsorship for approval-only batches, mirroring /check_approval_4337. The swap flow still uses sponsorshipInfo.",
             "x-internal": true
           }
         },
@@ -3114,12 +3191,102 @@
           "gasSponsored"
         ]
       },
+      "CheckApproval4337Request": {
+        "type": "object",
+        "description": "Request body for building an ERC-4337 UserOperation that performs a token approval, optionally gas-sponsored.",
+        "properties": {
+          "sender": {
+            "$ref": "#/components/schemas/Address",
+            "description": "Smart account address that will execute the UserOperation."
+          },
+          "token": {
+            "$ref": "#/components/schemas/inputToken"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/tokenAmount"
+          },
+          "chainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
+          "urgency": {
+            "$ref": "#/components/schemas/Urgency"
+          },
+          "requestGasSponsorship": {
+            "type": "boolean",
+            "default": false,
+            "description": "Opt in to gas sponsorship of the approval. When false a plain approval UserOperation is returned.",
+            "x-internal": true
+          },
+          "tokenOut": {
+            "$ref": "#/components/schemas/outputToken"
+          },
+          "tokenOutChainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
+          "walletExecutionContext": {
+            "$ref": "#/components/schemas/WalletExecutionContext",
+            "x-internal": true
+          },
+          "eip7702Auth": {
+            "$ref": "#/components/schemas/Eip7702Authorization"
+          },
+          "paymasterUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "When provided, selects the wallet flow: the backend fills the UserOperation's paymaster fields server-side against this paymaster.",
+            "x-internal": true
+          },
+          "paymasterServiceContext": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Opaque ERC-7677 paymaster service context forwarded to the paymaster in the wallet flow.",
+            "x-internal": true
+          }
+        },
+        "required": [
+          "sender",
+          "token",
+          "amount",
+          "chainId"
+        ]
+      },
+      "CheckApproval4337Response": {
+        "type": "object",
+        "description": "Response containing the approval ERC-4337 UserOperation. `userOperation` is omitted when no approval is required.",
+        "properties": {
+          "requestId": {
+            "$ref": "#/components/schemas/RequestId"
+          },
+          "userOperation": {
+            "$ref": "#/components/schemas/UserOperation"
+          },
+          "gasSponsored": {
+            "type": "boolean",
+            "description": "Whether gas for this approval will be sponsored.",
+            "x-internal": true
+          },
+          "gasSponsorshipRejectionReason": {
+            "type": "string",
+            "description": "Reason gas sponsorship was not granted. Present only when `gasSponsored` is `false`.",
+            "x-internal": true
+          },
+          "sponsorMetadata": {
+            "$ref": "#/components/schemas/SponsorMetadata",
+            "description": "Describes the sponsor returned by the paymaster.",
+            "x-internal": true
+          }
+        },
+        "required": [
+          "requestId",
+          "gasSponsored"
+        ]
+      },
       "UniversalRouterVersion": {
         "type": "string",
         "enum": [
-          "1.2",
           "2.0",
-          "2.1.1"
+          "2.1.1",
+          "2.2.0"
         ],
         "default": "2.0"
       },
@@ -5402,6 +5569,10 @@
             "type": "string",
             "format": "uri",
             "description": "URL the wallet holder must visit to complete KYC and become allowlisted. Always provided when isAllowlisted is false."
+          },
+          "issuer": {
+            "type": "string",
+            "description": "KYC provider display name (e.g. \"Superstate\"). Always provided when isPermissioned is true."
           }
         },
         "required": [
