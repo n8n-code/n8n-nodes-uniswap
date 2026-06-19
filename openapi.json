@@ -1628,7 +1628,7 @@
           "swapping"
         ],
         "summary": "Create approval ERC-4337 UserOperation",
-        "description": "Builds and returns an ERC-4337 v0.8 UserOperation that performs the ERC-20 approval (and any required allowance reset) needed before a swap. When `requestGasSponsorship` is `true` and a `paymasterUrl` is supplied, the backend fills the UserOperation's paymaster fields server-side and returns `sponsorMetadata`; otherwise a plain unsponsored UserOperation is returned with paymaster fields and `signature` left for the client to populate.",
+        "description": "Builds and returns an ERC-4337 v0.8 UserOperation that performs the ERC-20 approval (and any required allowance reset) needed before a swap. Paymaster fields and `signature` are left for the client to populate. When `sponsorshipInfo.sponsored` is `true`, the approval is tagged for sponsorship and a `paymasterServiceContext` envelope is returned for the client to forward to the paymaster.",
         "operationId": "check_approval_4337",
         "security": [
           {
@@ -3069,11 +3069,6 @@
             "type": "boolean",
             "description": "Return only the ERC-20 approval call(s) for the quote's input token — no swap transaction. Required (and only supported) for UniswapX quotes, whose swap is an off-chain signed order.",
             "x-internal": true
-          },
-          "requestGasSponsorship": {
-            "type": "boolean",
-            "description": "Explicit opt-in to gas sponsorship for approval-only batches, mirroring /check_approval_4337. The swap flow still uses sponsorshipInfo.",
-            "x-internal": true
           }
         },
         "required": [
@@ -3211,12 +3206,6 @@
           "urgency": {
             "$ref": "#/components/schemas/Urgency"
           },
-          "requestGasSponsorship": {
-            "type": "boolean",
-            "default": false,
-            "description": "Opt in to gas sponsorship of the approval. When false a plain approval UserOperation is returned.",
-            "x-internal": true
-          },
           "tokenOut": {
             "$ref": "#/components/schemas/outputToken"
           },
@@ -3230,16 +3219,8 @@
           "eip7702Auth": {
             "$ref": "#/components/schemas/Eip7702Authorization"
           },
-          "paymasterUrl": {
-            "type": "string",
-            "format": "uri",
-            "description": "When provided, selects the wallet flow: the backend fills the UserOperation's paymaster fields server-side against this paymaster.",
-            "x-internal": true
-          },
-          "paymasterServiceContext": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Opaque ERC-7677 paymaster service context forwarded to the paymaster in the wallet flow.",
+          "sponsorshipInfo": {
+            "$ref": "#/components/schemas/SponsorshipInfo",
             "x-internal": true
           }
         },
@@ -3270,9 +3251,8 @@
             "description": "Reason gas sponsorship was not granted. Present only when `gasSponsored` is `false`.",
             "x-internal": true
           },
-          "sponsorMetadata": {
-            "$ref": "#/components/schemas/SponsorMetadata",
-            "description": "Describes the sponsor returned by the paymaster.",
+          "paymasterServiceContext": {
+            "$ref": "#/components/schemas/PaymasterServiceContext",
             "x-internal": true
           }
         },

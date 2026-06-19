@@ -383,31 +383,6 @@ export const swapBatchingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Request Gas Sponsorship",
-			"name": "requestGasSponsorship",
-			"type": "boolean",
-			"default": true,
-			"description": "Explicit opt-in to gas sponsorship for approval-only batches, mirroring /check_approval_4337. The swap flow still uses sponsorshipInfo.",
-			"routing": {
-				"send": {
-					"property": "requestGasSponsorship",
-					"propertyInDotNotation": false,
-					"type": "body",
-					"value": "={{ $value }}"
-				}
-			},
-			"displayOptions": {
-				"show": {
-					"resource": [
-						"Swap Batching"
-					],
-					"operation": [
-						"Create Swap 5792 Transaction"
-					]
-				}
-			}
-		},
-		{
 			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",

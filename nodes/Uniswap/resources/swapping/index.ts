@@ -114,7 +114,7 @@ export const swappingDescription: INodeProperties[] = [
 					"name": "Check Approval 4337",
 					"value": "Check Approval 4337",
 					"action": "Create approval ERC-4337 UserOperation",
-					"description": "Builds and returns an ERC-4337 v0.8 UserOperation that performs the ERC-20 approval (and any required allowance reset) needed before a swap. When `requestGasSponsorship` is `true` and a `paymasterUrl` is supplied, the backend fills the UserOperation's paymaster fields server-side and returns `sponsorMetadata`; otherwise a plain unsponsored UserOperation is returned with paymaster fields and `signature` left for the client to populate.",
+					"description": "Builds and returns an ERC-4337 v0.8 UserOperation that performs the ERC-20 approval (and any required allowance reset) needed before a swap. Paymaster fields and `signature` are left for the client to populate. When `sponsorshipInfo.sponsored` is `true`, the approval is tagged for sponsorship and a `paymasterServiceContext` envelope is returned for the client to forward to the paymaster.",
 					"routing": {
 						"request": {
 							"method": "POST",
@@ -3589,31 +3589,6 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Request Gas Sponsorship",
-			"name": "requestGasSponsorship",
-			"type": "boolean",
-			"default": false,
-			"description": "Opt in to gas sponsorship of the approval. When false a plain approval UserOperation is returned.",
-			"routing": {
-				"send": {
-					"property": "requestGasSponsorship",
-					"propertyInDotNotation": false,
-					"type": "body",
-					"value": "={{ $value }}"
-				}
-			},
-			"displayOptions": {
-				"show": {
-					"resource": [
-						"Swapping"
-					],
-					"operation": [
-						"Check Approval 4337"
-					]
-				}
-			}
-		},
-		{
 			"displayName": "Token Out",
 			"name": "tokenOut",
 			"type": "string",
@@ -3816,39 +3791,14 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Paymaster URL",
-			"name": "paymasterUrl",
-			"type": "string",
-			"default": "",
-			"description": "When provided, selects the wallet flow: the backend fills the UserOperation's paymaster fields server-side against this paymaster.",
-			"routing": {
-				"send": {
-					"property": "paymasterUrl",
-					"propertyInDotNotation": false,
-					"type": "body",
-					"value": "={{ $value }}"
-				}
-			},
-			"displayOptions": {
-				"show": {
-					"resource": [
-						"Swapping"
-					],
-					"operation": [
-						"Check Approval 4337"
-					]
-				}
-			}
-		},
-		{
-			"displayName": "Paymaster Service Context",
-			"name": "paymasterServiceContext",
+			"displayName": "Sponsorship Info",
+			"name": "sponsorshipInfo",
 			"type": "json",
-			"default": "{}",
-			"description": "Opaque ERC-7677 paymaster service context forwarded to the paymaster in the wallet flow.",
+			"default": "{\n  \"campaign\": {},\n  \"sponsorMetadata\": {}\n}",
+			"description": "Gas sponsorship information for the quoted swap. When `sponsored` is `true`, gas fees for executing this swap will be covered by the sponsor described in `sponsorMetadata`, under the campaign described in `campaign`. When `sponsored` is `false`, `rejectionReason` describes why sponsorship was not granted.",
 			"routing": {
 				"send": {
-					"property": "paymasterServiceContext",
+					"property": "sponsorshipInfo",
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ JSON.parse($value) }}"
