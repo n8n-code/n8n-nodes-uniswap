@@ -3292,7 +3292,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "Sponsorship Info",
 			"name": "sponsorshipInfo",
 			"type": "json",
-			"default": "{\n  \"campaign\": {},\n  \"sponsorMetadata\": {}\n}",
+			"default": "{\n  \"campaign\": {\n    \"allowances\": [\n      {}\n    ],\n    \"eligibleChains\": [\n      null\n    ]\n  },\n  \"sponsorMetadata\": {}\n}",
 			"description": "Gas sponsorship information for the quoted swap. When `sponsored` is `true`, gas fees for executing this swap will be covered by the sponsor described in `sponsorMetadata`, under the campaign described in `campaign`. When `sponsored` is `false`, `rejectionReason` describes why sponsorship was not granted.",
 			"routing": {
 				"send": {
@@ -3794,7 +3794,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "Sponsorship Info",
 			"name": "sponsorshipInfo",
 			"type": "json",
-			"default": "{\n  \"campaign\": {},\n  \"sponsorMetadata\": {}\n}",
+			"default": "{\n  \"campaign\": {\n    \"allowances\": [\n      {}\n    ],\n    \"eligibleChains\": [\n      null\n    ]\n  },\n  \"sponsorMetadata\": {}\n}",
 			"description": "Gas sponsorship information for the quoted swap. When `sponsored` is `true`, gas fees for executing this swap will be covered by the sponsor described in `sponsorMetadata`, under the campaign described in `campaign`. When `sponsored` is `false`, `rejectionReason` describes why sponsorship was not granted.",
 			"routing": {
 				"send": {
