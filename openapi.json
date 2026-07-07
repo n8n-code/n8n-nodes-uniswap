@@ -1524,7 +1524,7 @@
                     "sigDeadline": "1776874465"
                   }
                 },
-                "smartContractDelegationAddress": "0x000000009b1d0af20d8c6d0a44e162d11f9b8f00"
+                "smartContractDelegationAddress": "0x000000005c84f8fd50b21cac312528a64437030e"
               }
             }
           }
@@ -2746,13 +2746,13 @@
                 "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421": {
                   "1": {
                     "isWalletDelegatedToUniswap": true,
-                    "currentDelegationAddress": "0x000000009b1d0af20d8c6d0a44e162d11f9b8f00",
-                    "latestDelegationAddress": "0x000000009b1d0af20d8c6d0a44e162d11f9b8f00"
+                    "currentDelegationAddress": "0x000000005c84f8fd50b21cac312528a64437030e",
+                    "latestDelegationAddress": "0x000000005c84f8fd50b21cac312528a64437030e"
                   },
                   "8453": {
                     "isWalletDelegatedToUniswap": true,
-                    "currentDelegationAddress": "0x000000009b1d0af20d8c6d0a44e162d11f9b8f00",
-                    "latestDelegationAddress": "0x000000009b1d0af20d8c6d0a44e162d11f9b8f00"
+                    "currentDelegationAddress": "0x000000005c84f8fd50b21cac312528a64437030e",
+                    "latestDelegationAddress": "0x000000005c84f8fd50b21cac312528a64437030e"
                   }
                 }
               }
@@ -3391,6 +3391,10 @@
           },
           "routing": {
             "$ref": "#/components/schemas/Routing"
+          },
+          "isTokenApprovalApplicable": {
+            "type": "boolean",
+            "description": "Whether an ERC-20 token approval is applicable to this swap's input. `true` when the routing pulls the input token via an allowance, so an approval may be required — verify (or orchestrate) it via `/check_approval`. `false` when no approval is ever needed for this route (e.g. native-currency input, wrap/unwrap, or a native-gas-token input paid as native value). Reflects the routing mechanism, not the swapper's current on-chain allowance. If absent, assume an approval is applicable."
           },
           "permitTransaction": {
             "$ref": "#/components/schemas/TransactionRequest"
@@ -4106,6 +4110,7 @@
           42161,
           42220,
           43114,
+          57073,
           59144,
           81457,
           7777777,
