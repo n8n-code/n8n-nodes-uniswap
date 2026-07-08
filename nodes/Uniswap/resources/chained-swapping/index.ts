@@ -109,7 +109,7 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			"displayName": "Quote",
 			"name": "quote",
 			"type": "json",
-			"default": "{\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"minimumAmount\": {}\n  },\n  \"tokenInChainId\": 1,\n  \"tokenOutChainId\": {},\n  \"tradeType\": \"EXACT_INPUT\",\n  \"gasEstimates\": [\n    null\n  ],\n  \"protocols\": [\n    null\n  ],\n  \"gasStrategies\": [\n    {}\n  ],\n  \"steps\": [\n    {\n      \"tokenIn\": {},\n      \"tokenInChainId\": {},\n      \"tokenOut\": {},\n      \"tokenOutChainId\": {}\n    }\n  ],\n  \"slippageTolerance\": {}\n}",
+			"default": "{\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"minimumAmount\": {}\n  },\n  \"tokenInChainId\": 1,\n  \"tokenOutChainId\": {},\n  \"tradeType\": \"EXACT_INPUT\",\n  \"gasEstimates\": [\n    null\n  ],\n  \"protocols\": [\n    null\n  ],\n  \"gasStrategies\": [\n    {}\n  ],\n  \"steps\": [\n    {\n      \"tokenIn\": {},\n      \"tokenInChainId\": {},\n      \"tokenOut\": {},\n      \"tokenOutChainId\": {}\n    }\n  ],\n  \"slippageTolerance\": {},\n  \"earnIntent\": {\n    \"chainId\": {},\n    \"underlyingAsset\": {},\n    \"requestedAssets\": {},\n    \"preview\": {\n      \"depositAssets\": [\n        {\n          \"token\": {},\n          \"chainId\": {},\n          \"amount\": {}\n        }\n      ],\n      \"estimatedSharesOut\": {}\n    }\n  },\n  \"earnPreview\": {}\n}",
 			"description": "A quote for a chained transaction flow that spans multiple steps, potentially across multiple chains.",
 			"routing": {
 				"send": {
@@ -167,6 +167,31 @@ export const chainedSwappingDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Chained Swapping"
+					],
+					"operation": [
+						"Create Plan"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Earn Intent",
+			"name": "earnIntent",
+			"type": "json",
+			"default": "{\n  \"chainId\": 1\n}",
+			"description": "Earn vault intent supplied on /quote and repeated on /plan. Earn currently supports the allowlisted Mainnet Morpho vaults.",
+			"routing": {
+				"send": {
+					"property": "earnIntent",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
 				}
 			},
 			"displayOptions": {

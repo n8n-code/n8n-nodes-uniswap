@@ -129,7 +129,7 @@
           "swapping"
         ],
         "summary": "Get a quote",
-        "description": "Requests a quote according to the specified swap parameters. This endpoint may be used to get a quote for a swap, a bridge, or a wrap/unwrap. The resulting response includes a quote for the swap and the proposed route by which the quote was achieved. The response will also include estimated gas fees for the proposed quote route. If the proposed route is via a Uniswap Protocol pool, the response may include a permit2 message for the swapper to sign prior to making a /swap request. The proposed route will also be simulated. If the simulation fails, the response will include an error message or `txFailureReason`.\n\nCertain routing options may be whitelisted by the requestor through the use of the `protocols` field. Further, the requestor may ask for the best price route or for the fastest price route through the 'routingPreference' field. Note that the fastest price route refers to the speed with which a quote is returned, not the number of transactions that may be required to get from the input token and chain to the output token and chain. Further note that all `routingPreference` values except for `FASTEST` and `BEST_PRICE` are deprecated. For more information on the `protocols` and `routingPreference` fields, see the [Token Trading Workflow](https://uniswap-docs.readme.io/reference/trading-flow#swap-routing) explanation of Swap Routing.\n\nAPI integrators using this API for the benefit of customer end users may request a service fee be taken from the output token and deposited to a fee collection address. To request this, please reach out to your Uniswap Labs contact. This optional fee is associated to the API key and is always taken from the output token. Note if there is a fee and the `type` is `EXACT_INPUT`, the output amount quoted will **not** include the fee subtraction. If there is a fee and the `type` is `EXACT_OUTPUT`, the input amount quoted will **not** include the fee addition. Instead, in both cases, the fee will be recorded in the `portionBips` and `portionAmount` fields.\n\nNative ETH on UniswapX: UniswapX routes (e.g. `DUTCH_V2`, `DUTCH_V3`, `PRIORITY`) can use native ETH as the input token by setting `tokenIn` to the native currency address (e.g. `0x0000000000000000000000000000000000000000`) and passing `x-erc20eth-enabled: true`. Native ETH input on UniswapX requires wallet support for EIP-7914, a smart wallet activated on your desired network, and a sufficient native allowance (set via /swap_7702 if x-erc20eth-enabled header is set to `true`). If these requirements are not met, UniswapX quotes for native input may be omitted and the response may fall back to `CLASSIC` routing instead.",
+        "description": "Requests a quote according to the specified swap parameters. This endpoint may be used to get a quote for a swap, a bridge, or a wrap/unwrap. The resulting response includes a quote for the swap and the proposed route by which the quote was achieved. The response will also include estimated gas fees for the proposed quote route. If the proposed route is via a Uniswap Protocol pool, the response may include a permit2 message for the swapper to sign prior to making a /swap request. The proposed route will also be simulated. If the simulation fails, the response will include an error message or `txFailureReason`.\n\nCertain routing options may be whitelisted by the requestor through the use of the `protocols` field. Further, the requestor may ask for the best price route or for the fastest price route through the 'routingPreference' field. Note that the fastest price route refers to the speed with which a quote is returned, not the number of transactions that may be required to get from the input token and chain to the output token and chain. Further note that all `routingPreference` values except for `FASTEST` and `BEST_PRICE` are deprecated. For more information on the `protocols` and `routingPreference` fields, see the [Token Trading Workflow](https://uniswap-docs.readme.io/reference/trading-flow#swap-routing) explanation of Swap Routing.\n\nAPI integrators using this API for the benefit of customer end users may request a service fee be taken from the output token and deposited to a fee collection address. To request this, please reach out to your Uniswap Labs contact. This optional fee is associated to the API key and is always taken from the output token. Note if there is a fee and the `type` is `EXACT_INPUT`, the output amount quoted will **not** include the fee subtraction. If there is a fee and the `type` is `EXACT_OUTPUT`, the input amount quoted will **not** include the fee addition. Instead, in both cases, the fee will be recorded in the `aggregatedOutputs` field.\n\nNative ETH on UniswapX: UniswapX routes (e.g. `DUTCH_V2`, `DUTCH_V3`, `PRIORITY`) can use native ETH as the input token by setting `tokenIn` to the native currency address (e.g. `0x0000000000000000000000000000000000000000`) and passing `x-erc20eth-enabled: true`. Native ETH input on UniswapX requires wallet support for EIP-7914, a smart wallet activated on your desired network, and a sufficient native allowance (set via /swap_7702 if x-erc20eth-enabled header is set to `true`). If these requirements are not met, UniswapX quotes for native input may be omitted and the response may fall back to `CLASSIC` routing instead.",
         "operationId": "aggregator_quote",
         "security": [
           {
@@ -414,19 +414,18 @@
                       "token": "0x0000000000000000000000000000000000000000",
                       "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                       "bps": 9975,
-                      "minAmount": "993829944455360"
+                      "minAmount": "993829944455360",
+                      "fee": false
                     },
                     {
                       "amount": "2490801865802",
                       "token": "0x0000000000000000000000000000000000000000",
                       "recipient": "0x000000fee13a103A10D593b9AE06b3e05F2E7E1c",
                       "bps": 25,
-                      "minAmount": "2490801865802"
+                      "minAmount": "2490801865802",
+                      "fee": true
                     }
-                  ],
-                  "portionAmount": "2490801865802",
-                  "portionBips": 25,
-                  "portionRecipient": "0x000000fee13a103A10D593b9AE06b3e05F2E7E1c"
+                  ]
                 },
                 "permitData": {
                   "domain": {
@@ -1301,7 +1300,8 @@
                       "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                       "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                       "bps": 10000,
-                      "minAmount": "1949892"
+                      "minAmount": "1949892",
+                      "fee": false
                     }
                   ]
                 },
@@ -1469,7 +1469,8 @@
                       "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                       "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                       "bps": 10000,
-                      "minAmount": "1949892"
+                      "minAmount": "1949892",
+                      "fee": false
                     }
                   ]
                 },
@@ -2046,19 +2047,18 @@
                     "token": "0x0000000000000000000000000000000000000000",
                     "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                     "bps": 9975,
-                    "minAmount": "993829944455360"
+                    "minAmount": "993829944455360",
+                    "fee": false
                   },
                   {
                     "amount": "2490801865802",
                     "token": "0x0000000000000000000000000000000000000000",
                     "recipient": "0x000000fee13a103A10D593b9AE06b3e05F2E7E1c",
                     "bps": 25,
-                    "minAmount": "2490801865802"
+                    "minAmount": "2490801865802",
+                    "fee": true
                   }
-                ],
-                "portionAmount": "2490801865802",
-                "portionBips": 25,
-                "portionRecipient": "0x000000fee13a103A10D593b9AE06b3e05F2E7E1c"
+                ]
               },
               "permitData": {
                 "domain": {
@@ -3793,6 +3793,10 @@
           "walletExecutionContext": {
             "$ref": "#/components/schemas/WalletExecutionContext",
             "x-internal": true
+          },
+          "earnIntent": {
+            "$ref": "#/components/schemas/EarnIntent",
+            "x-internal": true
           }
         },
         "required": [
@@ -4717,15 +4721,6 @@
           "output": {
             "$ref": "#/components/schemas/QuoteOutput"
           },
-          "portionBips": {
-            "$ref": "#/components/schemas/portionBips"
-          },
-          "portionAmount": {
-            "$ref": "#/components/schemas/portionAmount"
-          },
-          "portionRecipient": {
-            "$ref": "#/components/schemas/portionAmountReceiverAddress"
-          },
           "quoteId": {
             "$ref": "#/components/schemas/quoteId"
           },
@@ -4766,15 +4761,6 @@
           },
           "output": {
             "$ref": "#/components/schemas/QuoteOutput"
-          },
-          "portionBips": {
-            "$ref": "#/components/schemas/portionBips"
-          },
-          "portionAmount": {
-            "$ref": "#/components/schemas/portionAmount"
-          },
-          "portionRecipient": {
-            "$ref": "#/components/schemas/portionAmountReceiverAddress"
           },
           "quoteId": {
             "$ref": "#/components/schemas/quoteId"
@@ -4819,15 +4805,6 @@
           },
           "output": {
             "$ref": "#/components/schemas/QuoteOutput"
-          },
-          "portionBips": {
-            "$ref": "#/components/schemas/portionBips"
-          },
-          "portionAmount": {
-            "$ref": "#/components/schemas/portionAmount"
-          },
-          "portionRecipient": {
-            "$ref": "#/components/schemas/portionAmountReceiverAddress"
           },
           "quoteId": {
             "$ref": "#/components/schemas/quoteId"
@@ -4980,15 +4957,6 @@
           "output": {
             "$ref": "#/components/schemas/QuoteOutput"
           },
-          "portionBips": {
-            "$ref": "#/components/schemas/portionBips"
-          },
-          "portionAmount": {
-            "$ref": "#/components/schemas/portionAmount"
-          },
-          "portionRecipient": {
-            "$ref": "#/components/schemas/portionAmountReceiverAddress"
-          },
           "quoteId": {
             "$ref": "#/components/schemas/quoteId"
           },
@@ -5066,15 +5034,6 @@
           "gasFeeUSD": {
             "$ref": "#/components/schemas/gasFeeUSD"
           },
-          "portionBips": {
-            "$ref": "#/components/schemas/portionBips"
-          },
-          "portionAmount": {
-            "$ref": "#/components/schemas/portionAmount"
-          },
-          "portionRecipient": {
-            "$ref": "#/components/schemas/portionAmountReceiverAddress"
-          },
           "estimatedFillTimeMs": {
             "type": "number",
             "description": "The estimated time it will take to fill the order in milliseconds."
@@ -5142,11 +5101,219 @@
           "DUTCH_V3",
           "QUICKROUTE",
           "CHAINED",
+          "VAULT_DEPOSIT",
+          "VAULT_WITHDRAW",
           "APPROVAL_TXN",
           "APPROVAL_PERMIT",
           "RESET_APPROVAL_TXN"
         ],
         "description": "The type of step in a plan, including swap types and approval types."
+      },
+      "EarnAction": {
+        "x-internal": true,
+        "type": "string",
+        "enum": [
+          "deposit",
+          "withdraw"
+        ],
+        "description": "The Earn vault action to quote or plan."
+      },
+      "EarnWithdrawMode": {
+        "x-internal": true,
+        "type": "string",
+        "enum": [
+          "EXACT_ASSETS",
+          "MAX_SHARES"
+        ],
+        "description": "The ERC-4626 withdraw mode. EXACT_ASSETS withdraws the requested asset amount; MAX_SHARES redeems the owner's currently redeemable shares."
+      },
+      "EarnDestinationGasMode": {
+        "x-internal": true,
+        "type": "string",
+        "enum": [
+          "WALLET_BALANCE",
+          "SELF_FUNDED"
+        ],
+        "description": "Backend-selected funding mode for destination-chain gas on standard cross-chain Earn deposits. WALLET_BALANCE means the swapper has enough destination native gas; SELF_FUNDED means the route bridges native gas and reserves part of it for the remaining destination transactions."
+      },
+      "EarnIntent": {
+        "x-internal": true,
+        "type": "object",
+        "description": "Earn vault intent supplied on /quote and repeated on /plan. Earn currently supports the allowlisted Mainnet Morpho vaults.",
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/EarnAction"
+          },
+          "vault": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "chainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
+          "withdrawMode": {
+            "$ref": "#/components/schemas/EarnWithdrawMode"
+          }
+        },
+        "required": [
+          "action",
+          "vault",
+          "chainId"
+        ]
+      },
+      "EarnPreview": {
+        "x-internal": true,
+        "description": "Action-specific preview amounts computed while normalizing an Earn intent.",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/EarnDepositPreview"
+          },
+          {
+            "$ref": "#/components/schemas/EarnExactAssetsWithdrawPreview"
+          },
+          {
+            "$ref": "#/components/schemas/EarnMaxSharesWithdrawPreview"
+          }
+        ]
+      },
+      "EarnDepositPreview": {
+        "x-internal": true,
+        "type": "object",
+        "description": "Deposit preview. Asset amounts are vault-underlying assets, and share amounts are vault shares.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DEPOSIT"
+            ]
+          },
+          "depositAssets": {
+            "type": "array",
+            "description": "Vault underlying assets that will be deposited after any swap, bridge, wrap, or unwrap steps.",
+            "items": {
+              "$ref": "#/components/schemas/EarnPreviewDepositAsset"
+            }
+          },
+          "estimatedSharesOut": {
+            "description": "Estimated vault shares received from the deposit.",
+            "$ref": "#/components/schemas/tokenAmount"
+          }
+        },
+        "required": [
+          "type",
+          "depositAssets",
+          "estimatedSharesOut"
+        ]
+      },
+      "EarnExactAssetsWithdrawPreview": {
+        "x-internal": true,
+        "type": "object",
+        "description": "Exact-assets withdraw preview. Assets are vault-underlying assets, and shares are vault shares.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "EXACT_ASSETS_WITHDRAW"
+            ]
+          },
+          "requestedAssetsOut": {
+            "description": "Requested vault underlying assets returned by the withdraw.",
+            "$ref": "#/components/schemas/tokenAmount"
+          },
+          "estimatedSharesIn": {
+            "description": "Estimated vault shares spent to withdraw the requested assets.",
+            "$ref": "#/components/schemas/tokenAmount"
+          }
+        },
+        "required": [
+          "type",
+          "requestedAssetsOut",
+          "estimatedSharesIn"
+        ]
+      },
+      "EarnMaxSharesWithdrawPreview": {
+        "x-internal": true,
+        "type": "object",
+        "description": "Max-shares withdraw preview. Assets are vault-underlying assets, and shares are vault shares.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "MAX_SHARES_WITHDRAW"
+            ]
+          },
+          "maxRedeemableSharesIn": {
+            "description": "Vault shares spent by the max-shares redeem.",
+            "$ref": "#/components/schemas/tokenAmount"
+          },
+          "previewAssetsOut": {
+            "description": "Estimated vault underlying assets received by redeeming max redeemable shares.",
+            "$ref": "#/components/schemas/tokenAmount"
+          }
+        },
+        "required": [
+          "type",
+          "maxRedeemableSharesIn",
+          "previewAssetsOut"
+        ]
+      },
+      "EarnPreviewDepositAsset": {
+        "x-internal": true,
+        "type": "object",
+        "description": "A vault deposit input asset amount after all pre-vault routing has completed.",
+        "properties": {
+          "token": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "chainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/tokenAmount"
+          }
+        },
+        "required": [
+          "token",
+          "chainId",
+          "amount"
+        ]
+      },
+      "EarnQuoteIntent": {
+        "x-internal": true,
+        "type": "object",
+        "description": "Validated Earn intent returned by /quote and /plan. Internal vault execution metadata is kept off the public contract.",
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/EarnAction"
+          },
+          "vault": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "chainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
+          "withdrawMode": {
+            "$ref": "#/components/schemas/EarnWithdrawMode"
+          },
+          "destinationGasMode": {
+            "$ref": "#/components/schemas/EarnDestinationGasMode"
+          },
+          "underlyingAsset": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "requestedAssets": {
+            "$ref": "#/components/schemas/tokenAmount",
+            "description": "Requested underlying asset amount for EXACT_ASSETS withdraw intents."
+          },
+          "preview": {
+            "$ref": "#/components/schemas/EarnPreview"
+          }
+        },
+        "required": [
+          "action",
+          "vault",
+          "chainId",
+          "underlyingAsset"
+        ]
       },
       "AggregatedOutput": {
         "description": "An array of all outputs of the proposed transaction. This includes the swap as well as any fees collected by the API integrator. This does not include pool fees when routing is through a Uniswap Protocol pool.",
@@ -5166,6 +5333,10 @@
           },
           "minAmount": {
             "$ref": "#/components/schemas/minAmount"
+          },
+          "fee": {
+            "type": "boolean",
+            "description": "True if this output is an integrator fee (as specified by the `integratorFees` array in the /quote request); false for the core output of the swap."
           }
         }
       },
@@ -5659,15 +5830,6 @@
                 ]
               }
             }
-          },
-          "portionBips": {
-            "$ref": "#/components/schemas/portionBips"
-          },
-          "portionAmount": {
-            "$ref": "#/components/schemas/portionAmount"
-          },
-          "portionRecipient": {
-            "$ref": "#/components/schemas/portionAmountReceiverAddress"
           },
           "routeString": {
             "type": "string",
@@ -6670,19 +6832,6 @@
         "type": "string",
         "description": "A unique ID for the quote."
       },
-      "portionBips": {
-        "type": "number",
-        "multipleOf": 0.01,
-        "description": "The portion of the swap that will be taken as a fee stated in basis points. Fractional basis points are supported with up to two decimal places (e.g. 87.5 for 0.875%). The fee will be taken from the output token."
-      },
-      "portionAmount": {
-        "type": "string",
-        "description": "The portion of the swap that will be taken as a fee in the base units of the token. The fee will be taken from the output token."
-      },
-      "portionAmountReceiverAddress": {
-        "type": "string",
-        "description": "The wallet address which will receive the fee."
-      },
       "poolFee": {
         "type": "string",
         "description": "The fee of the pool in basis points."
@@ -7584,6 +7733,10 @@
           },
           "urgency": {
             "$ref": "#/components/schemas/Urgency"
+          },
+          "earnIntent": {
+            "$ref": "#/components/schemas/EarnIntent",
+            "x-internal": true
           }
         },
         "required": [
@@ -7725,6 +7878,10 @@
           },
           "autoSlippage": {
             "$ref": "#/components/schemas/AutoSlippage"
+          },
+          "earnIntent": {
+            "$ref": "#/components/schemas/EarnQuoteIntent",
+            "x-internal": true
           },
           "walletExecutionContext": {
             "$ref": "#/components/schemas/WalletExecutionContext",
@@ -7998,6 +8155,14 @@
           },
           "autoSlippage": {
             "$ref": "#/components/schemas/AutoSlippage"
+          },
+          "earnIntent": {
+            "$ref": "#/components/schemas/EarnQuoteIntent",
+            "x-internal": true
+          },
+          "earnPreview": {
+            "$ref": "#/components/schemas/EarnPreview",
+            "x-internal": true
           }
         },
         "required": [
