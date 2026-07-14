@@ -1518,6 +1518,31 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Include Route Candidates",
+			"name": "includeRouteCandidates",
+			"type": "boolean",
+			"default": true,
+			"description": "When true, uniroute-backed classic quotes include routeCandidates — the top alternative routes considered, each with its whole-route amounts.",
+			"routing": {
+				"send": {
+					"property": "includeRouteCandidates",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Aggregator Quote"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
@@ -2161,7 +2186,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "Quote",
 			"name": "quote",
 			"type": "json",
-			"default": "{\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"minimumAmount\": {}\n  },\n  \"chainId\": 1,\n  \"tradeType\": \"EXACT_INPUT\",\n  \"route\": [\n    [\n      {\n        \"type\": \"v2-pool\",\n        \"tokenIn\": {\n          \"address\": {},\n          \"chainId\": {},\n          \"sellFeeBps\": {}\n        },\n        \"tokenOut\": {},\n        \"reserve0\": {\n          \"token\": {}\n        },\n        \"reserve1\": {},\n        \"amountIn\": {},\n        \"amountOut\": {}\n      }\n    ]\n  ],\n  \"txFailureReasons\": [\n    null\n  ],\n  \"aggregatedOutputs\": [\n    {\n      \"token\": {},\n      \"amount\": {},\n      \"recipient\": {}\n    }\n  ],\n  \"swapSteps\": [\n    {\n      \"path\": [\n        null\n      ],\n      \"minHopPriceX36\": [\n        null\n      ]\n    }\n  ]\n}",
+			"default": "{\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"minimumAmount\": {}\n  },\n  \"chainId\": 1,\n  \"tradeType\": \"EXACT_INPUT\",\n  \"route\": [\n    [\n      {\n        \"type\": \"v2-pool\",\n        \"tokenIn\": {\n          \"address\": {},\n          \"chainId\": {},\n          \"sellFeeBps\": {}\n        },\n        \"tokenOut\": {},\n        \"reserve0\": {\n          \"token\": {}\n        },\n        \"reserve1\": {},\n        \"amountIn\": {},\n        \"amountOut\": {}\n      }\n    ]\n  ],\n  \"txFailureReasons\": [\n    null\n  ],\n  \"aggregatedOutputs\": [\n    {\n      \"token\": {},\n      \"amount\": {},\n      \"recipient\": {}\n    }\n  ],\n  \"swapSteps\": [\n    {\n      \"path\": [\n        null\n      ],\n      \"minHopPriceX36\": [\n        null\n      ]\n    }\n  ],\n  \"routeCandidates\": [\n    {}\n  ]\n}",
 			"routing": {
 				"send": {
 					"property": "quote",
@@ -3220,7 +3245,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "Quote",
 			"name": "quote",
 			"type": "json",
-			"default": "{\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"minimumAmount\": {}\n  },\n  \"chainId\": 1,\n  \"tradeType\": \"EXACT_INPUT\",\n  \"route\": [\n    [\n      {\n        \"type\": \"v2-pool\",\n        \"tokenIn\": {\n          \"address\": {},\n          \"chainId\": {},\n          \"sellFeeBps\": {}\n        },\n        \"tokenOut\": {},\n        \"reserve0\": {\n          \"token\": {}\n        },\n        \"reserve1\": {},\n        \"amountIn\": {},\n        \"amountOut\": {}\n      }\n    ]\n  ],\n  \"txFailureReasons\": [\n    null\n  ],\n  \"aggregatedOutputs\": [\n    {\n      \"token\": {},\n      \"amount\": {},\n      \"recipient\": {}\n    }\n  ],\n  \"swapSteps\": [\n    {\n      \"path\": [\n        null\n      ],\n      \"minHopPriceX36\": [\n        null\n      ]\n    }\n  ]\n}",
+			"default": "{\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"minimumAmount\": {}\n  },\n  \"chainId\": 1,\n  \"tradeType\": \"EXACT_INPUT\",\n  \"route\": [\n    [\n      {\n        \"type\": \"v2-pool\",\n        \"tokenIn\": {\n          \"address\": {},\n          \"chainId\": {},\n          \"sellFeeBps\": {}\n        },\n        \"tokenOut\": {},\n        \"reserve0\": {\n          \"token\": {}\n        },\n        \"reserve1\": {},\n        \"amountIn\": {},\n        \"amountOut\": {}\n      }\n    ]\n  ],\n  \"txFailureReasons\": [\n    null\n  ],\n  \"aggregatedOutputs\": [\n    {\n      \"token\": {},\n      \"amount\": {},\n      \"recipient\": {}\n    }\n  ],\n  \"swapSteps\": [\n    {\n      \"path\": [\n        null\n      ],\n      \"minHopPriceX36\": [\n        null\n      ]\n    }\n  ],\n  \"routeCandidates\": [\n    {}\n  ]\n}",
 			"routing": {
 				"send": {
 					"property": "quote",

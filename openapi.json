@@ -414,8 +414,7 @@
                       "token": "0x0000000000000000000000000000000000000000",
                       "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                       "bps": 9975,
-                      "minAmount": "993829944455360",
-                      "fee": false
+                      "minAmount": "993829944455360"
                     },
                     {
                       "amount": "2490801865802",
@@ -423,7 +422,7 @@
                       "recipient": "0x000000fee13a103A10D593b9AE06b3e05F2E7E1c",
                       "bps": 25,
                       "minAmount": "2490801865802",
-                      "fee": true
+                      "fee": "INTEGRATOR"
                     }
                   ]
                 },
@@ -1300,8 +1299,7 @@
                       "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                       "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                       "bps": 10000,
-                      "minAmount": "1949892",
-                      "fee": false
+                      "minAmount": "1949892"
                     }
                   ]
                 },
@@ -1469,8 +1467,7 @@
                       "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                       "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                       "bps": 10000,
-                      "minAmount": "1949892",
-                      "fee": false
+                      "minAmount": "1949892"
                     }
                   ]
                 },
@@ -2047,8 +2044,7 @@
                     "token": "0x0000000000000000000000000000000000000000",
                     "recipient": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                     "bps": 9975,
-                    "minAmount": "993829944455360",
-                    "fee": false
+                    "minAmount": "993829944455360"
                   },
                   {
                     "amount": "2490801865802",
@@ -2056,7 +2052,7 @@
                     "recipient": "0x000000fee13a103A10D593b9AE06b3e05F2E7E1c",
                     "bps": 25,
                     "minAmount": "2490801865802",
-                    "fee": true
+                    "fee": "INTEGRATOR"
                   }
                 ]
               },
@@ -3797,6 +3793,10 @@
           "earnIntent": {
             "$ref": "#/components/schemas/EarnIntent",
             "x-internal": true
+          },
+          "includeRouteCandidates": {
+            "type": "boolean",
+            "description": "When true, uniroute-backed classic quotes include routeCandidates — the top alternative routes considered, each with its whole-route amounts."
           }
         },
         "required": [
@@ -5335,8 +5335,11 @@
             "$ref": "#/components/schemas/minAmount"
           },
           "fee": {
-            "type": "boolean",
-            "description": "True if this output is an integrator fee (as specified by the `integratorFees` array in the /quote request); false for the core output of the swap."
+            "type": "string",
+            "enum": [
+              "INTEGRATOR"
+            ],
+            "description": "Set to INTEGRATOR when this output is an integrator fee (as specified by the `integratorFees` array in the /quote request); omitted for the core output of the swap."
           }
         }
       },
@@ -5878,8 +5881,37 @@
             "items": {
               "$ref": "#/components/schemas/SwapStep"
             }
+          },
+          "routeCandidates": {
+            "type": "array",
+            "description": "Top route candidates the router considered but did NOT serve (the served route and candidates proven unviable — simulation or trade-build failures — are excluded), best-first. Additive, opt-in via the `includeRouteCandidates` request flag; only populated for uniroute-backed quotes. May be short or empty when the route cache limits the candidate pool.",
+            "items": {
+              "$ref": "#/components/schemas/RouteCandidate"
+            }
           }
         }
+      },
+      "RouteCandidate": {
+        "type": "object",
+        "description": "A quoted route candidate with its whole-route (not per-hop) amounts.",
+        "properties": {
+          "routeString": {
+            "type": "string",
+            "description": "The candidate route in string format."
+          },
+          "quoteAmount": {
+            "type": "string",
+            "description": "The whole-route quoted amount: output amount for EXACT_INPUT, required input amount for EXACT_OUTPUT. A quoter estimate — does not carry the simulation/portion corrections applied to the served quote."
+          },
+          "quoteGasAdjusted": {
+            "type": "string",
+            "description": "The gas-adjusted whole-route amount. Omitted when gas details are unavailable."
+          }
+        },
+        "required": [
+          "routeString",
+          "quoteAmount"
+        ]
       },
       "SwapStep": {
         "x-internal": true,
