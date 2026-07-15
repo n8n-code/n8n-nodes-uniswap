@@ -1067,7 +1067,7 @@
           "utilities"
         ],
         "summary": "Get pool state",
-        "description": "Fetches detailed information about one or more liquidity pools across Uniswap V2, V3, and V4. Returns pool state including token addresses, reserves, liquidity, current tick, sqrtRatioX96, fee tier, tick spacing, and hook addresses (V4).\n\nProvide one of `poolParameters` or `poolReferences` (not both):\n- `poolParameters`: Look up pools by token pair. Provide token addresses and optional fee/tickSpacing/hooks to find matching pools.\n- `poolReferences`: Look up specific known pools by their reference identifier (pool address for V3, pool ID for V4, pair address for V2).",
+        "description": "Fetches detailed information about one or more liquidity pools across Uniswap V2, V3, and V4. Returns pool state including token addresses, reserves, liquidity, current tick, sqrtRatioX96, fee tier, tick spacing, and hook addresses (V4).\n\nProvide one of `poolParameters` or `poolReferences` (not both):\n- `poolParameters`: Look up pools by token pair. Provide token addresses and optional fee/tickSpacing/hooks to find matching pools.\n- `poolReferences`: Look up specific known pools by their reference identifier (pool address for V3, pool ID for V4, pair address for V2). Limited to 20 references per request; larger batches are rejected with a 400 RequestValidationError.\n\nPool reserves (`token0Reserves`/`token1Reserves`) are returned for V2 pools and, best-effort, for V4 pools. V4 reserves are the fee-excluded core principal computed from on-chain pool state: uncollected LP fees, donations, and hook-held assets are excluded, and for pools whose hooks perform custom accounting the value approximates swappable reserves.",
         "operationId": "pool_info",
         "security": [
           {
@@ -2511,7 +2511,9 @@
                   "tokenDecimalsB": "6",
                   "poolLiquidity": "1007803497966589811",
                   "sqrtRatioX96": "3796141369585623258184840",
-                  "currentTick": -198932
+                  "currentTick": -198932,
+                  "token0Reserves": "224201965836985417",
+                  "token1Reserves": "1004698471"
                 }
               ],
               "currentPage": 1,
@@ -7481,7 +7483,8 @@
           },
           "poolReferences": {
             "type": "array",
-            "description": "Array of pool reference identifiers to query. Each reference should include the protocol, chainId, and either the pool address (V3), pool id (V4), or pair address (V2).",
+            "description": "Array of pool reference identifiers to query. Each reference should include the protocol, chainId, and either the pool address (V3), pool id (V4), or pair address (V2). At most 20 references may be provided per request; requests exceeding this limit are rejected with a 400 RequestValidationError.",
+            "maxItems": 20,
             "items": {
               "$ref": "#/components/schemas/PoolReferenceByProtocol"
             }
@@ -7575,11 +7578,15 @@
           "currentTick": {
             "$ref": "#/components/schemas/lpTickCurrent"
           },
-          "tokenAReserves": {
-            "$ref": "#/components/schemas/tokenAmount"
+          "token0Reserves": {
+            "type": "string",
+            "description": "Pool reserves of token0, denominated in the token's base units. Populated for V2 pools (pair reserves) and V4 pools. For V4 pools this is the fee-excluded core principal computed from on-chain pool state: uncollected LP fees, donations, and hook-held assets are excluded, and for pools whose hooks perform custom accounting the value is an approximation of swappable reserves. Computed best-effort and omitted if unavailable. Not returned for V3 pools.",
+            "pattern": "^[0-9]+$"
           },
-          "tokenBReserves": {
-            "$ref": "#/components/schemas/tokenAmount"
+          "token1Reserves": {
+            "type": "string",
+            "description": "Pool reserves of token1, denominated in the token's base units. Populated for V2 pools (pair reserves) and V4 pools. For V4 pools this is the fee-excluded core principal computed from on-chain pool state: uncollected LP fees, donations, and hook-held assets are excluded, and for pools whose hooks perform custom accounting the value is an approximation of swappable reserves. Computed best-effort and omitted if unavailable. Not returned for V3 pools.",
+            "pattern": "^[0-9]+$"
           }
         }
       },

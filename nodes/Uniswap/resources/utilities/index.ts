@@ -42,7 +42,7 @@ export const utilitiesDescription: INodeProperties[] = [
 					"name": "Pool Info",
 					"value": "Pool Info",
 					"action": "Get pool state",
-					"description": "Fetches detailed information about one or more liquidity pools across Uniswap V2, V3, and V4. Returns pool state including token addresses, reserves, liquidity, current tick, sqrtRatioX96, fee tier, tick spacing, and hook addresses (V4).\n\nProvide one of `poolParameters` or `poolReferences` (not both):\n- `poolParameters`: Look up pools by token pair. Provide token addresses and optional fee/tickSpacing/hooks to find matching pools.\n- `poolReferences`: Look up specific known pools by their reference identifier (pool address for V3, pool ID for V4, pair address for V2).",
+					"description": "Fetches detailed information about one or more liquidity pools across Uniswap V2, V3, and V4. Returns pool state including token addresses, reserves, liquidity, current tick, sqrtRatioX96, fee tier, tick spacing, and hook addresses (V4).\n\nProvide one of `poolParameters` or `poolReferences` (not both):\n- `poolParameters`: Look up pools by token pair. Provide token addresses and optional fee/tickSpacing/hooks to find matching pools.\n- `poolReferences`: Look up specific known pools by their reference identifier (pool address for V3, pool ID for V4, pair address for V2). Limited to 20 references per request; larger batches are rejected with a 400 RequestValidationError.\n\nPool reserves (`token0Reserves`/`token1Reserves`) are returned for V2 pools and, best-effort, for V4 pools. V4 reserves are the fee-excluded core principal computed from on-chain pool state: uncollected LP fees, donations, and hook-held assets are excluded, and for pools whose hooks perform custom accounting the value approximates swappable reserves.",
 					"routing": {
 						"request": {
 							"method": "POST",
@@ -594,7 +594,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			"name": "poolReferences",
 			"type": "json",
 			"default": "[\n  {\n    \"chainId\": 1\n  }\n]",
-			"description": "Array of pool reference identifiers to query. Each reference should include the protocol, chainId, and either the pool address (V3), pool id (V4), or pair address (V2).",
+			"description": "Array of pool reference identifiers to query. Each reference should include the protocol, chainId, and either the pool address (V3), pool id (V4), or pair address (V2). At most 20 references may be provided per request; requests exceeding this limit are rejected with a 400 RequestValidationError.",
 			"routing": {
 				"send": {
 					"property": "poolReferences",
