@@ -69,10 +69,11 @@ That's it. No configuration files. No code. It just works.
 </details>
 
 <details>
-<summary><b>Utilities</b> (5 operations)</summary>
+<summary><b>Utilities</b> (6 operations)</summary>
 
 - Post Check token KYC permissions
 - Get bridgable tokens
+- Get supported chains
 - Post Get pool state
 - Post Get wallet delegations
 - Post Encode ERC 4337 UserOperation

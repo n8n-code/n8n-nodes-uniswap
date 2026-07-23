@@ -39,6 +39,18 @@ export const utilitiesDescription: INodeProperties[] = [
 					}
 				},
 				{
+					"name": "Get Supported Chains",
+					"value": "Get Supported Chains",
+					"action": "Get supported chains",
+					"description": "Returns the list of chains supported by the Trading API, including protocol contract addresses and the protocols and actions available on each chain.",
+					"routing": {
+						"request": {
+							"method": "GET",
+							"url": "=/supported_chains"
+						}
+					}
+				},
+				{
 					"name": "Pool Info",
 					"value": "Pool Info",
 					"action": "Get pool state",
@@ -502,6 +514,50 @@ export const utilitiesDescription: INodeProperties[] = [
 					],
 					"operation": [
 						"Get Swappable Tokens"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "GET /supported_chains",
+			"name": "operation",
+			"type": "notice",
+			"typeOptions": {
+				"theme": "info"
+			},
+			"default": "",
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Supported Chains"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "API Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Supported Chains"
 					]
 				}
 			}
