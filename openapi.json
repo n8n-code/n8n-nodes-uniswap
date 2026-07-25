@@ -3071,7 +3071,7 @@
           },
           "version": {
             "type": "string",
-            "description": "Only present where it distinguishes deployments: contract release lines (e.g. UniversalRouter 2.0/2.1.1/2.2.0, CaliburEntry tags) and same-named contracts (Quoter V3 vs V4)."
+            "description": "Only present where it distinguishes deployments: contract release lines (e.g. UniversalRouter 2.0/2.1.1/2.2.0) and same-named contracts (Quoter V3 vs V4)."
           },
           "address": {
             "type": "string"
