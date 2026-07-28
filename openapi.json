@@ -4950,6 +4950,11 @@
             "items": {
               "$ref": "#/components/schemas/AggregatedOutput"
             }
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For UniswapX orders this prefers USD parity, computed as 1 - (outputUSD + classicGasUseEstimateUSD) / inputUSD over the auction start amounts (the gas estimate is added back because the filler's gas is baked into the output), and falls back to comparing the execution price against the mid price implied by the classic quote (its execution price divided by 1 - priceImpact). Absent when neither source is available."
           }
         },
         "required": [
@@ -5000,6 +5005,11 @@
             "items": {
               "$ref": "#/components/schemas/AggregatedOutput"
             }
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For UniswapX orders this prefers USD parity, computed as 1 - (outputUSD + classicGasUseEstimateUSD) / inputUSD over the auction start amounts (the gas estimate is added back because the filler's gas is baked into the output), and falls back to comparing the execution price against the mid price implied by the classic quote (its execution price divided by 1 - priceImpact). Absent when neither source is available."
           }
         },
         "required": [
@@ -5151,6 +5161,11 @@
             "items": {
               "$ref": "#/components/schemas/AggregatedOutput"
             }
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For UniswapX orders this prefers USD parity, computed as 1 - (outputUSD + classicGasUseEstimateUSD) / inputUSD over the auction start amounts (the gas estimate is added back because the filler's gas is baked into the output), and falls back to comparing the execution price against the mid price implied by the classic quote (its execution price divided by 1 - priceImpact). Absent when neither source is available."
           }
         },
         "required": [
@@ -5221,6 +5236,11 @@
           "fillDeadline": {
             "type": "number",
             "description": "The deadline by which, if the order is not filled, the order will be reverted."
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For bridges this is the relayer fee as a percent of the input, 1 - amountOut / amountIn, computed on raw amounts since the same asset with the same decimals is bridged on both chains."
           }
         }
       },
@@ -6059,6 +6079,11 @@
             "items": {
               "$ref": "#/components/schemas/RouteCandidate"
             }
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For classic swaps this equals priceImpact, the pool-based impact reported by routing."
           }
         }
       },
@@ -6756,6 +6781,11 @@
           },
           "maxPriorityFeePerGas": {
             "$ref": "#/components/schemas/maxPriorityFeePerGas"
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. Always 0, since wraps and unwraps are 1:1."
           }
         }
       },
@@ -8288,6 +8318,11 @@
           },
           "slippage": {
             "$ref": "#/components/schemas/slippageTolerance"
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. The value for this step alone, computed according to the step's order type; the chained quote's top-level value compounds these."
           }
         },
         "required": [
@@ -8386,6 +8421,11 @@
           "earnPreview": {
             "$ref": "#/components/schemas/EarnPreview",
             "x-internal": true
+          },
+          "priceDifference": {
+            "x-internal": true,
+            "type": "number",
+            "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For chained trades this compounds the per-step values multiplicatively as 1 - product of (1 - stepValue/100) over the value-moving steps. Absent if any of those steps is missing its value."
           }
         },
         "required": [
