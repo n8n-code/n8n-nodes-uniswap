@@ -1743,6 +1743,9 @@
           "404": {
             "$ref": "#/components/responses/QuoteNotFound404"
           },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
           "429": {
             "$ref": "#/components/responses/RateLimitedErr429"
           },
