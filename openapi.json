@@ -148,6 +148,9 @@
           },
           {
             "$ref": "#/components/parameters/swapStepsEnabledHeader"
+          },
+          {
+            "$ref": "#/components/parameters/experimentalRoutingHeader"
           }
         ],
         "requestBody": {
@@ -8624,6 +8627,17 @@
         "name": "x-universal-router-swapsteps",
         "in": "header",
         "description": "Opts the request into Universal Router SwapSteps mode. Additive and opt-in: when set to `true`, the response's `ClassicQuote` may include a `swapSteps[]` array describing the Universal Router step sequence (the inputs to `SwapRouter.encodeSwaps`). The field is only populated when the GuideStar quoter wins the hybrid quote race (currently `EXACT_INPUT`; broader coverage will follow once UniRoute's transformer ships). Omitting or setting `false` preserves the existing response shape.",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "experimentalRoutingHeader": {
+        "x-internal": true,
+        "name": "x-api-experimental",
+        "in": "header",
+        "description": "Opts the query into experimental behaviors. The behaviors this header enables are not part of the stable API contract and change over time without notice. Use it only in consultation with Uniswap: it may break existing customer integrations, and it may return invalid calldata or otherwise negatively impact the end-user swap experience. Omitting the header or setting it to `false` preserves standard behavior.",
         "required": false,
         "schema": {
           "type": "boolean",

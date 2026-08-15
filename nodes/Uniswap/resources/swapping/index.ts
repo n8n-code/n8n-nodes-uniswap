@@ -739,6 +739,30 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "X API Experimental",
+			"name": "x-api-experimental",
+			"description": "Opts the query into experimental behaviors. The behaviors this header enables are not part of the stable API contract and change over time without notice. Use it only in consultation with Uniswap: it may break existing customer integrations, and it may return invalid calldata or otherwise negatively impact the end-user swap experience. Omitting the header or setting it to `false` preserves standard behavior.",
+			"default": false,
+			"type": "boolean",
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-experimental": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Aggregator Quote"
+					]
+				}
+			}
+		},
+		{
 			"required": true,
 			"displayName": "Type",
 			"name": "type",
