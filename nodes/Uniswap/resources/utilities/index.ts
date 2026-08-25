@@ -51,6 +51,18 @@ export const utilitiesDescription: INodeProperties[] = [
 					}
 				},
 				{
+					"name": "Get Tokens",
+					"value": "Get Tokens",
+					"action": "Get tokens",
+					"description": "Returns a list of tokens and their associated metadata, formatted in the style of a token list. `sort=tvl` and `sort=volume_24h` return the top `limit` tokens ranked across the requested chains, expanded to one entry per chain instance. `sort=default` (the default) returns the full Uniswap default token list; `limit` and `chainId` are ignored. `sort=bridgeable` returns all tokens with at least one bridgeable chain executable via the Uniswap API. This endpoint never returns `404`: an empty result (e.g. a ranked sort with no data for the requested chain) is a `200` with an empty `tokens` array, and internal data-source failures surface as `500`, or `504` on timeout.",
+					"routing": {
+						"request": {
+							"method": "GET",
+							"url": "=/tokens"
+						}
+					}
+				},
+				{
 					"name": "Pool Info",
 					"value": "Pool Info",
 					"action": "Get pool state",
@@ -558,6 +570,249 @@ export const utilitiesDescription: INodeProperties[] = [
 					],
 					"operation": [
 						"Get Supported Chains"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "GET /tokens",
+			"name": "operation",
+			"type": "notice",
+			"typeOptions": {
+				"theme": "info"
+			},
+			"default": "",
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Tokens"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Sort",
+			"name": "sort",
+			"default": "default",
+			"type": "options",
+			"description": "How tokens are selected and ordered. `tvl`: largest TVL first. `volume_24h`: highest 24h volume first. `default`: the Uniswap default token list (tokens.uniswap.org). `bridgeable`: tokens bridgeable via Uniswap.",
+			"options": [
+				{
+					"name": "Default",
+					"value": "default"
+				},
+				{
+					"name": "Tvl",
+					"value": "tvl"
+				},
+				{
+					"name": "Volume 24 H",
+					"value": "volume_24h"
+				},
+				{
+					"name": "Bridgeable",
+					"value": "bridgeable"
+				}
+			],
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "sort",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Tokens"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Limit",
+			"name": "limit",
+			"description": "Number of ranked tokens to return. Applies only when sort is `tvl` or `volume_24h`. Defaults to 100.",
+			"default": 100,
+			"type": "number",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "limit",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Tokens"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Chain ID",
+			"name": "chainId",
+			"default": 1,
+			"type": "options",
+			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"options": [
+				{
+					"name": "1",
+					"value": 1
+				},
+				{
+					"name": "10",
+					"value": 10
+				},
+				{
+					"name": "56",
+					"value": 56
+				},
+				{
+					"name": "130",
+					"value": 130
+				},
+				{
+					"name": "137",
+					"value": 137
+				},
+				{
+					"name": "143",
+					"value": 143
+				},
+				{
+					"name": "196",
+					"value": 196
+				},
+				{
+					"name": "324",
+					"value": 324
+				},
+				{
+					"name": "480",
+					"value": 480
+				},
+				{
+					"name": "1868",
+					"value": 1868
+				},
+				{
+					"name": "4217",
+					"value": 4217
+				},
+				{
+					"name": "4326",
+					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
+				},
+				{
+					"name": "8453",
+					"value": 8453
+				},
+				{
+					"name": "10143",
+					"value": 10143
+				},
+				{
+					"name": "42161",
+					"value": 42161
+				},
+				{
+					"name": "42220",
+					"value": 42220
+				},
+				{
+					"name": "43114",
+					"value": 43114
+				},
+				{
+					"name": "57073",
+					"value": 57073
+				},
+				{
+					"name": "59144",
+					"value": 59144
+				},
+				{
+					"name": "81457",
+					"value": 81457
+				},
+				{
+					"name": "7777777",
+					"value": 7777777
+				},
+				{
+					"name": "1301",
+					"value": 1301
+				},
+				{
+					"name": "84532",
+					"value": 84532
+				},
+				{
+					"name": "11155111",
+					"value": 11155111
+				}
+			],
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "chainId",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Tokens"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "API Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Utilities"
+					],
+					"operation": [
+						"Get Tokens"
 					]
 				}
 			}

@@ -643,6 +643,52 @@
         }
       }
     },
+    "/tokens": {
+      "get": {
+        "tags": [
+          "utilities"
+        ],
+        "summary": "Get tokens",
+        "description": "Returns a list of tokens and their associated metadata, formatted in the style of a token list. `sort=tvl` and `sort=volume_24h` return the top `limit` tokens ranked across the requested chains, expanded to one entry per chain instance. `sort=default` (the default) returns the full Uniswap default token list; `limit` and `chainId` are ignored. `sort=bridgeable` returns all tokens with at least one bridgeable chain executable via the Uniswap API. This endpoint never returns `404`: an empty result (e.g. a ranked sort with no data for the requested chain) is a `200` with an empty `tokens` array, and internal data-source failures surface as `500`, or `504` on timeout.",
+        "operationId": "get_tokens",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tokenListSortParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenListLimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/chainIdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetTokensSuccess200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitedErr429"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErr500"
+          },
+          "504": {
+            "$ref": "#/components/responses/Timeout504"
+          }
+        }
+      }
+    },
     "/limit_order_quote": {
       "post": {
         "tags": [
@@ -2886,6 +2932,45 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Err422"
+            }
+          }
+        }
+      },
+      "GetTokensSuccess200": {
+        "description": "Get tokens successful. An empty `tokens` array is a valid result when no tokens match the requested sort and chains.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/GetTokensResponse"
+            },
+            "example": {
+              "requestId": "cL_1ih66iYcEJ2g=",
+              "tokens": [
+                {
+                  "name": "USD Coin",
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "chainId": 1,
+                  "symbol": "USDC",
+                  "decimals": 6,
+                  "logoURI": "https://coin-images.coingecko.com/coins/images/6319/large/USDC.png?1769615602",
+                  "extensions": {
+                    "bridgeInfo": {
+                      "8453": {
+                        "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+                      },
+                      "42161": {
+                        "tokenAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+                      }
+                    },
+                    "safetyInfo": {
+                      "safetyLevel": "info",
+                      "safetyDescription": null,
+                      "buyFee": 0,
+                      "sellFee": 0
+                    }
+                  }
+                }
+              ]
             }
           }
         }
@@ -8590,6 +8675,110 @@
           "priceInflationFactor",
           "percentileThresholdFor1559Fee"
         ]
+      },
+      "TokenListSort": {
+        "type": "string",
+        "description": "How tokens are selected and ordered. `tvl`: largest TVL first. `volume_24h`: highest 24h volume first. `default`: the Uniswap default token list (tokens.uniswap.org). `bridgeable`: tokens bridgeable via Uniswap.",
+        "enum": [
+          "default",
+          "tvl",
+          "volume_24h",
+          "bridgeable"
+        ],
+        "default": "default"
+      },
+      "TokenListBridgeInfo": {
+        "type": "object",
+        "description": "Map of chainId to the token's counterpart address on that chain.",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "tokenAddress": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        }
+      },
+      "TokenListSafetyInfo": {
+        "type": "object",
+        "properties": {
+          "safetyLevel": {
+            "type": "string",
+            "description": "Derived from Uniswap-hosted token list membership: `verified` if the token is on the [default token list](https://tokens.uniswap.org), `blocked` if it is on the [unsupported token list](https://unsupportedtokens.uniswap.org), `info` if it is on neither.",
+            "enum": [
+              "verified",
+              "info",
+              "blocked"
+            ]
+          },
+          "safetyDescription": {
+            "type": "string",
+            "nullable": true,
+            "description": "Populated only when safetyLevel is `info`; null otherwise."
+          },
+          "buyFee": {
+            "type": "number",
+            "description": "Token buy fee as a percent. 0 when no fee or unknown."
+          },
+          "sellFee": {
+            "type": "number",
+            "description": "Token sell fee as a percent. 0 when no fee or unknown."
+          }
+        }
+      },
+      "TokenListEntry": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the token."
+          },
+          "address": {
+            "type": "string",
+            "description": "The token's address in its chain's native format. Not limited to EVM 0x addresses: `sort=default` mirrors the hosted token list, which includes non-EVM entries (e.g. Solana base58 addresses)."
+          },
+          "chainId": {
+            "type": "number",
+            "description": "The unique ID of the blockchain the entry lives on. Not limited to chains supported for trading: `sort=default` mirrors the hosted token list, which includes non-EVM chains (e.g. Solana)."
+          },
+          "symbol": {
+            "$ref": "#/components/schemas/tokenSymbol"
+          },
+          "decimals": {
+            "type": "number",
+            "description": "The number of decimals supported by the token."
+          },
+          "logoURI": {
+            "type": "string",
+            "nullable": true,
+            "description": "URI of the token logo. Null when no logo is available."
+          },
+          "extensions": {
+            "type": "object",
+            "properties": {
+              "bridgeInfo": {
+                "$ref": "#/components/schemas/TokenListBridgeInfo"
+              },
+              "safetyInfo": {
+                "$ref": "#/components/schemas/TokenListSafetyInfo"
+              }
+            }
+          }
+        }
+      },
+      "GetTokensResponse": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "$ref": "#/components/schemas/RequestId"
+          },
+          "tokens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TokenListEntry"
+            }
+          }
+        }
       }
     },
     "parameters": {
@@ -8791,6 +8980,26 @@
         "example": [
           "0xd47b609961a02483c9516d1f326244357e7e0b1d91569ebb4d119dff17e47330"
         ]
+      },
+      "tokenListSortParam": {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "$ref": "#/components/schemas/TokenListSort"
+        },
+        "required": false
+      },
+      "tokenListLimitParam": {
+        "name": "limit",
+        "in": "query",
+        "description": "Number of ranked tokens to return. Applies only when sort is `tvl` or `volume_24h`. Defaults to 100.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 100
+        },
+        "required": false
       }
     },
     "securitySchemes": {
