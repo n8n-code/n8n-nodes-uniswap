@@ -1672,6 +1672,11 @@
         "responses": {
           "200": {
             "description": "UserOperation encoded successfully.",
+            "headers": {
+              "x-universal-router-version": {
+                "$ref": "#/components/headers/universalRouterVersionHeader"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2062,6 +2067,11 @@
       },
       "QuoteSuccess200": {
         "description": "Quote request successful.",
+        "headers": {
+          "x-universal-router-version": {
+            "$ref": "#/components/headers/universalRouterVersionHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2271,6 +2281,11 @@
       },
       "CreateSwapSuccess200": {
         "description": "Create swap successful.",
+        "headers": {
+          "x-universal-router-version": {
+            "$ref": "#/components/headers/universalRouterVersionHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2572,6 +2587,11 @@
       },
       "CreateSwap5792Success200": {
         "description": "Create 5792 swap successful.",
+        "headers": {
+          "x-universal-router-version": {
+            "$ref": "#/components/headers/universalRouterVersionHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2605,6 +2625,11 @@
       },
       "CreateSwap7702Success200": {
         "description": "Create 7702 swap successful.",
+        "headers": {
+          "x-universal-router-version": {
+            "$ref": "#/components/headers/universalRouterVersionHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -8778,6 +8803,15 @@
               "$ref": "#/components/schemas/TokenListEntry"
             }
           }
+        }
+      }
+    },
+    "headers": {
+      "universalRouterVersionHeader": {
+        "description": "The version of the Universal Router the response was produced for. Always returned, whether the caller supplied `x-universal-router-version` on the request or the chain-specific default was applied.",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/UniversalRouterVersion"
         }
       }
     },
