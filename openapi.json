@@ -5412,9 +5412,10 @@
           "VAULT_WITHDRAW",
           "APPROVAL_TXN",
           "APPROVAL_PERMIT",
-          "RESET_APPROVAL_TXN"
+          "RESET_APPROVAL_TXN",
+          "MARGIN_EXECUTE"
         ],
-        "description": "The type of step in a plan, including swap types and approval types."
+        "description": "The type of step in a plan, including swap types, approval types, and margin types."
       },
       "EarnAction": {
         "x-internal": true,
