@@ -1985,6 +1985,99 @@
         },
         "x-internal": true
       }
+    },
+    "/margin/markets": {
+      "get": {
+        "operationId": "MarginMarkets",
+        "summary": "Discover the margin markets a chain can trade",
+        "description": "The market picker's feed. One row per `(exposureToken, counterToken, direction)`.\n\n**Indicative by construction, and that is the point.** Rates move every block, so no listing agrees with a quote taken seconds later. The quote re-reads on chain and stamps its bounds into router calldata, so a stale row costs a re-quote and never a bad execution. That is what makes this endpoint cacheable.\n\n**The ceiling is NOT indicative.** `maxLeverage` comes from the same policy function the quote refuses on, applied to the same `maxLtv` the support check read, so a picker cannot offer a leverage the quote will reject. Never recompute it client-side from `lltv`: the LTV cliff buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%.\n\n**Each market yields BOTH readings.** A venue market is a (collateral, debt) pair, and the same on-chain position is a long of its collateral and a short of its debt. Shorting a token is only expressible as a market whose debt it is, so emitting one reading would leave a caller unable to find the side they wanted.\n\n**Always paginated**, on the same contract as `GET /orders` and `GET /plans`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out. There is no unbounded response. Not user-scoped, so there is no `swapper`.\n\n`borrowRate`, `availableBorrowLiquidity`, `oraclePrice` and `feeBps` are not populated yet and are absent rather than zero, since a zero rate and an unread rate are different facts.",
+        "parameters": [
+          {
+            "name": "chainId",
+            "in": "query",
+            "required": true,
+            "description": "The chain the markets live on.",
+            "schema": {
+              "$ref": "#/components/schemas/ChainId"
+            }
+          },
+          {
+            "name": "exposureToken",
+            "in": "query",
+            "required": false,
+            "description": "Narrows to rows whose exposure is this token, in TRADER terms: it is the market's collateral on a LONG row and its debt on a SHORT one.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "counterToken",
+            "in": "query",
+            "required": false,
+            "description": "Narrows to rows whose counter side is this token.",
+            "schema": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "description": "Narrows to one side.",
+            "schema": {
+              "$ref": "#/components/schemas/MarginDirection"
+            }
+          },
+          {
+            "name": "venues",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated LENDING allowlist, e.g. `MORPHO,AAVE_V3`. A named subset also re-decides `headlineVenue` over that subset, so it filters the answer and not only the search. An unrecognised value is a 400 rather than a silent drop, since answering over a different set than was asked for is undetectable by the caller.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Opaque. Echo `nextCursor` back verbatim to get the following page. A KEYSET cursor over the row order, not an offset: the catalogue is rebuilt on a timer, and an offset taken against one build silently skips or repeats rows against the next. A cursor that does not decode is a 400 `MARGIN_INVALID_CURSOR` rather than a silent restart, which would loop a client forever.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Rows per page. Defaults to 20 and caps at 20, matching `GET /orders` and `GET /plans`, so a client that already pages those needs no second set of rules. **Every** response is bounded whether or not a caller asks: nothing about this endpoint limits its own size, and the row count grows whenever governance allows a market.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The markets this chain can trade.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarginMarketsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/MarginBadRequest400"
+          },
+          "503": {
+            "$ref": "#/components/responses/MarginUnavailable503"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5413,7 +5506,8 @@
           "APPROVAL_TXN",
           "APPROVAL_PERMIT",
           "RESET_APPROVAL_TXN",
-          "MARGIN_EXECUTE"
+          "MARGIN_EXECUTE",
+          "SWAP_BRIDGE"
         ],
         "description": "The type of step in a plan, including swap types, approval types, and margin types."
       },
@@ -8805,6 +8899,116 @@
             }
           }
         }
+      },
+      "MarginDirection": {
+        "type": "string",
+        "enum": [
+          "LONG",
+          "SHORT"
+        ],
+        "description": "Which side of the pair the position is exposed to. `LONG` borrows the counter token and buys the exposure token, so collateral is the exposure token and debt is the counter token. `SHORT` borrows the exposure token and sells it for the counter token, so collateral is the counter token and debt is the exposure token. The market is always addressed in trader terms: a client never sends a collateral/debt pair and never reorders `exposureToken`/`counterToken` to mean short."
+      },
+      "MarginMarketRow": {
+        "type": "object",
+        "description": "One row per (exposureToken, counterToken, direction). A venue market is a (collateral, debt) pair, and each one produces BOTH readings: the same on-chain position is a long of its collateral and a short of its debt, and shorting a token is only ever expressible as a market whose debt it is. Carries no `oraclePrice`: a mark belongs to a VENUE's oracle and two venues on one market need not agree, so a row-level price is a number no venue necessarily quoted. Carries no `feeBps` either: a pool fee tier is not a cost, since a 5bps pool with thin liquidity fills worse than a 30bps pool with depth. `effectivePrice` on a quote answers that, carrying the fee and the impact together.",
+        "properties": {
+          "exposureToken": {
+            "$ref": "#/components/schemas/MarginTokenMetadata"
+          },
+          "counterToken": {
+            "$ref": "#/components/schemas/MarginTokenMetadata"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/MarginDirection"
+          },
+          "headlineVenue": {
+            "$ref": "#/components/schemas/MarginVenue"
+          },
+          "maxLeverage": {
+            "type": "string"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MarginMarketVenue"
+            }
+          }
+        }
+      },
+      "MarginMarketVenue": {
+        "type": "object",
+        "description": "What one venue offers for a pair, for the advanced breakdown. The scalars beside `venues` on the row are the HEADLINE venue's; read `headlineVenue` rather than matching them back.",
+        "properties": {
+          "venue": {
+            "$ref": "#/components/schemas/MarginVenue"
+          },
+          "adapter": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "venueMarketId": {
+            "type": "string",
+            "description": "Morpho's market id. Absent where the (adapter, pair) IS the market."
+          },
+          "maxLeverage": {
+            "type": "string",
+            "description": "Decimal string, derived from the venue's BORROW-side LTV with the LTV cliff buffer already applied. Server-authored: a client must not compute this from `lltv`, or its ceiling and the quote's refusal disagree. Note the buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%."
+          },
+          "lltv": {
+            "type": "string",
+            "description": "The liquidation boundary itself, 18-decimal fixed point. Shown, never used to derive the ceiling."
+          },
+          "borrowRate": {
+            "type": "string",
+            "description": "Annual borrow rate, 18-decimal fixed point. Read from chain through the same function `POST /margin/quote` reads it through, so the venue a picker recommends is the venue a quote would pick for the same reason. Absent when the venue's rate read failed, which is not a rate of zero."
+          },
+          "availableBorrowLiquidity": {
+            "type": "string",
+            "description": "What the venue can actually lend, in raw debt-token units. On Aave this is `min(virtual balance, borrow cap - debt)`: the cap usually binds first, so the balance alone overstates it. Absent when the read failed."
+          }
+        }
+      },
+      "MarginMarketsResponse": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string"
+          },
+          "markets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MarginMarketRow"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Absent on the last page, which is how a client knows to stop. Present means more rows exist, never that the next page is non-empty."
+          }
+        },
+        "description": "A page of markets. Rows are in a total order over (exposureToken, counterToken, direction), so a token's rows are contiguous and a cursor resolves to the same row across a catalogue rebuild."
+      },
+      "MarginTokenMetadata": {
+        "type": "object",
+        "description": "A token as a response carries it. No symbol or name: this endpoint resolves markets, not token metadata, and a client merges display fields from its own token lists by address.",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "chainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
+          "decimals": {
+            "type": "integer"
+          }
+        }
+      },
+      "MarginVenue": {
+        "type": "string",
+        "enum": [
+          "MORPHO",
+          "AAVE_V3",
+          "AAVE_V4"
+        ],
+        "description": "A lending venue the position can be held at."
       }
     },
     "headers": {

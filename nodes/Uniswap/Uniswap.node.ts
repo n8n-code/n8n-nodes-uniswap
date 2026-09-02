@@ -4,6 +4,7 @@ import { utilitiesDescription } from './resources/utilities';
 import { liquidityProvisioningDescription } from './resources/liquidity-provisioning';
 import { swapBatchingDescription } from './resources/swap-batching';
 import { chainedSwappingDescription } from './resources/chained-swapping';
+import { defaultDescription } from './resources/default';
 
 export class Uniswap implements INodeType {
         description: INodeTypeDescription = {
@@ -62,6 +63,11 @@ export class Uniswap implements INodeType {
 					"name": "Chained Swapping",
 					"value": "Chained Swapping",
 					"description": ""
+				},
+				{
+					"name": "Default",
+					"value": "Default",
+					"description": ""
 				}
 			],
 			"default": ""
@@ -70,7 +76,8 @@ export class Uniswap implements INodeType {
 		...utilitiesDescription,
 		...liquidityProvisioningDescription,
 		...swapBatchingDescription,
-		...chainedSwappingDescription
+		...chainedSwappingDescription,
+		...defaultDescription
                 ],
         };
 }

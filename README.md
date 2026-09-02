@@ -13,7 +13,7 @@ Every time you connect n8n to uniswap, you waste hours mapping endpoints, defini
 
 **What if connecting n8n to uniswap took 5 minutes, not half a day?**
 
-This node gives you **5+ resources** out of the box: **Swapping**, **Utilities**, **Liquidity Provisioning**, **Swap Batching**, **Chained Swapping**: with full CRUD operations, typed parameters, and zero manual configuration.
+This node gives you **6+ resources** out of the box: **Swapping**, **Utilities**, **Liquidity Provisioning**, **Swap Batching**, **Chained Swapping**, and 1 more: with full CRUD operations, typed parameters, and zero manual configuration.
 
 ---
 
@@ -108,6 +108,13 @@ That's it. No configuration files. No code. It just works.
 - Post Create an execution plan
 - Get an execution plan
 - Patch Update an execution plan
+
+</details>
+
+<details>
+<summary><b>Default</b> (1 operations)</summary>
+
+- Get Discover the margin markets a chain can trade
 
 </details>
 
