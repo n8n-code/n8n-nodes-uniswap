@@ -2076,7 +2076,8 @@
           "503": {
             "$ref": "#/components/responses/MarginUnavailable503"
           }
-        }
+        },
+        "x-internal": true
       }
     }
   },
