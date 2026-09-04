@@ -28,6 +28,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/permit2DisabledHeader"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "requestBody": {
@@ -120,7 +123,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/quote": {
@@ -151,6 +159,9 @@
           },
           {
             "$ref": "#/components/parameters/experimentalRoutingHeader"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "requestBody": {
@@ -224,6 +235,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/erc20EthEnabledHeader"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "requestBody": {
@@ -303,6 +317,9 @@
           },
           {
             "$ref": "#/components/parameters/cursorParam"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -349,6 +366,9 @@
           },
           {
             "$ref": "#/components/parameters/permit2DisabledHeader"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "requestBody": {
@@ -540,6 +560,9 @@
           {
             "$ref": "#/components/parameters/swapperParam",
             "x-internal": true
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -583,6 +606,9 @@
           },
           {
             "$ref": "#/components/parameters/bridgeTokenInChainIdParam"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -623,7 +649,11 @@
             "apiKey": []
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/GetSupportedChainsSuccess200"
@@ -665,6 +695,9 @@
           },
           {
             "$ref": "#/components/parameters/chainIdParam"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -729,7 +762,12 @@
             "$ref": "#/components/responses/Timeout504"
           }
         },
-        "x-internal": true
+        "x-internal": true,
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/lp/check_approval": {
@@ -798,7 +836,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/lp/create": {
@@ -875,7 +918,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/lp/increase": {
@@ -941,7 +989,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/lp/decrease": {
@@ -1004,7 +1057,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/lp/claim_fees": {
@@ -1064,7 +1122,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/lp/create_classic": {
@@ -1134,7 +1197,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/lp/pool_info": {
@@ -1197,7 +1265,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/wallet/encode_7702": {
@@ -1244,7 +1317,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/wallet/check_delegation": {
@@ -1300,7 +1378,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/swap_5792": {
@@ -1444,6 +1527,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/universalRouterVersionHeader"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -1615,6 +1701,9 @@
           },
           {
             "$ref": "#/components/parameters/erc20EthEnabledHeader"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -1667,6 +1756,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/universalRouterVersionHeader"
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -1675,6 +1767,9 @@
             "headers": {
               "x-universal-router-version": {
                 "$ref": "#/components/headers/universalRouterVersionHeader"
+              },
+              "x-agent-info-status": {
+                "$ref": "#/components/headers/agentInfoStatusHeader"
               }
             },
             "content": {
@@ -1732,6 +1827,11 @@
         "responses": {
           "200": {
             "description": "UserOperation encoded successfully.",
+            "headers": {
+              "x-agent-info-status": {
+                "$ref": "#/components/headers/agentInfoStatusHeader"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1759,7 +1859,12 @@
             "$ref": "#/components/responses/Timeout504"
           }
         },
-        "x-internal": true
+        "x-internal": true,
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/plan": {
@@ -1809,7 +1914,12 @@
           "504": {
             "$ref": "#/components/responses/Timeout504"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/plan/{planId}": {
@@ -1844,6 +1954,9 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
@@ -1892,6 +2005,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "requestBody": {
@@ -1959,6 +2075,11 @@
         "responses": {
           "200": {
             "description": "UserOperation encoded successfully.",
+            "headers": {
+              "x-agent-info-status": {
+                "$ref": "#/components/headers/agentInfoStatusHeader"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1983,7 +2104,12 @@
             "$ref": "#/components/responses/Timeout504"
           }
         },
-        "x-internal": true
+        "x-internal": true,
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ]
       }
     },
     "/margin/markets": {
@@ -2057,11 +2183,19 @@
               "maximum": 20,
               "default": 20
             }
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
         "responses": {
           "200": {
             "description": "The markets this chain can trade.",
+            "headers": {
+              "x-agent-info-status": {
+                "$ref": "#/components/headers/agentInfoStatusHeader"
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2085,6 +2219,11 @@
     "responses": {
       "OrdersSuccess200": {
         "description": "The request orders matching the query parameters.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2151,6 +2290,11 @@
       },
       "OrderSuccess201": {
         "description": "Encoded order submitted.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2164,6 +2308,9 @@
         "headers": {
           "x-universal-router-version": {
             "$ref": "#/components/headers/universalRouterVersionHeader"
+          },
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
           }
         },
         "content": {
@@ -2303,6 +2450,11 @@
       },
       "LimitOrderQuoteSuccess200": {
         "description": "Limit Order Quote request successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2313,6 +2465,11 @@
       },
       "LPApprovalSuccess200": {
         "description": "LP approval check successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2350,6 +2507,11 @@
       },
       "ApprovalSuccess200": {
         "description": "Check approval successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2378,6 +2540,9 @@
         "headers": {
           "x-universal-router-version": {
             "$ref": "#/components/headers/universalRouterVersionHeader"
+          },
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
           }
         },
         "content": {
@@ -2404,6 +2569,11 @@
       },
       "GetSwapsSuccess200": {
         "description": "Get swap successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2424,6 +2594,11 @@
       },
       "GetSupportedChainsSuccess200": {
         "description": "Get supported chains successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2477,6 +2652,11 @@
       },
       "GetSwappableTokensSuccess200": {
         "description": "Get swappable tokens successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2534,6 +2714,11 @@
       },
       "CreatePositionSuccess200": {
         "description": "Create V3/V4 position successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2566,6 +2751,11 @@
       },
       "CreateClassicPositionSuccess200": {
         "description": "Create classic (V2) position successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2594,6 +2784,11 @@
       },
       "IncreasePositionSuccess200": {
         "description": "Increase position successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2625,6 +2820,11 @@
       },
       "DecreasePositionSuccess200": {
         "description": "Decrease position successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2653,6 +2853,11 @@
       },
       "ClaimFeesSuccess200": {
         "description": "Claim fees successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2684,6 +2889,9 @@
         "headers": {
           "x-universal-router-version": {
             "$ref": "#/components/headers/universalRouterVersionHeader"
+          },
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
           }
         },
         "content": {
@@ -2722,6 +2930,9 @@
         "headers": {
           "x-universal-router-version": {
             "$ref": "#/components/headers/universalRouterVersionHeader"
+          },
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
           }
         },
         "content": {
@@ -2747,6 +2958,11 @@
       },
       "PoolInfoResponse200": {
         "description": "Pool information response successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2781,6 +2997,11 @@
       },
       "BadRequest400": {
         "description": "RequestValidationError, Bad Input",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2791,6 +3012,11 @@
       },
       "ApprovalUnauthorized401": {
         "description": "UnauthorizedError eg. Account is blocked.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2801,6 +3027,11 @@
       },
       "ApprovalNotFound404": {
         "description": "ResourceNotFound eg. Token allowance not found or Gas info not found.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2811,6 +3042,11 @@
       },
       "Unauthorized401": {
         "description": "UnauthorizedError eg. Account is blocked.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2821,6 +3057,11 @@
       },
       "QuoteNotFound404": {
         "description": "ResourceNotFound eg. No quotes available or Gas fee/price not available",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2831,6 +3072,11 @@
       },
       "PoolInfoNotFound404": {
         "description": "ResourceNotFound eg. No pool information on given chain",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2841,6 +3087,11 @@
       },
       "PermissionsSuccess200": {
         "description": "Token permissions lookup successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2860,6 +3111,11 @@
       },
       "PermissionsNotFound404": {
         "description": "ResourceNotFound eg. Failed to fetch token permissions.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2870,6 +3126,11 @@
       },
       "SwapBadRequest400": {
         "description": "RequestValidationError, Bad Input",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2880,6 +3141,11 @@
       },
       "SwapUnauthorized401": {
         "description": "UnauthorizedError eg. Account is blocked or  Fee is not enabled.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2890,6 +3156,11 @@
       },
       "SwapNotFound404": {
         "description": "ResourceNotFound eg. No quotes available or Gas fee/price not available",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2900,6 +3171,11 @@
       },
       "OrdersNotFound404": {
         "description": "Orders not found.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2910,6 +3186,11 @@
       },
       "LPNotFound404": {
         "description": "ResourceNotFound eg. Cant Find LP Position.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2920,6 +3201,26 @@
       },
       "OrdersBadRequest400": {
         "description": "RequestValidationError eg. Token allowance not valid or Insufficient Funds.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Err400"
+            }
+          }
+        }
+      },
+      "MarginBadRequest400": {
+        "description": "RequestValidationError eg. chainId has no margin deployment, unrecognised venue, or undecodable cursor.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2930,6 +3231,11 @@
       },
       "RateLimitedErr429": {
         "description": "Ratelimited",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2940,6 +3246,11 @@
       },
       "InternalErr500": {
         "description": "Unexpected error",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2950,6 +3261,11 @@
       },
       "OrderUnavailable503": {
         "description": "Failed to post order to the upstream UniswapX service.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2960,6 +3276,26 @@
       },
       "OrdersUnavailable503": {
         "description": "Upstream UniswapX service unavailable while fetching orders.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Err503"
+            }
+          }
+        }
+      },
+      "MarginUnavailable503": {
+        "description": "Margin venue data unavailable while listing markets.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2970,6 +3306,11 @@
       },
       "Timeout504": {
         "description": "Request duration limit reached.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2980,6 +3321,11 @@
       },
       "WalletEncode7702Success200": {
         "description": "Encode 7702 wallet transactions successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2990,6 +3336,11 @@
       },
       "WalletCheckDelegationSuccess200": {
         "description": "Wallet delegation info request successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -3017,6 +3368,11 @@
       },
       "CreatePlanSuccess200": {
         "description": "Create plan successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -3027,6 +3383,11 @@
       },
       "GetPlanSuccess200": {
         "description": "Get plan successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -3037,6 +3398,11 @@
       },
       "UpdatePlanSuccess200": {
         "description": "Update plan successful.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -3047,6 +3413,11 @@
       },
       "UnprocessableEntity422": {
         "description": "UnprocessableEntity eg. Plan is already completed and cannot be updated.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -3057,6 +3428,11 @@
       },
       "GetTokensSuccess200": {
         "description": "Get tokens successful. An empty `tokens` array is a valid result when no tokens match the requested sort and chains.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -9019,6 +9395,16 @@
         "schema": {
           "$ref": "#/components/schemas/UniversalRouterVersion"
         }
+      },
+      "agentInfoStatusHeader": {
+        "description": "Present, with the fixed value `malformed`, only when the request carried an `x-agent-info` header that failed to parse and was dropped; the value never echoes anything from the request. Absent when `x-agent-info` parsed, was not sent, or was sent with an empty value, which the gateway treats as not sent. Set by the API gateway once it has resolved the route and before it proxies the request, so it is returned on every response, including gateway-generated errors such as 400, 401, 403, and 429. It reports attribution only; the request itself succeeds or fails independently of it.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "malformed"
+          ]
+        }
       }
     },
     "parameters": {
@@ -9071,6 +9457,17 @@
         "schema": {
           "type": "boolean",
           "default": false
+        }
+      },
+      "agentInfoHeader": {
+        "name": "x-agent-info",
+        "in": "header",
+        "description": "Optional attribution hint for AI-agent traffic; send it if an AI agent built or operates your integration. The value is a JSON object with up to three fields: `decision_origin` (required, exactly `autonomous` or `human_mediated`, case-sensitive), `integration_name` (optional string naming your integration, e.g. `my-trading-bot`), and `version` (optional string identifying your integration's version). Any other key is dropped, never rejected. The raw value must be at most 1024 bytes of printable US-ASCII (`0x20`-`0x7E`), so send non-ASCII text as JSON `\\u` escapes; `integration_name` and `version` are each limited to 256 UTF-16 code units and may not contain control characters, U+2028, U+2029, or U+FFFD. Send the header once: repeated header lines are joined with `, ` and the joined string is what gets parsed, so two complete objects fail as invalid JSON while a single object split across two lines still parses. The header is analytics-only and never affects the request: omitting it, sending it, or sending a value that fails these rules never changes the response status, body, or swap behavior. A value that fails to parse is dropped and reported by the `x-agent-info-status` response header. Never put a user ID, wallet address, email, session token, or API key in these fields.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 1024,
+          "example": "{\"decision_origin\":\"autonomous\",\"integration_name\":\"my-trading-bot\",\"version\":\"1.4.0\"}"
         }
       },
       "cursorParam": {
