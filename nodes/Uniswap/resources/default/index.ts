@@ -25,6 +25,18 @@ export const defaultDescription: INodeProperties[] = [
 							"url": "=/margin/markets"
 						}
 					}
+				},
+				{
+					"name": "Margin Positions",
+					"value": "Margin Positions",
+					"action": "A wallet's margin positions on a chain",
+					"description": "The positions tab's feed. One row per `(exposureToken, counterToken, direction)`, aggregated at read time from the legs a wallet actually holds.\n\n**Everything here is read on chain, per request.** There is no index and no store behind it: position accounts are a pure CREATE2 function of `(swapper, subId)`, so the addresses are known offchain for free and the only question the chain answers is which of them hold anything. That is what makes the feed correct from a device that has never seen this wallet before, and correct in the same block an open lands. A health factor is the one number a caller must not act on stale, which is why none of this is cached.\n\n**Legs are the unit of truth.** A logical position can span venues, and venues liquidate independently, so a row's risk numbers are the NEAREST leg's rather than an average. Balances add across legs; risk does not.\n\n**Risk is in TRADER terms.** `oraclePrice` and `liquidationPrice` are both reciprocated on a SHORT, so `liquidationPrice / oraclePrice` equals `healthFactor` on either side. A row that mixed frames would still satisfy every type check and be wrong by a factor of the price.\n\n**`maxWithdrawable` is bounded by the BUFFERED ceiling, not the raw LLTV.** There is no on-chain guard on a withdraw, so this figure is the whole guard. Never recompute it client-side from `lltv`.\n\n**Always paginated**, on the same keyset contract and the same cursor as `GET /margin/markets`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out.\n\nCost-basis fields (`entryPrice`, `openedAt`, `accruedInterest`, `unrealizedPnl`, `roe`) and the terminal fields need the margin event consumer and are ABSENT rather than zero in v1: a zero PnL is a claim, an absent one is not. For the same reason a non-`ACTIVE` `status` currently returns an empty page rather than a refusal — the question is valid, the data is not yet indexed.",
+					"routing": {
+						"request": {
+							"method": "GET",
+							"url": "=/margin/positions"
+						}
+					}
 				}
 			],
 			"default": ""
@@ -385,6 +397,325 @@ export const defaultDescription: INodeProperties[] = [
 					],
 					"operation": [
 						"Margin Markets"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "GET /margin/positions",
+			"name": "operation",
+			"type": "notice",
+			"typeOptions": {
+				"theme": "info"
+			},
+			"default": "",
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Swapper",
+			"name": "swapper",
+			"required": true,
+			"description": "The wallet whose positions to read. Not taken from the session: a caller may legitimately read another address, and every number here is public on chain.",
+			"default": "",
+			"type": "string",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "swapper",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Chain ID",
+			"name": "chainId",
+			"required": true,
+			"description": "The chain the positions live on.",
+			"default": 1,
+			"type": "options",
+			"options": [
+				{
+					"name": "1",
+					"value": 1
+				},
+				{
+					"name": "10",
+					"value": 10
+				},
+				{
+					"name": "56",
+					"value": 56
+				},
+				{
+					"name": "130",
+					"value": 130
+				},
+				{
+					"name": "137",
+					"value": 137
+				},
+				{
+					"name": "143",
+					"value": 143
+				},
+				{
+					"name": "196",
+					"value": 196
+				},
+				{
+					"name": "324",
+					"value": 324
+				},
+				{
+					"name": "480",
+					"value": 480
+				},
+				{
+					"name": "1868",
+					"value": 1868
+				},
+				{
+					"name": "4217",
+					"value": 4217
+				},
+				{
+					"name": "4326",
+					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
+				},
+				{
+					"name": "8453",
+					"value": 8453
+				},
+				{
+					"name": "10143",
+					"value": 10143
+				},
+				{
+					"name": "42161",
+					"value": 42161
+				},
+				{
+					"name": "42220",
+					"value": 42220
+				},
+				{
+					"name": "43114",
+					"value": 43114
+				},
+				{
+					"name": "57073",
+					"value": 57073
+				},
+				{
+					"name": "59144",
+					"value": 59144
+				},
+				{
+					"name": "81457",
+					"value": 81457
+				},
+				{
+					"name": "7777777",
+					"value": 7777777
+				},
+				{
+					"name": "1301",
+					"value": 1301
+				},
+				{
+					"name": "84532",
+					"value": 84532
+				},
+				{
+					"name": "11155111",
+					"value": 11155111
+				}
+			],
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "chainId",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Status",
+			"name": "status",
+			"description": "Selects the tab. Unset means `ACTIVE`. Terminal statuses parse and return an empty page until the event consumer ships.",
+			"default": "ACTIVE",
+			"type": "options",
+			"options": [
+				{
+					"name": "ACTIVE",
+					"value": "ACTIVE"
+				},
+				{
+					"name": "COMPLETED",
+					"value": "COMPLETED"
+				},
+				{
+					"name": "LIQUIDATED",
+					"value": "LIQUIDATED"
+				},
+				{
+					"name": "PARTIALLY LIQUIDATED",
+					"value": "PARTIALLY_LIQUIDATED"
+				}
+			],
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "status",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Cursor",
+			"name": "cursor",
+			"description": "Opaque. Echo `nextCursor` back verbatim. A KEYSET cursor over the row order, the same one `GET /margin/markets` issues. A cursor that does not decode is a 400 `MARGIN_INVALID_CURSOR` rather than a silent restart, which would loop a client forever.",
+			"default": "",
+			"type": "string",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "cursor",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Limit",
+			"name": "limit",
+			"description": "Rows per page. Defaults to 20 and caps at 20, matching `GET /margin/markets`, `GET /orders` and `GET /plans`.",
+			"default": 0,
+			"type": "number",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "limit",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "X Agent Info",
+			"name": "x-agent-info",
+			"description": "Optional attribution hint for AI-agent traffic; send it if an AI agent built or operates your integration. The value is a JSON object with up to three fields: `decision_origin` (required, exactly `autonomous` or `human_mediated`, case-sensitive), `integration_name` (optional string naming your integration, e.g. `my-trading-bot`), and `version` (optional string identifying your integration's version). Any other key is dropped, never rejected. The raw value must be at most 1024 bytes of printable US-ASCII (`0x20`-`0x7E`), so send non-ASCII text as JSON `\\u` escapes; `integration_name` and `version` are each limited to 256 UTF-16 code units and may not contain control characters, U+2028, U+2029, or U+FFFD. Send the header once: repeated header lines are joined with `, ` and the joined string is what gets parsed, so two complete objects fail as invalid JSON while a single object split across two lines still parses. The header is analytics-only and never affects the request: omitting it, sending it, or sending a value that fails these rules never changes the response status, body, or swap behavior. A value that fails to parse is dropped and reported by the `x-agent-info-status` response header. Never put a user ID, wallet address, email, session token, or API key in these fields.",
+			"default": "{\"decision_origin\":\"autonomous\",\"integration_name\":\"my-trading-bot\",\"version\":\"1.4.0\"}",
+			"type": "string",
+			"routing": {
+				"request": {
+					"headers": {
+						"x-agent-info": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "API Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Positions"
 					]
 				}
 			}

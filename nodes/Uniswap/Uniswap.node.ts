@@ -4,6 +4,7 @@ import { utilitiesDescription } from './resources/utilities';
 import { liquidityProvisioningDescription } from './resources/liquidity-provisioning';
 import { swapBatchingDescription } from './resources/swap-batching';
 import { chainedSwappingDescription } from './resources/chained-swapping';
+import { marginDescription } from './resources/margin';
 import { defaultDescription } from './resources/default';
 
 export class Uniswap implements INodeType {
@@ -65,6 +66,11 @@ export class Uniswap implements INodeType {
 					"description": ""
 				},
 				{
+					"name": "Margin",
+					"value": "Margin",
+					"description": ""
+				},
+				{
 					"name": "Default",
 					"value": "Default",
 					"description": ""
@@ -77,6 +83,7 @@ export class Uniswap implements INodeType {
 		...liquidityProvisioningDescription,
 		...swapBatchingDescription,
 		...chainedSwappingDescription,
+		...marginDescription,
 		...defaultDescription
                 ],
         };
