@@ -10889,6 +10889,10 @@
           },
           "protocols": {
             "$ref": "#/components/schemas/MarginProtocols"
+          },
+          "routingPreference": {
+            "$ref": "#/components/schemas/RoutingPreference",
+            "description": "Defaults to `BEST_PRICE`, matching every other quote in this API. This leg is the slowest call in a margin quote, and `FASTEST` takes roughly a second off it for a handful of basis points -- which `slippageTolerance` already floors before the position is sized. Send `FASTEST` when the quote is indicative and the latency matters more than the last few bps."
           }
         },
         "not": {
