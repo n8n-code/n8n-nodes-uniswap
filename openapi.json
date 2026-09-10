@@ -1899,8 +1899,14 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/MarginDisabled403"
+          },
           "404": {
             "$ref": "#/components/responses/ResourceNotFound404"
+          },
+          "409": {
+            "$ref": "#/components/responses/ReservationContended409"
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity422"
@@ -3766,6 +3772,21 @@
             }
           }
         }
+      },
+      "ReservationContended409": {
+        "description": "A margin open lost the race for its sub-account. The subId this plan was allocated was claimed by another plan between the allocation read and the write, so nothing was persisted. Retrying the same request allocates the next free subId; it is not a server fault and needs no operator action.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Err409"
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -5090,6 +5111,18 @@
               "TokenBalanceNotAvailable",
               "InsufficientBalance"
             ],
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "Err409": {
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "default": "ReservationContendedError",
             "type": "string"
           },
           "detail": {
@@ -6430,6 +6463,33 @@
           "chainId",
           "underlyingAsset"
         ]
+      },
+      "MarginPlanIntent": {
+        "type": "object",
+        "x-internal": true,
+        "description": "Names the margin position a plan acts on. Present only on a margin plan, so its absence is how a client tells one from a swap plan. Everything the router needs -- adapter, universal router, pool key, bounds, deadline -- stays server-side. `marketKey` is display-only: resolve the market from `collateralToken`, `debtToken` and `venue` rather than by parsing it.",
+        "properties": {
+          "intent": {
+            "type": "string",
+            "description": "The action, e.g. `OPEN`, `INCREASE_LEVERAGE`, `CLOSE`."
+          },
+          "marketKey": {
+            "type": "string"
+          },
+          "venue": {
+            "type": "string"
+          },
+          "collateralToken": {
+            "type": "string"
+          },
+          "debtToken": {
+            "type": "string"
+          },
+          "subId": {
+            "type": "string",
+            "description": "The sub-account the position lives in. Allocated server-side on an open."
+          }
+        }
       },
       "AggregatedOutput": {
         "description": "An array of all outputs of the proposed transaction. This includes the swap as well as any fees collected by the API integrator. This does not include pool fees when routing is through a Uniswap Protocol pool.",
@@ -8915,11 +8975,15 @@
           "earnIntent": {
             "$ref": "#/components/schemas/EarnIntent",
             "x-internal": true
+          },
+          "marginQuote": {
+            "type": "object",
+            "x-internal": true,
+            "description": "A margin quote echoed back, in place of `quote`. Exactly one of the two is accepted. Every bound and the pool are re-derived from the venue at plan create rather than trusted, so this names the shape of the position and never the numbers it executes on."
           }
         },
         "required": [
-          "routing",
-          "quote"
+          "routing"
         ]
       },
       "UpdatePlanRequest": {
@@ -9059,6 +9123,10 @@
           },
           "earnIntent": {
             "$ref": "#/components/schemas/EarnQuoteIntent",
+            "x-internal": true
+          },
+          "marginIntent": {
+            "$ref": "#/components/schemas/MarginPlanIntent",
             "x-internal": true
           },
           "walletExecutionContext": {

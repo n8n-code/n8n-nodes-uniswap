@@ -129,7 +129,6 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"required": true,
 			"displayName": "Quote",
 			"name": "quote",
 			"type": "json",
@@ -213,6 +212,31 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			"routing": {
 				"send": {
 					"property": "earnIntent",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Chained Swapping"
+					],
+					"operation": [
+						"Create Plan"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Margin Quote",
+			"name": "marginQuote",
+			"type": "json",
+			"default": "{}",
+			"description": "A margin quote echoed back, in place of `quote`. Exactly one of the two is accepted. Every bound and the pool are re-derived from the venue at plan create rather than trusted, so this names the shape of the position and never the numbers it executes on.",
+			"routing": {
+				"send": {
+					"property": "marginQuote",
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ JSON.parse($value) }}"
