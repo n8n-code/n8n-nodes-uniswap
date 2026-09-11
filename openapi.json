@@ -9895,28 +9895,6 @@
           }
         }
       },
-      "MarginIncompleteOpen": {
-        "type": "object",
-        "description": "Collateral parked at a MarginAccount whose open never completed. Derived from the chain rather than the plan store, so it survives plan-row expiry and is visible from any device.",
-        "properties": {
-          "account": {
-            "type": "string"
-          },
-          "subId": {
-            "type": "string"
-          },
-          "deployed": {
-            "type": "boolean",
-            "description": "False when the account holds a balance but was never deployed, which is the window this surface exists for: pre-swap delivered, position not opened."
-          },
-          "token": {
-            "$ref": "#/components/schemas/MarginTokenMetadata"
-          },
-          "amount": {
-            "type": "string"
-          }
-        }
-      },
       "MarginPendingPlan": {
         "type": "object",
         "description": "The one plan-store read, and a deliberately weaker guarantee than the rest of this response: session-scoped and TTL-bound, so absent rather than wrong once a row ages out. Acceptable only because no funds are at risk in that state.",
@@ -9926,13 +9904,31 @@
           },
           "createdAt": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Epoch milliseconds. Rendered as a string by proto3 JSON; the client does not sort on it."
           },
           "currentStep": {
-            "type": "integer"
+            "type": "integer",
+            "description": "0-based index of the first step that is not COMPLETE."
           },
           "cancellable": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "False once an in-progress step carries a proof: that transaction may have landed, so cancelling could strand what it moved."
+          },
+          "marketKey": {
+            "type": "string"
+          },
+          "venue": {
+            "$ref": "#/components/schemas/MarginVenue"
+          },
+          "collateralToken": {
+            "type": "string"
+          },
+          "debtToken": {
+            "type": "string"
+          },
+          "stepCount": {
+            "type": "integer"
           }
         }
       },
@@ -9953,19 +9949,12 @@
             "type": "string",
             "description": "Absent on the last page, which is how a client knows to stop. Present means more rows exist, never that the next page is non-empty."
           },
-          "incompleteOpens": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MarginIncompleteOpen"
-            },
-            "description": "Serializes as [] when the read ran and found nothing. It cannot express \"not read\": a degraded read logs a warning and reports empty, matching how the markets feed degrades a failed venue. Not populated in v1."
-          },
           "pendingPlans": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MarginPendingPlan"
             },
-            "description": "Same contract as incompleteOpens. Not populated in v1."
+            "description": "The margin plans this swapper started and has not finished, newest first, so a client can offer to resume or cancel one. Terminal plans are excluded server-side. Serializes as [] when the read ran and found nothing; it cannot express \"not read\", so a degraded plan-store read logs a warning and reports empty rather than failing the page."
           }
         }
       },
