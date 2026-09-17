@@ -3975,7 +3975,7 @@
           },
           "version": {
             "type": "string",
-            "description": "Only present where it distinguishes deployments: contract release lines (e.g. UniversalRouter 2.0/2.1.1/2.2.0) and same-named contracts (Quoter V3 vs V4)."
+            "description": "Only present where it distinguishes deployments: contract release lines (e.g. UniversalRouter 2.0/2.1.1) and same-named contracts (Quoter V3 vs V4)."
           },
           "address": {
             "type": "string"
@@ -4336,8 +4336,7 @@
         "type": "string",
         "enum": [
           "2.0",
-          "2.1.1",
-          "2.2.0"
+          "2.1.1"
         ],
         "default": "2.0"
       },
@@ -9197,7 +9196,12 @@
             "$ref": "#/components/schemas/PlanStepType"
           },
           "gasUseEstimate": {
-            "$ref": "#/components/schemas/gasLimit"
+            "type": "string",
+            "description": "The estimated units of gas this step will consume; the step's gasFee is priced from it."
+          },
+          "gasLimit": {
+            "type": "string",
+            "description": "The units of gas to send as this step's transaction gas limit. Carries headroom over gasUseEstimate, so the two are not interchangeable."
           },
           "gasFeeUSD": {
             "$ref": "#/components/schemas/gasFeeUSD"
