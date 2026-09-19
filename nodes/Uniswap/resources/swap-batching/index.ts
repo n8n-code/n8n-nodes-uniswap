@@ -232,6 +232,10 @@ export const swapBatchingDescription: INodeProperties[] = [
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 1 2",
+					"value": "2.1.2"
 				}
 			],
 			"routing": {
@@ -484,6 +488,10 @@ export const swapBatchingDescription: INodeProperties[] = [
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 1 2",
+					"value": "2.1.2"
 				}
 			],
 			"routing": {

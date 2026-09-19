@@ -3975,7 +3975,7 @@
           },
           "version": {
             "type": "string",
-            "description": "Only present where it distinguishes deployments: contract release lines (e.g. UniversalRouter 2.0/2.1.1) and same-named contracts (Quoter V3 vs V4)."
+            "description": "Only present where it distinguishes deployments: contract release lines (e.g. UniversalRouter 2.0/2.1.2) and same-named contracts (Quoter V3 vs V4)."
           },
           "address": {
             "type": "string"
@@ -4334,9 +4334,11 @@
       },
       "UniversalRouterVersion": {
         "type": "string",
+        "description": "Universal Router release line. `2.1.1` is accepted for backwards compatibility and served as `2.1.2`, a redeploy of 2.1.1 with identical calldata at its own address on every chain; the `x-universal-router-version` response header reports the version actually served.",
         "enum": [
           "2.0",
-          "2.1.1"
+          "2.1.1",
+          "2.1.2"
         ],
         "default": "2.0"
       },

@@ -666,6 +666,10 @@ export const swappingDescription: INodeProperties[] = [
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 1 2",
+					"value": "2.1.2"
 				}
 			],
 			"routing": {
@@ -2249,6 +2253,10 @@ export const swappingDescription: INodeProperties[] = [
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 1 2",
+					"value": "2.1.2"
 				}
 			],
 			"routing": {
@@ -3400,6 +3408,10 @@ export const swappingDescription: INodeProperties[] = [
 				{
 					"name": "2 1 1",
 					"value": "2.1.1"
+				},
+				{
+					"name": "2 1 2",
+					"value": "2.1.2"
 				}
 			],
 			"routing": {
