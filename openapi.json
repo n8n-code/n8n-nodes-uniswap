@@ -4334,13 +4334,13 @@
       },
       "UniversalRouterVersion": {
         "type": "string",
-        "description": "Universal Router release line. `2.1.1` is accepted for backwards compatibility and served as `2.1.2`, a redeploy of 2.1.1 with identical calldata at its own address on every chain; the `x-universal-router-version` response header reports the version actually served.",
+        "description": "Universal Router release line. An explicitly pinned version is served unchanged. `2.1.2` is a redeploy of `2.1.1` with identical calldata at its own per-chain address; callers that do not pin a version default to `2.1.2` on chains where it is deployed, and fall back to an older deployed version elsewhere (e.g. zkSync and Monad Testnet, which have no `2.1.2` deployment). The `x-universal-router-version` response header reports the version actually served.",
         "enum": [
           "2.0",
           "2.1.1",
           "2.1.2"
         ],
-        "default": "2.0"
+        "default": "2.1.2"
       },
       "Address": {
         "type": "string",

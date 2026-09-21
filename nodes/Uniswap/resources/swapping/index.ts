@@ -656,7 +656,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "X Universal Router Version",
 			"name": "x-universal-router-version",
 			"description": "The version of the Universal Router to use for the swap journey. *MUST* be consistent throughout the API calls.",
-			"default": "2.0",
+			"default": "2.1.2",
 			"type": "options",
 			"options": [
 				{
@@ -2243,7 +2243,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "X Universal Router Version",
 			"name": "x-universal-router-version",
 			"description": "The version of the Universal Router to use for the swap journey. *MUST* be consistent throughout the API calls.",
-			"default": "2.0",
+			"default": "2.1.2",
 			"type": "options",
 			"options": [
 				{
@@ -3398,7 +3398,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "X Universal Router Version",
 			"name": "x-universal-router-version",
 			"description": "The version of the Universal Router to use for the swap journey. *MUST* be consistent throughout the API calls.",
-			"default": "2.0",
+			"default": "2.1.2",
 			"type": "options",
 			"options": [
 				{
