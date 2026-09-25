@@ -4477,6 +4477,22 @@
           "permitGasFee": {
             "$ref": "#/components/schemas/gasFee"
           },
+          "swapTransaction": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransactionRequest"
+              }
+            ],
+            "description": "Ready-to-send swap transaction, returned for CLASSIC quotes (never FASTEST) whenever no permit signature needs to be embedded in the calldata: the request was made with `x-permit2-disabled: true` (proxy-approval flow), the swapper already holds a valid permit (`permitData` is `null`), or the permit was requested as a transaction (`generatePermitAsTransaction: true`). Never returned when `txFailureReasons` is populated — request the calldata from `/swap` to proceed anyway. Built with default settings (`safetyMode: SAFE`, deadline 30 minutes ahead); use the `/swap` endpoint to customize them. `/swap` continues to work unchanged for these quotes."
+          },
+          "swapGasFee": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/gasFee"
+              }
+            ],
+            "description": "The estimated gas fee for `swapTransaction`, equal to the `gasFee` that `/swap` would return without gas refresh. Only present when `swapTransaction` is present."
+          },
           "sponsorshipInfo": {
             "$ref": "#/components/schemas/SponsorshipInfo",
             "x-internal": true
