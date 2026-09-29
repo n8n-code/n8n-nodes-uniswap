@@ -3835,8 +3835,10 @@
         "description": "Indicates whether you want to receive a permit2 transaction to sign and submit onchain, or a permit message to sign. When set to `true`, the quote response returns the Permit2 as a calldata which the user signs and broadcasts. When set to `false` (the default), the quote response returns the Permit2 as a message which the user signs but does not need to broadcast. When using a 7702-delegated wallet, set this field to `true`. Except for this scenario, it is recommended that this field is set to false. Note that a Permit2 calldata (e.g. `true`), will provide indefinite permission for Permit2 to spend a token, in contrast to a Permit2 message (e.g. `false`) which is only valid for 30 days. Further, a Permit2 calldata (e.g. `true`) requires the user to pay gas to submit the transaction, whereas the Permit2 message (e.g. `false` ) does not require the user to submit a transaction and requires no gas."
       },
       "slippageTolerance": {
-        "description": "The slippage tolerance as a percentage up to a maximum of two decimal places. This is the maximum acceptable output loss as a percentage: for exact-input trades, the minimum received is expectedOut × (1 - slippageTolerance); for exact-output trades, the maximum input is expectedIn × (1 + slippageTolerance).\n\nWhen submitting a quote, note that slippage tolerance works differently in UniswapX swaps where it does not set a limit on the Spread in an order. See [here](https://api-docs.uniswap.org/guides/faqs#why-do-uniswapx-quotes-have-more-slippage-than-the-tolerance-i-set) for more information.\n\nNote that if the trade type is `EXACT_INPUT`, then the slippage is in terms of the output token. If the trade type is `EXACT_OUTPUT`, then the slippage is in terms of the input token.\n\nWhen submitting a request, `slippageTolerance` may not be set when `autoSlippage` is defined. One of `slippageTolerance` or `autoSlippage` must be defined.",
+        "description": "The slippage tolerance as a percentage up to a maximum of two decimal places, between 0 and 100 (a value outside that range is rejected). This is the maximum acceptable output loss as a percentage: for exact-input trades, the minimum received is expectedOut × (1 - slippageTolerance); for exact-output trades, the maximum input is expectedIn × (1 + slippageTolerance).\n\nWhen submitting a quote, note that slippage tolerance works differently in UniswapX swaps where it does not set a limit on the Spread in an order. See [here](https://api-docs.uniswap.org/guides/faqs#why-do-uniswapx-quotes-have-more-slippage-than-the-tolerance-i-set) for more information.\n\nNote that if the trade type is `EXACT_INPUT`, then the slippage is in terms of the output token. If the trade type is `EXACT_OUTPUT`, then the slippage is in terms of the input token.\n\nWhen submitting a request, `slippageTolerance` may not be set when `autoSlippage` is defined. One of `slippageTolerance` or `autoSlippage` must be defined.",
         "type": "number",
+        "minimum": 0,
+        "maximum": 100,
         "pattern": "^[0-9]{0,3}\\.?[0-9]{0,2}$"
       },
       "SwapStatus": {
@@ -4089,6 +4091,12 @@
           },
           "urgency": {
             "$ref": "#/components/schemas/Urgency"
+          },
+          "swapSource": {
+            "$ref": "#/components/schemas/SwapSource"
+          },
+          "enforceExactIn": {
+            "$ref": "#/components/schemas/EnforceExactIn"
           }
         },
         "required": [
@@ -4357,7 +4365,7 @@
             "$ref": "#/components/schemas/RequestId"
           },
           "swap": {
-            "$ref": "#/components/schemas/TransactionRequest"
+            "$ref": "#/components/schemas/SwapTransactionResponse"
           },
           "gasFee": {
             "$ref": "#/components/schemas/gasFee"
@@ -4480,10 +4488,10 @@
           "swapTransaction": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/TransactionRequest"
+                "$ref": "#/components/schemas/SwapTransactionResponse"
               }
             ],
-            "description": "Ready-to-send swap transaction, returned for CLASSIC quotes (never FASTEST) whenever no permit signature needs to be embedded in the calldata: the request was made with `x-permit2-disabled: true` (proxy-approval flow), the swapper already holds a valid permit (`permitData` is `null`), or the permit was requested as a transaction (`generatePermitAsTransaction: true`). Never returned when `txFailureReasons` is populated — request the calldata from `/swap` to proceed anyway. Built with default settings (`safetyMode: SAFE`, deadline 30 minutes ahead); use the `/swap` endpoint to customize them. `/swap` continues to work unchanged for these quotes."
+            "description": "Ready-to-send swap transaction, returned for CLASSIC quotes when no permit signature needs to be embedded in the calldata. That's the case when the request used `x-permit2-disabled: true`, the swapper already holds a valid permit (`permitData` is `null`), or the permit was requested as a transaction (`generatePermitAsTransaction: true`). The returned calldata is built with default settings (`safetyMode: SAFE`, deadline 30 minutes ahead); use `/swap` to customize them. Not returned when `txFailureReasons` is populated; call `/swap` to build the calldata anyway. With `swapSource: \"UR\"` a failed simulation returns a 422 instead of a quote without calldata, except for `TRANSFER_FROM_FAILED` and `SLIPPAGE_TOO_LOW`, which still return calldata. `/swap` is unchanged for these quotes."
           },
           "swapGasFee": {
             "allOf": [
@@ -4884,6 +4892,12 @@
           "earnIntent": {
             "$ref": "#/components/schemas/EarnIntent",
             "x-internal": true
+          },
+          "swapSource": {
+            "$ref": "#/components/schemas/SwapSource"
+          },
+          "enforceExactIn": {
+            "$ref": "#/components/schemas/EnforceExactIn"
           },
           "includeRouteCandidates": {
             "type": "boolean",
@@ -8191,6 +8205,48 @@
           "chainId"
         ]
       },
+      "SwapTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "$ref": "#/components/schemas/receiverWalletAddress"
+          },
+          "from": {
+            "$ref": "#/components/schemas/senderWalletAddress",
+            "description": "Present on every response except swapSource \"UR\" swapTransaction calldata, where the sender is the integrator's filler and unknown at quote time."
+          },
+          "data": {
+            "type": "string",
+            "description": "The calldata for the transaction."
+          },
+          "value": {
+            "type": "string",
+            "description": "Native currency attached to the call, in wei. \"0\" for swapSource \"UR\": the filler funds the router, and for a native input attaches the delivered ETH as msg.value."
+          },
+          "gasLimit": {
+            "$ref": "#/components/schemas/gasLimit"
+          },
+          "chainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
+          "maxFeePerGas": {
+            "$ref": "#/components/schemas/maxFeePerGas"
+          },
+          "maxPriorityFeePerGas": {
+            "$ref": "#/components/schemas/maxPriorityFeePerGas"
+          },
+          "gasPrice": {
+            "$ref": "#/components/schemas/gasPrice"
+          }
+        },
+        "required": [
+          "to",
+          "data",
+          "value",
+          "chainId"
+        ],
+        "description": " Same shape as TransactionRequest, except `from` is omitted for swapSource \"UR\" quotes (the executing filler is unknown to the API)."
+      },
       "TransactionRequest5792": {
         "type": "object",
         "properties": {
@@ -11331,6 +11387,20 @@
           "execution",
           "display"
         ]
+      },
+      "SwapSource": {
+        "type": "string",
+        "enum": [
+          "UR",
+          "WALLET"
+        ],
+        "default": "WALLET",
+        "description": "Where the input tokens come from. Leave unset (or send \"WALLET\") to pull them from the swapper's wallet as usual. Send \"UR\" to get calldata that swaps whatever balance of the input token the Universal Router holds when it runs, for bridge-and-swap flows where a bridge deposits into the router and executes the swap in the same transaction. In UR mode, quote on the destination chain, use `amount` as your estimate of what will arrive, and put the end user in `swapper`. Exact-input, single-chain, AMM-only swaps: `protocols` defaults to V2/V3/V4 and a UniswapX protocol is rejected with a 400. The returned transaction has no `from` (the executing filler is unknown) and a `value` of \"0\"; with a native input the filler must attach the delivered ETH as msg.value. The output floor is fixed at quote time from `amount` minus `slippageTolerance`: if less than `amount` arrives, the whole balance is still swapped and must clear that floor, so a delivery short by more than the tolerance reverts even without `enforceExactIn`. Use a conservative `amount` or widen `slippageTolerance`. `generatePermitAsTransaction` is rejected with a 400. Works on both /quote and /swap. A failed simulation only refuses the request when the verdict applies to a router-funded fill: a revert, or a simulation that could not run. A slippage flag, or a failure to pull from the quoted swapper, still returns calldata. Read the guide before using it: https://developers.uniswap.org/docs/trading/swapping-api/start-building/integration-guide#swapping-funds-already-in-the-universal-router-swapsource-ur"
+      },
+      "EnforceExactIn": {
+        "type": "boolean",
+        "default": false,
+        "description": "Only with swapSource \"UR\". Set it to true when your bridge guarantees how much will arrive; the calldata then checks the router's balance and reverts if it holds less than `amount`. Leave it off if `amount` is just an estimate, or a good fill can revert over a small shortfall. Details: https://developers.uniswap.org/docs/trading/swapping-api/start-building/integration-guide#swapping-funds-already-in-the-universal-router-swapsource-ur"
       }
     },
     "headers": {
