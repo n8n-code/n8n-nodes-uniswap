@@ -4491,7 +4491,7 @@
                 "$ref": "#/components/schemas/SwapTransactionResponse"
               }
             ],
-            "description": "Ready-to-send swap transaction, returned for CLASSIC quotes when no permit signature needs to be embedded in the calldata. That's the case when the request used `x-permit2-disabled: true`, the swapper already holds a valid permit (`permitData` is `null`), or the permit was requested as a transaction (`generatePermitAsTransaction: true`). The returned calldata is built with default settings (`safetyMode: SAFE`, deadline 30 minutes ahead); use `/swap` to customize them. Not returned when `txFailureReasons` is populated; call `/swap` to build the calldata anyway. With `swapSource: \"UR\"` a failed simulation returns a 422 instead of a quote without calldata, except for `TRANSFER_FROM_FAILED` and `SLIPPAGE_TOO_LOW`, which still return calldata. `/swap` is unchanged for these quotes."
+            "description": "Ready-to-send swap transaction, returned for CLASSIC quotes when no permit signature needs to be embedded in the calldata. That's the case when the request used `x-permit2-disabled: true`, the swapper already holds a valid permit (`permitData` is `null`), or the permit was requested as a transaction (`generatePermitAsTransaction: true`). The returned calldata is built with default settings (`safetyMode: SAFE`, deadline 30 minutes ahead); use `/swap` to customize them. Not returned when `txFailureReasons` is populated; call `/swap` to build the calldata anyway. With `swapSource: \"UNIVERSAL_ROUTER\"` a failed simulation returns a 422 instead of a quote without calldata, except for `TRANSFER_FROM_FAILED` and `SLIPPAGE_TOO_LOW`, which still return calldata. `/swap` is unchanged for these quotes."
           },
           "swapGasFee": {
             "allOf": [
@@ -8213,7 +8213,7 @@
           },
           "from": {
             "$ref": "#/components/schemas/senderWalletAddress",
-            "description": "Present on every response except swapSource \"UR\" swapTransaction calldata, where the sender is the integrator's filler and unknown at quote time."
+            "description": "Present on every response except swapSource \"UNIVERSAL_ROUTER\" swapTransaction calldata, where the sender is the integrator's filler and unknown at quote time."
           },
           "data": {
             "type": "string",
@@ -8221,7 +8221,7 @@
           },
           "value": {
             "type": "string",
-            "description": "Native currency attached to the call, in wei. \"0\" for swapSource \"UR\": the filler funds the router, and for a native input attaches the delivered ETH as msg.value."
+            "description": "Native currency attached to the call, in wei. \"0\" for swapSource \"UNIVERSAL_ROUTER\": the filler funds the router, and for a native input attaches the delivered ETH as msg.value."
           },
           "gasLimit": {
             "$ref": "#/components/schemas/gasLimit"
@@ -8245,7 +8245,7 @@
           "value",
           "chainId"
         ],
-        "description": " Same shape as TransactionRequest, except `from` is omitted for swapSource \"UR\" quotes (the executing filler is unknown to the API)."
+        "description": " Same shape as TransactionRequest, except `from` is omitted for swapSource \"UNIVERSAL_ROUTER\" quotes (the executing filler is unknown to the API)."
       },
       "TransactionRequest5792": {
         "type": "object",
@@ -11391,16 +11391,16 @@
       "SwapSource": {
         "type": "string",
         "enum": [
-          "UR",
+          "UNIVERSAL_ROUTER",
           "WALLET"
         ],
         "default": "WALLET",
-        "description": "Where the input tokens come from. Leave unset (or send \"WALLET\") to pull them from the swapper's wallet as usual. Send \"UR\" to get calldata that swaps whatever balance of the input token the Universal Router holds when it runs, for bridge-and-swap flows where a bridge deposits into the router and executes the swap in the same transaction. In UR mode, quote on the destination chain, use `amount` as your estimate of what will arrive, and put the end user in `swapper`. Exact-input, single-chain, AMM-only swaps: `protocols` defaults to V2/V3/V4 and a UniswapX protocol is rejected with a 400. The returned transaction has no `from` (the executing filler is unknown) and a `value` of \"0\"; with a native input the filler must attach the delivered ETH as msg.value. The output floor is fixed at quote time from `amount` minus `slippageTolerance`: if less than `amount` arrives, the whole balance is still swapped and must clear that floor, so a delivery short by more than the tolerance reverts even without `enforceExactIn`. Use a conservative `amount` or widen `slippageTolerance`. `generatePermitAsTransaction` is rejected with a 400. Works on both /quote and /swap. A failed simulation only refuses the request when the verdict applies to a router-funded fill: a revert, or a simulation that could not run. A slippage flag, or a failure to pull from the quoted swapper, still returns calldata. Read the guide before using it: https://developers.uniswap.org/docs/trading/swapping-api/start-building/integration-guide#swapping-funds-already-in-the-universal-router-swapsource-ur"
+        "description": "Where the input tokens come from. Leave unset (or send \"WALLET\") to pull them from the swapper's wallet as usual. Send \"UNIVERSAL_ROUTER\" to get calldata that swaps whatever balance of the input token the Universal Router holds when it runs, for bridge-and-swap flows where a bridge deposits into the router and executes the swap in the same transaction. In this mode, quote on the destination chain, use `amount` as your estimate of what will arrive, and put the end user in `swapper`. Exact-input, single-chain, AMM-only swaps: `protocols` defaults to V2/V3/V4 and a UniswapX protocol is rejected with a 400. The returned transaction has no `from` (the executing filler is unknown) and a `value` of \"0\"; with a native input the filler must attach the delivered ETH as msg.value. The output floor is fixed at quote time from `amount` minus `slippageTolerance`: if less than `amount` arrives, the whole balance is still swapped and must clear that floor, so a delivery short by more than the tolerance reverts even without `enforceExactIn`. Use a conservative `amount` or widen `slippageTolerance`. `generatePermitAsTransaction` is rejected with a 400. Works on both /quote and /swap. A failed simulation only refuses the request when the verdict applies to a router-funded fill: a revert, or a simulation that could not run. A slippage flag, or a failure to pull from the quoted swapper, still returns calldata. Read the guide before using it: https://developers.uniswap.org/docs/trading/swapping-api/start-building/integration-guide#swapping-funds-already-in-the-universal-router"
       },
       "EnforceExactIn": {
         "type": "boolean",
         "default": false,
-        "description": "Only with swapSource \"UR\". Set it to true when your bridge guarantees how much will arrive; the calldata then checks the router's balance and reverts if it holds less than `amount`. Leave it off if `amount` is just an estimate, or a good fill can revert over a small shortfall. Details: https://developers.uniswap.org/docs/trading/swapping-api/start-building/integration-guide#swapping-funds-already-in-the-universal-router-swapsource-ur"
+        "description": "Only with swapSource \"UNIVERSAL_ROUTER\". Set it to true when your bridge guarantees how much will arrive; the calldata then checks the router's balance and reverts if it holds less than `amount`. Leave it off if `amount` is just an estimate, or a good fill can revert over a small shortfall. Details: https://developers.uniswap.org/docs/trading/swapping-api/start-building/integration-guide#swapping-funds-already-in-the-universal-router"
       }
     },
     "headers": {
