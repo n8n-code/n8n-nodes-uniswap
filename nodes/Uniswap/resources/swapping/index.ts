@@ -1459,7 +1459,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "permitAmount",
 			"type": "options",
 			"default": "FULL",
-			"description": "For Uniswap Protocols (v2, v3, v4) swaps, specify the input token spend allowance (e.g. quantity) to be set in the permit. `FULL` can be used to specify an unlimited token quantity, and may prevent the wallet from needing to sign another permit for the same token in the future. `EXACT` can be used to specify the exact input token quantity for this request. Defaults to `FULL`.",
+			"description": "For Uniswap Protocols (v2, v3, v4) swaps, specify the input token spend allowance (e.g. quantity) to be set in the Permit2 permit. Applies to both the Permit2 message (`generatePermitAsTransaction: false`) and the Permit2 approval transaction (`generatePermitAsTransaction: true`). `FULL` can be used to specify an unlimited token quantity, and may prevent the wallet from needing to sign another permit for the same token in the future. `EXACT` bounds the allowance to the most the swap may spend: the input amount for exact-input trades, and the quoted input amount plus slippage tolerance for exact-output trades. Defaults to `FULL`.",
 			"options": [
 				{
 					"name": "FULL",

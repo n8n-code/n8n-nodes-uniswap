@@ -1975,6 +1975,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/PlanNotOwner403"
+          },
           "404": {
             "$ref": "#/components/responses/ResourceNotFound404"
           },
@@ -2035,8 +2038,14 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/PlanNotOwner403"
+          },
           "404": {
             "$ref": "#/components/responses/ResourceNotFound404"
+          },
+          "409": {
+            "$ref": "#/components/responses/StalePlan409"
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity422"
@@ -2122,7 +2131,7 @@
       "get": {
         "operationId": "MarginMarkets",
         "summary": "Discover the margin markets a chain can trade",
-        "description": "The market picker's feed. One row per `(exposureToken, counterToken, direction)`.\n\n**Indicative by construction, and that is the point.** Rates move every block, so no listing agrees with a quote taken seconds later. The quote re-reads on chain and stamps its bounds into router calldata, so a stale row costs a re-quote and never a bad execution. That is what makes this endpoint cacheable.\n\n**The ceiling is NOT indicative.** `maxLeverage` comes from the same policy function the quote refuses on, applied to the same `maxLtv` the support check read, so a picker cannot offer a leverage the quote will reject. Never recompute it client-side from `lltv`: the LTV cliff buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%.\n\n**Each market yields BOTH readings.** A venue market is a (collateral, debt) pair, and the same on-chain position is a long of its collateral and a short of its debt. Shorting a token is only expressible as a market whose debt it is, so emitting one reading would leave a caller unable to find the side they wanted.\n\n**Always paginated**, on the same contract as `GET /orders` and `GET /plans`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out. There is no unbounded response. Not user-scoped, so there is no `swapper`.\n\n`borrowRate`, `availableBorrowLiquidity`, `oraclePrice` and `feeBps` are not populated yet and are absent rather than zero, since a zero rate and an unread rate are different facts.",
+        "description": "The market picker's feed. One row per `(exposureToken, counterToken, direction)`.\n\n**Indicative by construction, and that is the point.** Rates move every block, so no listing agrees with a quote taken seconds later. The quote re-reads on chain and stamps its bounds into router calldata, so a stale row costs a re-quote and never a bad execution. That is what makes this endpoint cacheable.\n\n**The ceiling is policy, not a promise.** `maxLeverage` comes from the same policy function the quote refuses on, applied to the same `maxLtv` the support check read, so the quote never refuses a leverage under it for the ceiling alone. The router checks health at the leverage swap's fill, though, which pays the pool's price up to its slippage bound rather than the oracle mark, so a quote near the ceiling can still be refused with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX` once that swap is priced. Never recompute it client-side from `lltv`: the LTV cliff buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%.\n\n**Each market yields BOTH readings.** A venue market is a (collateral, debt) pair, and the same on-chain position is a long of its collateral and a short of its debt. Shorting a token is only expressible as a market whose debt it is, so emitting one reading would leave a caller unable to find the side they wanted.\n\n**Always paginated**, on the same contract as `GET /orders` and `GET /plans`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out. There is no unbounded response. Not user-scoped, so there is no `swapper`.\n\n`borrowRate` and `availableBorrowLiquidity` are best-effort per venue and absent rather than zero when unread, since a zero rate and an unread rate are different facts. A venue the quote would refuse (its adapter disallowed on the router, or its market identity unreadable) is left off the row, and a row with no venue left is not served.\n\nA failed chain or discovery read is a 503 `MARGIN_MARKET_READ_UNAVAILABLE`, never a 200 with an empty page.",
         "parameters": [
           {
             "name": "chainId",
@@ -2173,7 +2182,7 @@
             "name": "cursor",
             "in": "query",
             "required": false,
-            "description": "Opaque. Echo `nextCursor` back verbatim to get the following page. A KEYSET cursor over the row order, not an offset: the catalogue is rebuilt on a timer, and an offset taken against one build silently skips or repeats rows against the next. A cursor that does not decode is a 400 `MARGIN_INVALID_CURSOR` rather than a silent restart, which would loop a client forever.",
+            "description": "Opaque. Echo `nextCursor` back verbatim to get the following page. A KEYSET cursor over the row order, not an offset: the catalogue is rebuilt on a timer, and an offset taken against one build silently skips or repeats rows against the next. A cursor that is not base64 is a 400 `RequestValidationError`; one that is base64 but does not parse is a 400 `MARGIN_INVALID_CURSOR`. Neither restarts at page one, which would loop a client forever.",
             "schema": {
               "type": "string"
             }
@@ -2227,7 +2236,7 @@
       "get": {
         "operationId": "MarginPositions",
         "summary": "A wallet's margin positions on a chain",
-        "description": "The positions tab's feed. One row per `(exposureToken, counterToken, direction)`, aggregated at read time from the legs a wallet actually holds.\n\n**Everything here is read on chain, per request.** There is no index and no store behind it: position accounts are a pure CREATE2 function of `(swapper, subId)`, so the addresses are known offchain for free and the only question the chain answers is which of them hold anything. That is what makes the feed correct from a device that has never seen this wallet before, and correct in the same block an open lands. A health factor is the one number a caller must not act on stale, which is why none of this is cached.\n\n**Legs are the unit of truth.** A logical position can span venues, and venues liquidate independently, so a row's risk numbers are the NEAREST leg's rather than an average. Balances add across legs; risk does not.\n\n**Risk is in TRADER terms.** `oraclePrice` and `liquidationPrice` are both reciprocated on a SHORT, so `liquidationPrice / oraclePrice` equals `healthFactor` on either side. A row that mixed frames would still satisfy every type check and be wrong by a factor of the price.\n\n**`maxWithdrawable` is bounded by the BUFFERED ceiling, not the raw LLTV.** There is no on-chain guard on a withdraw, so this figure is the whole guard. Never recompute it client-side from `lltv`.\n\n**Always paginated**, on the same keyset contract and the same cursor as `GET /margin/markets`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out.\n\nCost-basis fields (`entryPrice`, `openedAt`, `accruedInterest`, `unrealizedPnl`, `roe`) and the terminal fields need the margin event consumer and are ABSENT rather than zero in v1: a zero PnL is a claim, an absent one is not. For the same reason a non-`ACTIVE` `status` currently returns an empty page rather than a refusal — the question is valid, the data is not yet indexed.",
+        "description": "The positions tab's feed. One row per `(exposureToken, counterToken, direction)`, aggregated at read time from the legs a wallet actually holds.\n\n**Everything here is read on chain, per request.** There is no index and no store behind it: position accounts are a pure CREATE2 function of `(swapper, subId)`, so the addresses are known offchain for free and the only question the chain answers is which of them hold anything. That is what makes the feed correct from a device that has never seen this wallet before, and correct in the same block an open lands. A health factor is the one number a caller must not act on stale, which is why none of this is cached.\n\n**Legs are the unit of truth.** A logical position can span venues, and venues liquidate independently, so a row's risk numbers are the NEAREST leg's rather than an average. Balances add across legs; risk does not.\n\n**Risk is in TRADER terms.** `oraclePrice` and `liquidationPrice` are both reciprocated on a SHORT, so the price distance to liquidation equals `healthFactor` in either direction: `oraclePrice / liquidationPrice` on a LONG, `liquidationPrice / oraclePrice` on a SHORT. A row that mixed frames would still satisfy every type check and be wrong by a factor of the price.\n\n**`maxWithdrawable` is bounded by the BUFFERED ceiling, not the raw LLTV.** There is no on-chain guard on a withdraw, so this figure is the whole guard. Never recompute it client-side from `lltv`.\n\n**Always paginated**, on the same keyset contract and the same cursor as `GET /margin/markets`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out.\n\nCost-basis fields (`entryPrice`, `openedAt`, and the PnL fields) come from the position store and are ABSENT rather than zero for a position the store has not indexed: a zero PnL is a claim, an absent one is not. A non-`ACTIVE` `status` is served from the store, newest first, on its own opaque `cursor`; echo `nextCursor` back to page. Use a cursor only with the status that returned it.",
         "parameters": [
           {
             "name": "swapper",
@@ -2260,7 +2269,7 @@
             "name": "cursor",
             "in": "query",
             "required": false,
-            "description": "Opaque. Echo `nextCursor` back verbatim. A KEYSET cursor over the row order, the same one `GET /margin/markets` issues. A cursor that does not decode is a 400 `MARGIN_INVALID_CURSOR` rather than a silent restart, which would loop a client forever.",
+            "description": "Opaque. Echo `nextCursor` back verbatim. A KEYSET cursor over the row order, the same one `GET /margin/markets` issues. A cursor that is not base64 is a 400 `RequestValidationError`; one that is base64 but does not parse is a 400 `MARGIN_INVALID_CURSOR`. Neither restarts at page one, which would loop a client forever.",
             "schema": {
               "type": "string"
             }
@@ -2313,7 +2322,7 @@
           "margin"
         ],
         "summary": "Get a margin quote",
-        "description": "Prices a margin action (opening, closing, or managing a leveraged position) and returns both the execution subtree `POST /plan` consumes and the projections a confirmation modal renders.\n\nOne endpoint prices every action, in either direction. The market is addressed in TRADER terms (`exposureToken`, `counterToken`, `direction`), never in venue terms: `direction` alone decides which side is collateral and which is debt, so a client never sends a collateral/debt pair and never reorders the pair to mean short.\n\nThe body is a shared block plus exactly one of ten action keys. Two shared blocks are required-or-forbidden per key rather than optional: the wallet block (`walletToken`, `walletChainId`, `swapConfig`) is forbidden on `increaseLeverage` and `decreaseLeverage` and required on the other eight, and the top-level `slippageTolerance` is forbidden on `addEquity` and `withdrawEquity` and required on the other eight. See `MarginQuoteRequest` for the per-key rules.\n\nTwo tolerances, neither defaulting from the other: the top-level `slippageTolerance` bounds the LEVERAGE leg, the flash-accounted debt-funded swap inside the router, and is always an explicit percentage because it derives the calldata bounds that act as the MEV backstop. `swapConfig` bounds the WALLET-side swap and is the only place `autoSlippage` is accepted.\n\nUnits: amounts are decimal strings in the token's native decimals, leverage is a decimal string, and prices, the liquidation health factors and borrow rates are unsuffixed 18-decimal fixed point. Every response enum is serialized, including at its default value.\n\n**All ten action keys are served.**\n\n`close` is the one with nothing to solve and a risk none of the others carry: the debt it must clear KEEPS GROWING between the read and the router repaying it, so `debtToRepay` deliberately EXCEEDS what the position owes. The over-buy is the projected accrual over the inclusion window plus a small safety margin, and a trailing `SWEEP` returns whatever the buffer did not need. A close therefore reports `debtRepaid` (the debt itself) and `collateralReturned`, and reports NO leverage, liquidation price or health factor, because the position it describes will not exist. A position whose collateral cannot cover buying its debt back within the slippage-padded cap is refused with a 422 `MARGIN_CLOSE_UNFUNDABLE` rather than answered with a negative payout.\n\nA composite populates MORE than one operation, in the order they execute, and the equity side sits on opposite ends depending on which way it moves. A supply goes FIRST, because it strictly lowers LTV, so the borrow that follows is the only step raising it. A withdrawal goes LAST, matching what the router does. Both withdraw composites currently pay out ONLY in the position's collateral token, for the same reason the bare `withdrawEquity` does.\n\nWhich direction an action swaps in is decided by the SOLVE, not by the key. A target above what the position already holds buys collateral with borrowed funds and emits `INCREASE_POSITION` with `collateralToBuy` and `maxDebtIn`; a target below it sells collateral to repay debt and emits `DECREASE_POSITION` with `debtToRepay` and `maxCollateralIn`. `addEquityAndDecreaseLeverage` does BOTH depending on the numbers: deleveraging does not imply selling, it implies the equity grew faster than the size, so a modest target still buys while an aggressive one sells. The bound is always on the side the router gives up.\n\nAll six leverage-target keys (`increaseLeverage`, `decreaseLeverage` and the four equity composites) price whichever leg the solve's sign calls for, through the same v4 quoter: a target the position reaches by buying prices a leverage leg, and one it can only reach by selling prices a deleverage leg. So `addEquityAndDecreaseLeverage` normally still BUYS, and a target low enough to need a sale is priced as a `DECREASE_POSITION` rather than refused. What IS refused is a target that leaves the position exactly where it is with no equity moving, which is a `MARGIN_INTENT_MISMATCH` rather than an empty operation.\n\n`increaseLeverage` and `decreaseLeverage` hold EQUITY and move only the debt, which is the mirror of the equity keys. Both price a leverage-side leg, so both require the top-level `slippageTolerance`, and both forbid the wallet rail entirely: nothing crosses the wallet boundary, so neither serves a `funding` block. The key is an ASSERTION about which way leverage moves, checked before the leverage leg is priced (on the two add composites the wallet-side funding swap is priced first, since the target is measured against the equity it actually delivers, so a funding refusal precedes an intent mismatch there): a target on the wrong side of the position's current leverage is refused with `MARGIN_INTENT_MISMATCH` naming the key that fits (an `increaseLeverage` aimed below current leverage names `decreaseLeverage`, and the composites are corrected on their leverage axis only), while a target exactly at the current leverage satisfies either key. A target past the buffered LTV ceiling is refused with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX`.\n\nThe two equity keys hold size, so they borrow nothing, swap nothing on the leverage side and move no debt: their whole effect is on the collateral, which makes leverage fall on an add and rise on a withdrawal. Neither serves an `effectivePrice`, because there is no swap for one to describe, and their single operation is `ADD_COLLATERAL` or `WITHDRAW`.\n\n`withdrawEquity` currently pays out ONLY in the position's collateral token: its `walletToken` must equal that collateral, and any other value is refused with `MARGIN_FUNDING_SWAP_UNSUPPORTED`, because the swap that would sell the proceeds is not priced yet. A withdrawal is also held back from the venue's liquidation threshold by the LTV cliff buffer, so a request that would land the position on the edge is refused with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX` even when it is under the venue's own limit.",
+        "description": "Prices a margin action (opening, closing, or managing a leveraged position) and returns both the execution subtree `POST /plan` consumes and the projections a confirmation modal renders.\n\nOne endpoint prices every action, in either direction. The market is addressed in TRADER terms (`exposureToken`, `counterToken`, `direction`), never in venue terms: `direction` alone decides which side is collateral and which is debt, so a client never sends a collateral/debt pair and never reorders the pair to mean short.\n\nThe body is a shared block plus exactly one of ten action keys. Two shared blocks are required-or-forbidden per key rather than optional: the wallet block (`walletToken`, `walletChainId`, `swapConfig`) is forbidden on `increaseLeverage` and `decreaseLeverage` and required on the other eight, and the top-level `slippageTolerance` is forbidden on `addEquity` and `withdrawEquity` and required on the other eight. See `MarginQuoteRequest` for the per-key rules.\n\nTwo tolerances, neither defaulting from the other: the top-level `slippageTolerance` bounds the LEVERAGE leg, the flash-accounted debt-funded swap inside the router, and is always an explicit percentage because it derives the calldata bounds that act as the MEV backstop. `swapConfig.slippageTolerance` bounds the WALLET-side swap and is required as well; `autoSlippage` is refused on both legs.\n\nUnits: amounts are decimal strings in the token's native decimals, leverage is a decimal string, and prices, the liquidation health factors and borrow rates are unsuffixed 18-decimal fixed point. Every response enum is serialized, including at its default value.\n\n**All ten action keys are served.**\n\n`close` is the one with nothing to solve and a risk none of the others carry: the debt it must clear KEEPS GROWING between the read and the router repaying it, so `debtToRepay` deliberately EXCEEDS what the position owes. The over-buy is the projected accrual over the inclusion window plus a small safety margin, and a trailing `SWEEP` returns whatever the buffer did not need. A close therefore reports `debtRepaid` (the debt itself) and `collateralReturned`, and reports NO leverage, liquidation price or health factor, because the position it describes will not exist. A position whose collateral cannot cover buying its debt back within the slippage-padded cap is refused with a 422 `MARGIN_CLOSE_UNFUNDABLE` rather than answered with a negative payout.\n\nA composite populates MORE than one operation, in the order they execute, and the equity side sits on opposite ends depending on which way it moves. A supply goes FIRST, because it strictly lowers LTV, so the borrow that follows is the only step raising it. A withdrawal goes LAST, matching what the router does. Both withdraw composites currently pay out ONLY in the position's collateral token, for the same reason the bare `withdrawEquity` does.\n\nWhich direction an action swaps in is decided by the SOLVE, not by the key. A target above what the position already holds buys collateral with borrowed funds and emits `INCREASE_POSITION` with `collateralToBuy` and `maxDebtIn`; a target below it sells collateral to repay debt and emits `DECREASE_POSITION` with `debtToRepay` and `maxCollateralIn`. `addEquityAndDecreaseLeverage` does BOTH depending on the numbers: deleveraging does not imply selling, it implies the equity grew faster than the size, so a modest target still buys while an aggressive one sells. The bound is always on the side the router gives up.\n\nAll six leverage-target keys (`increaseLeverage`, `decreaseLeverage` and the four equity composites) price whichever leg the solve's sign calls for, through the same v4 quoter: a target the position reaches by buying prices a leverage leg, and one it can only reach by selling prices a deleverage leg. So `addEquityAndDecreaseLeverage` normally still BUYS, and a target low enough to need a sale is priced as a `DECREASE_POSITION` rather than refused. What IS refused is a target that leaves the position exactly where it is with no equity moving, which is a `MARGIN_INTENT_MISMATCH` rather than an empty operation.\n\n`increaseLeverage` and `decreaseLeverage` hold EQUITY and move only the debt, which is the mirror of the equity keys. Both price a leverage-side leg, so both require the top-level `slippageTolerance`, and both forbid the wallet rail entirely: nothing crosses the wallet boundary, so neither serves a `funding` block. The key is an ASSERTION about which way leverage moves, checked before the leverage leg is priced (on the two add composites the wallet-side funding swap is priced first, since the target is measured against the equity it actually delivers, so a funding refusal precedes an intent mismatch there): a target on the wrong side of the position's current leverage is refused with `MARGIN_INTENT_MISMATCH` naming the key that fits (an `increaseLeverage` aimed below current leverage names `decreaseLeverage`, and the composites are corrected on their leverage axis only), while a target exactly at the current leverage satisfies either key. A target past the buffered LTV ceiling is refused with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX`.\n\nThe two equity keys hold size, so they borrow nothing, swap nothing on the leverage side and move no debt: their whole effect is on the collateral, which makes leverage fall on an add and rise on a withdrawal. Neither serves an `effectivePrice`, because there is no swap for one to describe, and their single operation is `ADD_COLLATERAL` or `WITHDRAW`.\n\n`withdrawEquity` currently pays out ONLY in the position's collateral token: its `walletToken` must equal that collateral, and any other value is refused with `MARGIN_FUNDING_SWAP_UNSUPPORTED`, because the swap that would sell the proceeds is not priced yet. A withdrawal is also held back from the venue's liquidation threshold by the LTV cliff buffer, so a request that would land the position on the edge is refused with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX` even when it is under the venue's own limit.",
         "operationId": "margin_quote",
         "security": [
           {
@@ -2345,7 +2354,7 @@
                     "walletToken": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
                     "walletChainId": 1,
                     "swapConfig": {
-                      "autoSlippage": "DEFAULT"
+                      "slippageTolerance": 0.5
                     },
                     "open": {
                       "leverageTarget": "3",
@@ -2369,7 +2378,7 @@
                     "walletToken": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
                     "walletChainId": 1,
                     "swapConfig": {
-                      "autoSlippage": "DEFAULT"
+                      "slippageTolerance": 0.5
                     },
                     "open": {
                       "leverageTarget": "2",
@@ -3432,7 +3441,7 @@
         }
       },
       "MarginBadRequest400": {
-        "description": "The request was refused before anything was priced. `errorCode` is `RequestValidationError` when the body or query failed schema validation, which on `POST /margin/quote` includes sending no action key or more than one, a wallet block or `slippageTolerance` on a key that forbids it, and a `leverageTarget` at or below 1; it is `BadRequest` when the request parsed but the margin domain refused it, with the margin code in `detail`, optionally followed by `: ` and a corrective hint.\n\nOn `POST /margin/quote` the codes are: `MARGIN_MARKET_NOT_SUPPORTED`, the chain has no margin configuration (or no v4 quoter), the position's venue is not configured, or none of the named `venues` is configured (an unsupported pair is not this code: it is a 422 `MARGIN_NO_ELIGIBLE_VENUE` on `open` and `MARGIN_POSITION_NOT_FOUND` on the manage keys); `MARGIN_INTENT_MISMATCH`, the action key contradicts the numbers. A leverage target on the wrong side of the position's current leverage names the key to send instead on its leverage axis only (`MARGIN_INTENT_MISMATCH: decreaseLeverage` for an `increaseLeverage` aimed below current leverage, and likewise for the composites), a `close` of a position with no debt names `withdrawEquity`, a withdrawal of every last unit of collateral names `close`, and a target that moves nothing, or an `open` whose target buys no collateral at all, carries no suffix; `MARGIN_POSITION_NOT_FOUND`, no live position with that `positionId` for this `swapper` on this market; `MARGIN_FUNDING_SWAP_UNSUPPORTED`, `walletChainId` differs from `positionChainId`, since cross-chain funding is a bridge rather than a swap and is not served yet, or a pay-out key (`close`, `withdrawEquity` and the withdraw composites) named a `walletToken` other than the position's collateral, with the suffix naming what to ask for; `MARGIN_SLIPPAGE_TOLERANCE_REQUIRED`, a leg that swaps was sent without an explicit tolerance: `swapConfig.slippageTolerance` on a wallet-side swap, since `autoSlippage` is not resolved yet, or the leverage leg's top-level `slippageTolerance`; `MARGIN_LEVERAGE_EXCEEDS_MAX` on `open` only, every venue that carries the pair has a buffered leverage ceiling below `leverageTarget`, so lowering it is the fix (on the manage keys the same code is a 422, because the position's own state decides it).\n\nOn `GET /margin/markets` the codes are: `MARGIN_MARKET_NOT_SUPPORTED`, the chain has no margin configuration; `MARGIN_INVALID_CURSOR`, a `cursor` that does not decode, refused rather than restarting at page one. An unrecognised `venues` value is a `RequestValidationError`.",
+        "description": "The request was refused before anything was priced. `errorCode` is `RequestValidationError` when the body or query failed schema validation, which on `POST /margin/quote` includes sending no action key or more than one, a wallet block or `slippageTolerance` on a key that forbids it, a `leverageTarget` at or below 1, an `autoSlippage` or a missing or 100% `swapConfig.slippageTolerance`, an `amount` that is zero, has leading zeros or exceeds 2^128 - 1, and a `positionId` with leading zeros or above 2^256 - 1; it is `BadRequest` when the request parsed but the margin domain refused it, with the margin code in `detail`, optionally followed by `: ` and a corrective hint.\n\nOn `POST /margin/quote` the codes are: `MARGIN_MARKET_NOT_SUPPORTED`, the chain has no margin configuration (or no v4 quoter), the position's venue is not configured, or none of the named `venues` is configured (an unsupported pair is not this code: it is a 422 `MARGIN_NO_ELIGIBLE_VENUE` on `open` and `MARGIN_POSITION_NOT_FOUND` on the manage keys); `MARGIN_INTENT_MISMATCH`, the action key contradicts the numbers. A leverage target on the wrong side of the position's current leverage names the key to send instead on its leverage axis only (`MARGIN_INTENT_MISMATCH: decreaseLeverage` for an `increaseLeverage` aimed below current leverage, and likewise for the composites), a `close` of a position with no debt names `withdrawEquity`, whose full `collateralAmount` is that position's exit, a withdrawal of every last unit of collateral from a position that still owes debt, or a withdraw composite taking out all of the equity, names `close`, and a target that moves nothing, or an `open` whose target buys no collateral at all, carries no suffix; `MARGIN_POSITION_NOT_FOUND`, no live position with that `positionId` for this `swapper` on this market; `MARGIN_FUNDING_SWAP_UNSUPPORTED`, `walletChainId` differs from `positionChainId` on any key that carries the wallet block, pay-out keys included, since cross-chain funding is a bridge rather than a swap and is not served yet, or a pay-out key (`close`, `withdrawEquity` and the withdraw composites) named a `walletToken` other than the position's collateral, with the suffix `pays out in <collateral address>` naming the token to send as `walletToken` instead; `MARGIN_SLIPPAGE_TOLERANCE_REQUIRED`, a leg that swaps reached pricing without an explicit tolerance, a backstop behind the schema, which requires both; `MARGIN_LEVERAGE_EXCEEDS_MAX` on `open` only, every venue that carries the pair has a buffered leverage ceiling below `leverageTarget`, so lowering it is the fix (on the manage keys the same code is a 422, because the position's own state decides it).\n\nOn `GET /margin/markets` the codes are: `MARGIN_MARKET_NOT_SUPPORTED`, the chain has no margin configuration; `MARGIN_INVALID_CURSOR`, a `cursor` that does not decode, refused rather than restarting at page one. An unrecognised `venues` value is a `RequestValidationError`.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -3507,7 +3516,7 @@
         }
       },
       "MarginUnavailable503": {
-        "description": "A venue's on-chain state could not be read. `errorCode` is `ServiceUnavailable` and `detail` is `MARGIN_MARKET_READ_UNAVAILABLE`. Retryable. On `POST /margin/quote`: a market snapshot, a token's decimals or, on `close`, the borrow rate that sizes the accrual buffer was unavailable, so the mark and the risk numbers cannot be derived; an unavailable gas oracle does NOT produce this, since `gasEstimate` is indicative and is simply omitted. On `GET /margin/markets`: a market-discovery read (router or adapter multicall) failed.",
+        "description": "A venue's on-chain state could not be read. `errorCode` is `ServiceUnavailable` and `detail` is `MARGIN_MARKET_READ_UNAVAILABLE`. Retryable. On `POST /margin/quote`: a market snapshot, a token's decimals, the v4 quoter read that prices a leverage leg (an RPC failure, not a revert for want of a pool) or, on `close`, the borrow rate that sizes the accrual buffer was unavailable, or a venue's oracle answered a zero mark, so the mark and the risk numbers cannot be derived; an unavailable gas oracle does NOT produce this, since `gasEstimate` is indicative and is simply omitted. On `GET /margin/markets`: a market-discovery read (router or adapter multicall) failed.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -3759,7 +3768,7 @@
         }
       },
       "MarginUnprocessable422": {
-        "description": "The request is well formed but cannot be priced as asked. `errorCode` is `UnprocessableEntity` and `detail` is the margin code with no suffix: `MARGIN_NO_ELIGIBLE_VENUE`, on `open`, no venue can hold this market at all (none supports the pair, none has an allowed adapter, or none has an oracle the service can mark against), which a later block may change; `MARGIN_INSUFFICIENT_BORROW_LIQUIDITY`, on `open`, every eligible venue would have to lend more than it can (the manage keys do not check lendable balance); `MARGIN_SWAP_INSUFFICIENT_LIQUIDITY`, a swap leg cannot be priced or bounded: no route for the wallet-side swap, no v4 pool to price the leverage leg through, or a fill so small that its slippage bound rounds to zero, which the router refuses outright; `MARGIN_SWAP_PRICE_IMPACT`, the leverage leg would fill more than 150bps above the pool's own marginal price, measured against the route rather than against any oracle, and on leverage that cost is an instant drawdown multiplied by the leverage. Never raised on `close`, where refusing would leave the caller unable to exit; `MARGIN_LEVERAGE_EXCEEDS_MAX` on the manage keys, the position AFTER the action would sit at or past the venue's buffered LTV ceiling, including a `withdrawEquity` that walks it there (on `open` the same code is a 400, since lowering `leverageTarget` is the fix); `MARGIN_CLOSE_UNFUNDABLE`, on `close` the collateral the position holds cannot cover buying its debt back within the slippage-padded cap, so the exit cannot be funded from the position itself and is refused rather than reported as a negative payout.",
+        "description": "The request is well formed but cannot be priced as asked. `errorCode` is `UnprocessableEntity` and `detail` is the margin code with no suffix: `MARGIN_NO_ELIGIBLE_VENUE`, on `open`, no venue can hold this market at all (none supports the pair, none has an allowed adapter, or none has an oracle the service can mark against), which a later block may change, or the market, or every venue named for it, is not one `GET /margin/markets` lists, since positions and account allocation only ever look there, and on a manage key that supplies collateral or borrows, the position's adapter is not allowed on the router (decreases, withdrawals and `close` are still served), and on any key a token of the pair answers like no ERC20 (no code, or no `decimals()`); `MARGIN_INSUFFICIENT_BORROW_LIQUIDITY`, on `open`, every eligible venue would have to lend more than it can (the manage keys do not check lendable balance); `MARGIN_SWAP_INSUFFICIENT_LIQUIDITY`, a swap leg cannot be priced or bounded: no route for the wallet-side swap, a wallet-side swap whose floor at `swapConfig.slippageTolerance` rounds to zero, no v4 pool to price the leverage leg through, a leverage swap wider than the router's uint128 amount, or a fill so small that its slippage bound rounds to zero, which the router refuses outright; `MARGIN_SWAP_PRICE_IMPACT`, the leverage leg would fill more than 150bps above the pool's own marginal price, measured against the route rather than against any oracle, and on leverage that cost is an instant drawdown multiplied by the leverage. Never raised on `close`, where refusing would leave the caller unable to exit; `MARGIN_LEVERAGE_EXCEEDS_MAX` on the manage keys, the position AFTER the action would sit at or past the venue's buffered LTV ceiling, including a `withdrawEquity` that walks it there (on `open` the same code is a 400 when the target itself is past every venue's ceiling, since lowering `leverageTarget` is the fix), and on `open` and every action that buys, the debt the leverage swap may spend at its slippage bound, valued at the venue's mark, would land the position at or past that ceiling even though the target is under it; `MARGIN_POSITION_UNDERWATER`, on the six leverage-target keys, the venue reports the position's debt at or above its collateral value, so there is no equity for a leverage target to multiply; `MARGIN_CLOSE_UNFUNDABLE`, on `close` the collateral the position holds cannot cover buying its debt back within the slippage-padded cap, so the exit cannot be funded from the position itself and is refused rather than reported as a negative payout.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -3775,6 +3784,36 @@
       },
       "ReservationContended409": {
         "description": "A margin open lost the race for its sub-account. The subId this plan was allocated was claimed by another plan between the allocation read and the write, so nothing was persisted. Retrying the same request allocates the next free subId; it is not a server fault and needs no operator action.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Err409"
+            }
+          }
+        }
+      },
+      "PlanNotOwner403": {
+        "description": "The plan exists but was created by another caller: `errorCode` is `ForbiddenError` and `detail` is `Caller is not the owner of this plan`. Only the caller that created a plan (the same session or API key) can read, refresh or update it.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Err403"
+            }
+          }
+        }
+      },
+      "StalePlan409": {
+        "description": "A concurrent request saved a newer version of the plan between this update's read and its write, so nothing from this request was saved: `errorCode` is `StalePlanError`. Re-GET the plan and PATCH again if the step still needs the proof; re-sending a proof the step already records is accepted without change.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -6497,7 +6536,7 @@
       "MarginPlanIntent": {
         "type": "object",
         "x-internal": true,
-        "description": "Names the margin position a plan acts on. Present only on a margin plan, so its absence is how a client tells one from a swap plan. Everything the router needs -- adapter, universal router, pool key, bounds, deadline -- stays server-side. `marketKey` is display-only: resolve the market from `collateralToken`, `debtToken` and `venue` rather than by parsing it.",
+        "description": "Names the margin position a plan acts on. Present only on a margin plan, so its absence is how a client tells one from a swap plan. Everything the router needs -- adapter, universal router, pool key, bounds, deadline -- stays server-side. `marketKey` is display-only: resolve the market from `collateralToken`, `debtToken` and `venue` rather than by parsing it.\n\nOn a margin plan the `MARGIN_EXECUTE` step's `tokenInAmount` is the collateral pulled from the wallet. Its `tokenOutAmount`, and the plan's `expectedOutput`, are what the plan pays the wallet on the keys that pay out (`withdrawEquity`, the two withdraw composites, and `close`, where it is the floor of the collateral returned), and the collateral committed to the position on every other key.",
         "properties": {
           "intent": {
             "type": "string",
@@ -8011,7 +8050,7 @@
           "FULL",
           "EXACT"
         ],
-        "description": "For Uniswap Protocols (v2, v3, v4) swaps, specify the input token spend allowance (e.g. quantity) to be set in the permit. `FULL` can be used to specify an unlimited token quantity, and may prevent the wallet from needing to sign another permit for the same token in the future. `EXACT` can be used to specify the exact input token quantity for this request. Defaults to `FULL`.",
+        "description": "For Uniswap Protocols (v2, v3, v4) swaps, specify the input token spend allowance (e.g. quantity) to be set in the Permit2 permit. Applies to both the Permit2 message (`generatePermitAsTransaction: false`) and the Permit2 approval transaction (`generatePermitAsTransaction: true`). `FULL` can be used to specify an unlimited token quantity, and may prevent the wallet from needing to sign another permit for the same token in the future. `EXACT` bounds the allowance to the most the swap may spend: the input amount for exact-input trades, and the quoted input amount plus slippage tolerance for exact-output trades. Defaults to `FULL`.",
         "default": "FULL"
       },
       "IntegratorFee": {
@@ -9051,7 +9090,7 @@
           "marginQuote": {
             "type": "object",
             "x-internal": true,
-            "description": "A margin quote echoed back, in place of `quote`. Exactly one of the two is accepted. Every bound and the pool are re-derived from the venue at plan create rather than trusted, so this names the shape of the position and never the numbers it executes on."
+            "description": "A margin quote echoed back verbatim, in place of `quote`. Exactly one of the two is accepted. Decoded strictly: an unknown field, an unrecognised enum string or a wrongly typed value is a 400 `RequestValidationError`. Every bound and the pool are re-derived from the venue at plan create, and a re-derived `maxDebtIn` or `maxCollateralIn` is never looser than the one echoed, since that is the bound the caller agreed to.\n\nRefused with a 400 `MARGIN_PLAN_OPERATION_UNSUPPORTED`: a `legs[].subId` on `open`, which the service allocates; an amount or `subId` that is not a non-negative integer string in range; a `funding` block without its `slippageTolerance`. Refused with a 422: `MARGIN_PRICE_DRIFT`, the leverage leg now costs more than the echoed `maxDebtIn` (or sells more than the echoed `maxCollateralIn`), so re-quote; `MARGIN_SWAP_PRICE_IMPACT`, the leverage leg now crosses the quote's 150bps ceiling; `MARGIN_NO_ELIGIBLE_VENUE`, the venue no longer carries the market or its adapter is no longer allowlisted. A `close` is never refused for drift or impact: its cap is held to the echoed one.\n\nThe wallet-side funding swap runs at `funding.slippageTolerance`, the tolerance its floor was derived at, and routes over V2, V3 and V4 pools without hooks, never UniswapX. An `open` on a market or venue `GET /margin/markets` does not list is refused with a 422 `MARGIN_NO_ELIGIBLE_VENUE`."
           }
         },
         "required": [
@@ -9810,7 +9849,7 @@
           },
           "maxLeverage": {
             "type": "string",
-            "description": "Decimal string, derived from the venue's BORROW-side LTV with the LTV cliff buffer already applied. Server-authored: a client must not compute this from `lltv`, or its ceiling and the quote's refusal disagree. Note the buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%."
+            "description": "Decimal string, derived from the venue's BORROW-side LTV with the LTV cliff buffer already applied. Server-authored: a client must not compute this from `lltv`, or its ceiling and the quote's refusal disagree. The policy ceiling, not a guarantee: a quote near it can still be refused once its swap is priced. Note the buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%."
           },
           "lltv": {
             "type": "string",
@@ -9822,7 +9861,7 @@
           },
           "availableBorrowLiquidity": {
             "type": "string",
-            "description": "What the venue can actually lend, in raw debt-token units. On Aave this is `min(virtual balance, borrow cap - debt)`: the cap usually binds first, so the balance alone overstates it. Absent when the read failed."
+            "description": "What the venue can actually lend, in raw debt-token units. On Aave this is `min(virtual balance, borrow cap - debt)`: the cap usually binds first, so the balance alone overstates it. Absent when the read failed, and always absent on `AAVE_V4`, whose liquidity is not read."
           }
         }
       },
@@ -9928,10 +9967,12 @@
           },
           "equity": {
             "type": "string",
-            "description": "Collateral net of debt, in exposure-token base units."
+            "description": "Collateral net of debt, each leg's debt valued at its own venue mark, in COLLATERAL-token base units: the exposure token on a LONG, the counter token on a SHORT, so scale it by that token's decimals. Absent when a leg's mark could not be read."
           },
           "leverage": {
-            "$ref": "#/components/schemas/marginLeverage"
+            "type": "string",
+            "description": "Collateral over equity, as a decimal string (`\"1.83\"`): the encoding `POST /margin/quote` serves as `display.leverage` and reads back as a leverage target, never a raw WAD integer. Absent when the position is underwater: with no equity there is no finite leverage, and `healthFactor` is below 1e18.",
+            "pattern": "^[0-9]+(\\.[0-9]+)?$"
           },
           "oraclePrice": {
             "type": "string",
@@ -9939,11 +9980,11 @@
           },
           "liquidationPrice": {
             "type": "string",
-            "description": "Nearest leg, in trader terms. `liquidationPrice / oraclePrice` equals `healthFactor` on both directions."
+            "description": "Nearest leg, in trader terms. `oraclePrice / liquidationPrice` equals `healthFactor` on a LONG; on a SHORT, where both prices are reciprocated, `liquidationPrice / oraclePrice` does."
           },
           "buffer": {
             "type": "string",
-            "description": "How far the mark can move before the nearest leg liquidates, as a WAD fraction."
+            "description": "How far the mark can move before the nearest leg liquidates, as a WAD fraction of the mark. Zero at or past liquidation, never negative: `healthFactor` says how far past."
           },
           "healthFactor": {
             "type": "string",
@@ -10031,7 +10072,7 @@
             "items": {
               "$ref": "#/components/schemas/MarginPendingPlan"
             },
-            "description": "The margin plans this swapper started and has not finished, newest first, so a client can offer to resume or cancel one. Terminal plans are excluded server-side. Serializes as [] when the read ran and found nothing; it cannot express \"not read\", so a degraded plan-store read logs a warning and reports empty rather than failing the page."
+            "description": "The margin plans this swapper started and has not finished, newest first, so a client can offer to resume or cancel one. Terminal plans are excluded server-side, and so is a plan whose execute deadline has passed, since its MARGIN_EXECUTE can only revert; one with an in-progress step carrying a proof stays, uncancellable, because that transaction may have landed. Served on the first page only: a request carrying `cursor` gets [] here, so concatenating pages never repeats a plan. Serializes as [] when the read ran and found nothing; it cannot express \"not read\", so a degraded plan-store read logs a warning and reports empty rather than failing the page."
           }
         }
       },
@@ -10163,7 +10204,7 @@
         "items": {
           "$ref": "#/components/schemas/ProtocolItemsAmm"
         },
-        "description": "The AMM allowlist for the swap legs, distinct from `venues`, which is the lending allowlist. Only Uniswap AMM protocols are eligible: a margin leg is flash-accounted inside the router, so UniswapX order types cannot serve it."
+        "description": "The AMM allowlist for the swap legs, distinct from `venues`, which is the lending allowlist. Only Uniswap AMM protocols are eligible: a margin leg is flash-accounted inside the router, so UniswapX order types cannot serve it. Applies when the quote is priced: the funding swap `POST /plan` builds routes over V2, V3 and V4 pools without hooks whatever this list named."
       },
       "MarginQuoteAddEquityAndDecreaseLeverageRequest": {
         "type": "object",
@@ -11011,15 +11052,11 @@
       },
       "MarginSwapConfig": {
         "type": "object",
-        "description": "Execution policy for the WALLET-side swap, and nothing else. It names no token, no chain, no amount and no trade type: identity lives at the top level in `walletToken`/`walletChainId`, the magnitude lives in the action key, and exact-in versus exact-out follows from whether the action pays in or pays out.\n\nAt most one of `slippageTolerance` and `autoSlippage` may be set; sending both is rejected. Sending neither is allowed, and leaves the wallet-side swap on the server's default. This is the only place `autoSlippage` is accepted: the leverage leg's tolerance is always an explicit percentage.\n\nKept separate from `walletToken` because the two have different lifetimes: `walletToken` is always meaningful, while this block can be moot, since paying in the collateral token needs no funding swap at all and whether one is needed is a routing outcome not knowable at request time.",
+        "description": "Execution policy for the WALLET-side swap, and nothing else. It names no token, no chain, no amount and no trade type: identity lives at the top level in `walletToken`/`walletChainId`, the magnitude lives in the action key, and exact-in versus exact-out follows from whether the action pays in or pays out.\n\n`slippageTolerance` is required and must be below 100, since at 100% the floor the position is sized on is zero. `autoSlippage` is refused by name with a `RequestValidationError`, as on the leverage leg: this tolerance derives that floor, and a resolved auto-slippage value is not visible to the sizing path.\n\nKept separate from `walletToken` because the two have different lifetimes: `walletToken` is always meaningful, while this block can be moot, since paying in the collateral token needs no funding swap at all and whether one is needed is a routing outcome not knowable at request time.",
         "properties": {
           "slippageTolerance": {
             "$ref": "#/components/schemas/slippageTolerance",
-            "description": "The WALLET-side swap’s tolerance. Derives `funding.output.minimumAmount`, which is the equity the position is sized on — not `funding.output.amount`. Required in practice today, since `autoSlippage` is not served yet."
-          },
-          "autoSlippage": {
-            "$ref": "#/components/schemas/AutoSlippage",
-            "description": "Accepted by the schema but NOT served yet: a quote sent with `autoSlippage` and no `slippageTolerance` is refused with `MARGIN_SLIPPAGE_TOLERANCE_REQUIRED`. The wallet leg’s tolerance derives the floor the position is SIZED on, and a resolved auto-slippage value is not visible at that point, so an equity bounded by a number the sizing path cannot see is refused rather than assumed."
+            "description": "The WALLET-side swap’s tolerance, from 0 up to but excluding 100. Derives `funding.output.minimumAmount`, which is the equity the position is sized on — not `funding.output.amount`."
           },
           "protocols": {
             "$ref": "#/components/schemas/MarginProtocols"
@@ -11029,12 +11066,9 @@
             "description": "Defaults to `BEST_PRICE`, matching every other quote in this API. This leg is the slowest call in a margin quote, and `FASTEST` takes roughly a second off it for a handful of basis points -- which `slippageTolerance` already floors before the position is sized. Send `FASTEST` when the quote is indicative and the latency matters more than the last few bps."
           }
         },
-        "not": {
-          "required": [
-            "slippageTolerance",
-            "autoSlippage"
-          ]
-        }
+        "required": [
+          "slippageTolerance"
+        ]
       },
       "MarginVenues": {
         "type": "array",
@@ -11073,8 +11107,8 @@
       },
       "marginPositionId": {
         "type": "string",
-        "description": "The id of an existing margin position, as a positive integer string. Absent on `open`, where the server allocates it at plan create.",
-        "pattern": "^[0-9]+$"
+        "description": "The id of an existing margin position, as a decimal integer string with no leading zeros, at most 2^256 - 1 (the router's uint256 subId). Absent on `open`, where the server allocates it at plan create.",
+        "pattern": "^(0|[1-9][0-9]*)$"
       },
       "marginFixedPoint18": {
         "type": "string",
@@ -11122,7 +11156,7 @@
           },
           "maxDebtIn": {
             "$ref": "#/components/schemas/tokenAmount",
-            "description": "`INCREASE_POSITION` only: the binding cap on debt spent, the expected debt padded UP by the leverage leg's `slippageTolerance`. Mandatory and non-zero on-chain, since the router refuses a zero bound outright; a fill too small to bound is refused as a 422 `MARGIN_SWAP_INSUFFICIENT_LIQUIDITY`. Derived from the top-level tolerance and never from `swapConfig`'s, so widening the wallet-side swap cannot loosen the MEV backstop."
+            "description": "`INCREASE_POSITION` only: the binding cap on debt spent, the expected debt padded UP by the leverage leg's `slippageTolerance`, and the most `POST /plan` will stamp: a re-priced fill above it is refused with a 422 `MARGIN_PRICE_DRIFT`. Mandatory and non-zero on-chain, since the router refuses a zero bound outright; a fill too small to bound is refused as a 422 `MARGIN_SWAP_INSUFFICIENT_LIQUIDITY`. Derived from the top-level tolerance and never from `swapConfig`'s, so widening the wallet-side swap cannot loosen the MEV backstop."
           },
           "debtToRepay": {
             "$ref": "#/components/schemas/tokenAmount",
@@ -11130,7 +11164,7 @@
           },
           "maxCollateralIn": {
             "$ref": "#/components/schemas/tokenAmount",
-            "description": "`DECREASE_POSITION` only: the cap on collateral sold to raise `debtToRepay`, padded UP by the leverage leg's `slippageTolerance`."
+            "description": "`DECREASE_POSITION` only: the cap on collateral sold to raise `debtToRepay`, padded UP by the leverage leg's `slippageTolerance`, and the most `POST /plan` will stamp. A re-priced fill above it is refused with a 422 `MARGIN_PRICE_DRIFT`, except on `close`, whose cap is held to this one rather than refused."
           },
           "maxLtvAfter": {
             "$ref": "#/components/schemas/marginFixedPoint18",
@@ -11146,7 +11180,7 @@
           },
           "effectivePrice": {
             "$ref": "#/components/schemas/marginFixedPoint18",
-            "description": "This operation's quoted fill, and the price-drift reference when `POST /plan` re-stamps. Present on `INCREASE_POSITION` and `DECREASE_POSITION`, the two operations that swap; absent on the rest."
+            "description": "This operation's quoted fill. Reported only: `POST /plan` measures drift against `maxDebtIn` and `maxCollateralIn`, not against this. On the venue's own (collateral, debt) orientation, debt per collateral, so a short's reads inverted relative to `display.effectivePrice`. Present on `INCREASE_POSITION` and `DECREASE_POSITION`, the two operations that swap; absent on the rest."
           }
         },
         "required": [
@@ -11163,7 +11197,7 @@
           },
           "subId": {
             "$ref": "#/components/schemas/marginPositionId",
-            "description": "Server-resolved on the manage keys, where it is the `positionId` the request addressed. Absent on `open` until plan create allocates one."
+            "description": "Server-resolved on the manage keys, where it is the `positionId` the request addressed. Absent on `open` until plan create allocates one, and `POST /plan` refuses an `open` echo that carries one."
           },
           "operations": {
             "type": "array",
@@ -11290,11 +11324,11 @@
           },
           "effectivePrice": {
             "$ref": "#/components/schemas/marginFixedPoint18",
-            "description": "The quoted fill including fees, impact and slippage, size-weighted across legs. A property of a swap, so it is absent on `addEquity` and `withdrawEquity`, which perform none: reporting the mark there would be the exact substitution this field exists to prevent."
+            "description": "The quoted fill including fees, impact and slippage, size-weighted across legs. A property of a swap, so it is absent on `addEquity` and `withdrawEquity`, which perform none: reporting the mark there would be the exact substitution this field exists to prevent. In TRADER terms (counter per exposure): on a short, the reciprocal of the operation's `effectivePrice`."
           },
           "liquidationPrice": {
             "$ref": "#/components/schemas/marginFixedPoint18",
-            "description": "The oracle price at which LTV reaches LLTV. Multi-leg: the nearest leg's, because legs liquidate independently. Absent on `close`. In TRADER terms (counter per exposure): on a short this is the reciprocal of the venue frame that `oraclePrice` and `effectivePrice` are reported in."
+            "description": "The oracle price at which LTV reaches LLTV. Multi-leg: the nearest leg's, because legs liquidate independently. Absent on `close`. In TRADER terms (counter per exposure), the same frame as `oraclePrice` and `effectivePrice`."
           },
           "healthFactor": {
             "$ref": "#/components/schemas/marginFixedPoint18",
@@ -11306,7 +11340,7 @@
           },
           "oraclePrice": {
             "$ref": "#/components/schemas/marginFixedPoint18",
-            "description": "The venue's liquidation-reference price, on the venue's own (collateral, debt) orientation rather than in trader terms, so a short's reads inverted relative to its exposure token."
+            "description": "The venue's liquidation-reference price, in TRADER terms (counter per exposure): reciprocated on a short, the same frame as `effectivePrice` and `liquidationPrice`."
           },
           "collateralReturned": {
             "$ref": "#/components/schemas/tokenAmount",
