@@ -6266,8 +6266,28 @@
             "x-internal": true,
             "type": "number",
             "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For bridges this is the relayer fee as a percent of the input, 1 - amountOut / amountIn, computed on raw amounts since the same asset with the same decimals is bridged on both chains."
+          },
+          "provider": {
+            "$ref": "#/components/schemas/BridgeProvider"
+          },
+          "approvalSpender": {
+            "type": "string",
+            "description": "The contract the swapper must approve to spend the input token for this quote. Absent for native input. Differs by provider (the Across SpokePool or a Relay contract), so approve against this address rather than assuming one.",
+            "pattern": "^(0x)?[0-9a-fA-F]{40}$"
+          },
+          "transactionRequest": {
+            "$ref": "#/components/schemas/TransactionRequest",
+            "description": "The deposit transaction the provider built, present on Relay quotes. Send the quote unchanged to /swap, which returns this transaction with gas fields attached."
           }
         }
+      },
+      "BridgeProvider": {
+        "type": "string",
+        "enum": [
+          "ACROSS",
+          "RELAY"
+        ],
+        "description": "The bridge vendor serving the route."
       },
       "SafetyLevel": {
         "type": "string",
@@ -10183,7 +10203,6 @@
         },
         "required": [
           "leverageTarget",
-          "venues",
           "amount"
         ]
       },
@@ -11075,8 +11094,7 @@
         "items": {
           "$ref": "#/components/schemas/MarginVenue"
         },
-        "minItems": 1,
-        "description": "The LENDING allowlist for the position, distinct from `protocols`, which is the AMM allowlist for the swap legs. At least one venue must be named; the server ranks the allowed venues and serves the best one."
+        "description": "The LENDING allowlist for the position, distinct from `protocols`, which is the AMM allowlist for the swap legs. Omitted or empty allows every venue the market is served on; the server ranks the allowed venues and serves the best one."
       },
       "MarginWalletBlock": {
         "type": "object",
