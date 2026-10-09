@@ -7154,6 +7154,10 @@
               "$ref": "#/components/schemas/RouteCandidate"
             }
           },
+          "routeGraph": {
+            "x-internal": true,
+            "$ref": "#/components/schemas/RouteGraph"
+          },
           "priceDifference": {
             "x-internal": true,
             "type": "number",
@@ -7181,6 +7185,94 @@
         "required": [
           "routeString",
           "quoteAmount"
+        ]
+      },
+      "RouteGraph": {
+        "x-internal": true,
+        "type": "object",
+        "description": "Pool-level graph of the quoted route: one entry per pool hop, in swap direction. Omitted whenever it cannot be built completely (unresolvable token, shares that do not reconcile, a cycle), so it is either whole or absent.",
+        "properties": {
+          "pools": {
+            "type": "array",
+            "description": "One entry per pool hop (edge). The same pool traversed in both directions appears twice.",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/RouteGraphPool"
+            }
+          }
+        },
+        "required": [
+          "pools"
+        ]
+      },
+      "RouteGraphPool": {
+        "x-internal": true,
+        "type": "object",
+        "description": "One pool hop of the quoted route, oriented in swap direction (input -> output) regardless of tradeType. `tokenIn`/`tokenOut` carry `address` and `symbol`; `decimals` is present only for the native currency and its wrapped token, so do not do amount math on it. A graph node is a token plus its visit index (`tokenInVisit`/`tokenOutVisit`), so a token the route passes through more than once appears as several nodes.",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "enum": [
+              "V2",
+              "V3",
+              "V4",
+              "WRAP",
+              "OTHER"
+            ],
+            "description": "WRAP is the native <-> wrapped-native conversion step."
+          },
+          "address": {
+            "type": "string",
+            "description": "V2/V3 pool address (checksummed); V4 pool id (bytes32). Omitted for WRAP."
+          },
+          "hooks": {
+            "type": "string",
+            "description": "V4 hook contract. Omitted when the pool has no hook (never the zero address)."
+          },
+          "fee": {
+            "type": "string",
+            "description": "Pool fee in the same units as V3PoolInRoute.fee (hundredths of a bip). Omitted for WRAP and for dynamic-fee pools."
+          },
+          "isDynamicFee": {
+            "type": "boolean",
+            "description": "Set for V4 dynamic-fee pools."
+          },
+          "tokenIn": {
+            "$ref": "#/components/schemas/TokenInRoute"
+          },
+          "tokenInVisit": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Disambiguates repeated visits of the same token within the graph; absent means the first visit."
+          },
+          "tokenOut": {
+            "$ref": "#/components/schemas/TokenInRoute"
+          },
+          "tokenOutVisit": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Disambiguates repeated visits of the same token within the graph; absent means the first visit."
+          },
+          "shareOfInputBps": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "Share of the trade's total input VALUE routed through this pool (USD-equivalent), in bps. Downstream pools trade a different token, so an amount share is undefined there; edges leaving the input token's first visit and edges entering the output token's first visit each sum to 10000 (within rounding), and flow is conserved at every other node."
+          },
+          "usdIn": {
+            "type": "string",
+            "description": "USD value entering the pool, as a decimal string. Omitted when no USD valuation is available."
+          },
+          "usdOut": {
+            "type": "string",
+            "description": "USD value leaving the pool, as a decimal string. Omitted when no USD valuation is available."
+          }
+        },
+        "required": [
+          "protocol",
+          "tokenIn",
+          "tokenOut",
+          "shareOfInputBps"
         ]
       },
       "SwapStep": {
