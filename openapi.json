@@ -10058,20 +10058,20 @@
           },
           "entryPrice": {
             "type": "string",
-            "description": "Cost basis. Absent in v1 pending the margin event consumer."
+            "description": "Cost basis, from the position store: raw debt per raw collateral, 1e18-scaled, weighted over every indexed leg's buys. Absent when no leg is indexed or none recorded a buy."
           },
           "openedAt": {
             "type": "integer",
             "format": "int64",
-            "description": "Cost basis. Absent in v1 pending the margin event consumer."
+            "description": "Epoch milliseconds of the earliest indexed leg's open, from the position store. Absent when no leg is indexed."
           },
           "accruedInterest": {
             "type": "string",
-            "description": "Cost basis. Absent in v1 pending the margin event consumer."
+            "description": "Interest accrued on the debt, in raw debt-token units. ACTIVE rows: interest up to the last position event plus live growth since. Terminal rows: lifetime interest. Absent when any leg predates interest tracking."
           },
           "unrealizedPnl": {
             "type": "string",
-            "description": "Cost basis. Absent in v1 pending the margin event consumer."
+            "description": "ACTIVE only. Raw collateral-token units: current equity plus collateral already returned, minus collateral deposited. Absent when a leg is unindexed or has no recorded deposit."
           },
           "roe": {
             "type": "string",
@@ -10113,15 +10113,85 @@
           "closedAt": {
             "type": "integer",
             "format": "int64",
-            "description": "Terminal only. Absent in v1 pending the margin event consumer."
+            "description": "Terminal only. Epoch milliseconds."
           },
           "exitPrice": {
             "type": "string",
-            "description": "Terminal only. Absent in v1 pending the margin event consumer."
+            "description": "Terminal only. Raw debt per raw collateral, 1e18-scaled: the close's swap price, or the liquidation's. Absent when nothing was sold."
           },
           "realizedPnl": {
             "type": "string",
-            "description": "Terminal only. Absent in v1 pending the margin event consumer."
+            "description": "Terminal only. Raw collateral-token units: collateral returned over the position's life minus collateral deposited. On a liquidation, collateral left on the account after the seizure counts as returned. Absent for positions closed outside the router, and for liquidations whose collateral was not tracked."
+          },
+          "unrealizedPnlInDebt": {
+            "type": "string",
+            "description": "ACTIVE only. `unrealizedPnl` in raw debt-token units, with each deposit and return valued at the venue's oracle mark at its event; `entryPrice` and `exitPrice` are the swap fills. The dollar PnL on a LONG against a stablecoin. Absent when any deposit or return could not be priced."
+          },
+          "realizedPnlInDebt": {
+            "type": "string",
+            "description": "Terminal only. `realizedPnl` in raw debt-token units, valued the same way, with a liquidation's leftover at the liquidation's price. Absent when any deposit or return could not be priced."
+          },
+          "openTxHash": {
+            "type": "string",
+            "description": "The tx that opened the position (the earliest leg's)."
+          },
+          "closeTxHash": {
+            "type": "string",
+            "description": "Terminal only. The tx that closed the position; a full liquidation is its own close."
+          },
+          "lastLiquidationTxHash": {
+            "type": "string",
+            "description": "The latest liquidation, partial or full. On an ACTIVE row it means the position survived a partial liquidation."
+          },
+          "collateralAtOpen": {
+            "type": "string",
+            "description": "Raw collateral-token units held right after the open, summed over legs. Absent when a leg did not record it."
+          },
+          "decreases": {
+            "type": "array",
+            "description": "Partial decreases, oldest first, the newest 50 per leg.",
+            "items": {
+              "$ref": "#/components/schemas/MarginDecreaseActivity"
+            }
+          },
+          "costBasisInDebt": {
+            "type": "string",
+            "description": "ACTIVE only. Raw debt-token units: the basis of the equity still in the position, each deposit valued at the venue's oracle mark at its event. Each withdrawal removes the share of the basis it takes of the equity, both at the withdrawal's price. Absent like `unrealizedPnlInDebt`."
+          },
+          "realizedPnlToDateInDebt": {
+            "type": "string",
+            "description": "ACTIVE only. Raw debt-token units, signed: what withdrawals so far fetched above the basis they removed."
+          }
+        }
+      },
+      "MarginDecreaseActivity": {
+        "type": "object",
+        "required": [
+          "txHash",
+          "at",
+          "debtRepaid",
+          "collateralSold"
+        ],
+        "properties": {
+          "txHash": {
+            "type": "string"
+          },
+          "at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Epoch milliseconds."
+          },
+          "debtRepaid": {
+            "type": "string",
+            "description": "Raw debt-token units."
+          },
+          "collateralSold": {
+            "type": "string",
+            "description": "Raw collateral-token units."
+          },
+          "exitPrice": {
+            "type": "string",
+            "description": "Raw debt per raw collateral, 1e18-scaled. Absent when nothing was sold."
           }
         }
       },
