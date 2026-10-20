@@ -609,6 +609,30 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Quote",
+			"name": "quote",
+			"type": "json",
+			"default": "{\n  \"chainId\": 1,\n  \"destinationChainId\": {},\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"recipient\": {},\n    \"minimumAmount\": {}\n  },\n  \"tradeType\": \"EXACT_INPUT\",\n  \"transactionRequest\": {\n    \"to\": {},\n    \"gasLimit\": {},\n    \"chainId\": {},\n    \"maxFeePerGas\": {},\n    \"maxPriorityFeePerGas\": {},\n    \"gasPrice\": {}\n  }\n}",
+			"routing": {
+				"send": {
+					"property": "quote",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
@@ -4173,6 +4197,30 @@ export const swappingDescription: INodeProperties[] = [
 					"propertyInDotNotation": false,
 					"type": "body",
 					"value": "={{ $value }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Check Approval 4337"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Quote",
+			"name": "quote",
+			"type": "json",
+			"default": "{\n  \"chainId\": 1,\n  \"destinationChainId\": {},\n  \"input\": {\n    \"maximumAmount\": {}\n  },\n  \"output\": {\n    \"amount\": {},\n    \"recipient\": {},\n    \"minimumAmount\": {}\n  },\n  \"tradeType\": \"EXACT_INPUT\",\n  \"transactionRequest\": {\n    \"to\": {},\n    \"gasLimit\": {},\n    \"chainId\": {},\n    \"maxFeePerGas\": {},\n    \"maxPriorityFeePerGas\": {},\n    \"gasPrice\": {}\n  }\n}",
+			"routing": {
+				"send": {
+					"property": "quote",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
 				}
 			},
 			"displayOptions": {

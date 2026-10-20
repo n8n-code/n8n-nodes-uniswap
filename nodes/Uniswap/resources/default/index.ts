@@ -18,7 +18,7 @@ export const defaultDescription: INodeProperties[] = [
 					"name": "Margin Markets",
 					"value": "Margin Markets",
 					"action": "Discover the margin markets a chain can trade",
-					"description": "The market picker's feed. One row per `(exposureToken, counterToken, direction)`.\n\n**Indicative by construction, and that is the point.** Rates move every block, so no listing agrees with a quote taken seconds later. The quote re-reads on chain and stamps its bounds into router calldata, so a stale row costs a re-quote and never a bad execution. That is what makes this endpoint cacheable.\n\n**The ceiling is policy, not a promise.** `maxLeverage` comes from the same policy function the quote refuses on, applied to the same `maxLtv` the support check read, so the quote never refuses a leverage under it for the ceiling alone. The router checks health at the leverage swap's fill, though, which pays the pool's price up to its slippage bound rather than the oracle mark, so a quote near the ceiling can still be refused with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX` once that swap is priced. Never recompute it client-side from `lltv`: the LTV cliff buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%.\n\n**Each market yields BOTH readings.** A venue market is a (collateral, debt) pair, and the same on-chain position is a long of its collateral and a short of its debt. Shorting a token is only expressible as a market whose debt it is, so emitting one reading would leave a caller unable to find the side they wanted.\n\n**Always paginated**, on the same contract as `GET /orders` and `GET /plans`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out. There is no unbounded response. Not user-scoped, so there is no `swapper`.\n\n`borrowRate` and `availableBorrowLiquidity` are best-effort per venue and absent rather than zero when unread, since a zero rate and an unread rate are different facts. A venue the quote would refuse (its adapter disallowed on the router, or its market identity unreadable) is left off the row, and a row with no venue left is not served.\n\nA failed chain or discovery read is a 503 `MARGIN_MARKET_READ_UNAVAILABLE`, never a 200 with an empty page.",
+					"description": "The market picker's feed. One row per `(exposureToken, counterToken, direction)`.\n\n**Indicative by construction, and that is the point.** Rates move every block, so no listing agrees with a quote taken seconds later. The quote re-reads on chain and stamps its bounds into router calldata, so a stale row costs a re-quote and never a bad execution. That is what makes this endpoint cacheable.\n\n**The ceiling is policy, not a promise.** `maxLeverage` comes from the same policy function the quote refuses on, applied to the same liquidation LTV the support check read and the LTV the venue lends at, so the quote never refuses a leverage under it for the ceiling alone. The router checks health at the leverage swap's fill, though, which pays the pool's price up to its slippage bound rather than the oracle mark, so an `open` or `increaseLeverage` near the ceiling is served at the most leverage whose worst-case fill clears it, reported in `display.leverage`, while the composite keys refuse it with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX`. Never recompute it client-side from `lltv`: the LTV cliff buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%.\n\n**Each market yields BOTH readings.** A venue market is a (collateral, debt) pair, and the same on-chain position is a long of its collateral and a short of its debt. Shorting a token is only expressible as a market whose debt it is, so emitting one reading would leave a caller unable to find the side they wanted.\n\n**Always paginated**, on the same contract as `GET /orders` and `GET /plans`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out. There is no unbounded response. Not user-scoped, so there is no `swapper`.\n\n`borrowRate` and `availableBorrowLiquidity` are best-effort per venue and absent rather than zero when unread, since a zero rate and an unread rate are different facts. A venue the quote would refuse (its adapter disallowed on the router, its market identity unreadable, or nothing lent against the collateral) is left off the row, and so is an Aave v3 venue whose reserve LTV did not read, since its ceiling cannot be built without it. A row with no venue left is not served.\n\nA failed discovery read is a 503 `MARGIN_MARKET_READ_UNAVAILABLE`, never a 200 with an empty page, and so is a page that a failed Aave v3 reserve read leaves empty.",
 					"routing": {
 						"request": {
 							"method": "GET",
@@ -30,7 +30,7 @@ export const defaultDescription: INodeProperties[] = [
 					"name": "Margin Positions",
 					"value": "Margin Positions",
 					"action": "A wallet's margin positions on a chain",
-					"description": "The positions tab's feed. One row per `(exposureToken, counterToken, direction)`, aggregated at read time from the legs a wallet actually holds.\n\n**Everything here is read on chain, per request.** There is no index and no store behind it: position accounts are a pure CREATE2 function of `(swapper, subId)`, so the addresses are known offchain for free and the only question the chain answers is which of them hold anything. That is what makes the feed correct from a device that has never seen this wallet before, and correct in the same block an open lands. A health factor is the one number a caller must not act on stale, which is why none of this is cached.\n\n**Legs are the unit of truth.** A logical position can span venues, and venues liquidate independently, so a row's risk numbers are the NEAREST leg's rather than an average. Balances add across legs; risk does not.\n\n**Risk is in TRADER terms.** `oraclePrice` and `liquidationPrice` are both reciprocated on a SHORT, so the price distance to liquidation equals `healthFactor` in either direction: `oraclePrice / liquidationPrice` on a LONG, `liquidationPrice / oraclePrice` on a SHORT. A row that mixed frames would still satisfy every type check and be wrong by a factor of the price.\n\n**`maxWithdrawable` is bounded by the BUFFERED ceiling, not the raw LLTV.** There is no on-chain guard on a withdraw, so this figure is the whole guard. Never recompute it client-side from `lltv`.\n\n**Always paginated**, on the same keyset contract and the same cursor as `GET /margin/markets`: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out.\n\nCost-basis fields (`entryPrice`, `openedAt`, and the PnL fields) come from the position store and are ABSENT rather than zero for a position the store has not indexed: a zero PnL is a claim, an absent one is not. A non-`ACTIVE` `status` is served from the store, newest first, on its own opaque `cursor`; echo `nextCursor` back to page. Use a cursor only with the status that returned it.",
+					"description": "The positions tab's feed. One row per position: a margin account (`swapper`, `subId`) on one venue and market. Each open allocates its own `subId`, so a wallet's positions in the same pair are separate rows, each with its own risk and its own actions.\n\n**Balances and risk are read on chain, per request.** Position accounts are a pure CREATE2 function of `(swapper, subId)`, so the addresses are known offchain for free and the only question the chain answers is which of them hold anything. That is what makes the feed correct from a device that has never seen this wallet before, and correct in the same block an open lands. A health factor is the one number a caller must not act on stale, which is why none of this is cached.\n\n**Risk is in TRADER terms.** `oraclePrice` and `liquidationPrice` are both reciprocated on a SHORT, so the price distance to liquidation equals `healthFactor` in either direction: `oraclePrice / liquidationPrice` on a LONG, `liquidationPrice / oraclePrice` on a SHORT. A row that mixed frames would still satisfy every type check and be wrong by a factor of the price.\n\n**`maxWithdrawable` is bounded by the BUFFERED ceiling, not the raw LLTV.** The withdraw plan asserts that ceiling on chain, and this figure sits just inside it so a withdraw of the full amount still clears it when it lands. Never recompute it client-side from `lltv`.\n\n**Always paginated**, oldest `subId` first: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out.\n\nCost-basis fields (`entryPrice`, `openedAt`, and the PnL fields) come from the position store and are ABSENT rather than zero for a position the store has not indexed: a zero PnL is a claim, an absent one is not. Finished `statuses` are served from the store, newest first, on one opaque `cursor` over the whole requested set; echo `nextCursor` back with the same `statuses` to page. Use a cursor only with the `statuses` that returned it.",
 					"routing": {
 						"request": {
 							"method": "GET",
@@ -579,33 +579,15 @@ export const defaultDescription: INodeProperties[] = [
 			}
 		},
 		{
-			"displayName": "Status",
-			"name": "status",
-			"description": "Selects the tab. Unset means `ACTIVE`. Terminal statuses parse and return an empty page until the event consumer ships.",
-			"default": "ACTIVE",
-			"type": "options",
-			"options": [
-				{
-					"name": "ACTIVE",
-					"value": "ACTIVE"
-				},
-				{
-					"name": "COMPLETED",
-					"value": "COMPLETED"
-				},
-				{
-					"name": "LIQUIDATED",
-					"value": "LIQUIDATED"
-				},
-				{
-					"name": "PARTIALLY LIQUIDATED",
-					"value": "PARTIALLY_LIQUIDATED"
-				}
-			],
+			"displayName": "Statuses",
+			"name": "statuses",
+			"description": "Selects the tab: comma-separated (`statuses=COMPLETED,LIQUIDATED,PARTIALLY_LIQUIDATED`) or repeated (`statuses=COMPLETED&statuses=LIQUIDATED`). Unset means `ACTIVE`. `ACTIVE` is read on chain and the finished statuses from the position store, which page differently, so `ACTIVE` must be sent alone; any set of finished statuses is served in one page, newest first, each row carrying its own status. The Active tab sends `ACTIVE`, the Completed tab `COMPLETED,LIQUIDATED,PARTIALLY_LIQUIDATED`. A 400 `RequestValidationError` for `ACTIVE` with any other status, a status named twice, an empty value, or a value outside the enum. Any query key the endpoint does not take, such as the retired `status` or a bracketed `statuses[]`, is refused the same way rather than ignored.",
+			"default": "[\n  \"COMPLETED\",\n  \"LIQUIDATED\",\n  \"PARTIALLY_LIQUIDATED\"\n]",
+			"type": "json",
 			"routing": {
 				"send": {
 					"type": "query",
-					"property": "status",
+					"property": "statuses",
 					"value": "={{ $value }}",
 					"propertyInDotNotation": false
 				}
@@ -624,7 +606,7 @@ export const defaultDescription: INodeProperties[] = [
 		{
 			"displayName": "Cursor",
 			"name": "cursor",
-			"description": "Opaque. Echo `nextCursor` back verbatim. A KEYSET cursor over the row order, the same one `GET /margin/markets` issues. A cursor that is not base64 is a 400 `RequestValidationError`; one that is base64 but does not parse is a 400 `MARGIN_INVALID_CURSOR`. Neither restarts at page one, which would loop a client forever.",
+			"description": "Opaque. Echo `nextCursor` back verbatim. A KEYSET cursor over the row order (`subId`, then venue and market). A cursor that is not base64 is a 400 `RequestValidationError`; one that is base64 but does not parse is a 400 `MARGIN_INVALID_CURSOR`. Neither restarts at page one, which would loop a client forever.",
 			"default": "",
 			"type": "string",
 			"routing": {
