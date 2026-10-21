@@ -2329,6 +2329,72 @@
         "x-internal": true
       }
     },
+    "/margin/positions/activity": {
+      "get": {
+        "operationId": "MarginPositionActivity",
+        "summary": "Every event of one margin position's lifecycle",
+        "description": "The history behind a row of `GET /margin/positions`: one entry per event the position store folded for the row's lifecycle (the open, each buy, sale, deposit, withdrawal and liquidation, and the close), oldest first. Ask with the row's `activityId`; a row without one has no history to serve.\n\nAmounts are raw token units the event moved. `price` and `entryPrice` are in the same terms as the row's `entryPrice`. `collateralAfter`, `debtAfter` and `entryPrice` are the position as the event left it, so a chart can draw each event at its fill and the entry line between them.\n\n**Always paginated**: `limit` (default and max 50) plus an opaque `cursor` in, `nextCursor` out.",
+        "x-internal": true,
+        "parameters": [
+          {
+            "name": "activityId",
+            "in": "query",
+            "required": true,
+            "description": "A `MarginPositionRow.activityId`. Anything else, or none, is a 400 `RequestValidationError`; a well-formed id the store holds nothing for serves an empty `activity`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Opaque. Echo `nextCursor` back verbatim with the same `activityId`. A cursor that is not base64 is a 400 `RequestValidationError`; one from another `activityId`, or that does not parse, is a 400 `MARGIN_INVALID_CURSOR`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Entries per page. Defaults to 50 and caps at 50.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/agentInfoHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "This lifecycle's events.",
+            "headers": {
+              "x-agent-info-status": {
+                "$ref": "#/components/headers/agentInfoStatusHeader"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarginPositionActivityResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/MarginBadRequest400"
+          },
+          "403": {
+            "$ref": "#/components/responses/MarginDisabled403"
+          },
+          "503": {
+            "$ref": "#/components/responses/MarginUnavailable503"
+          }
+        }
+      }
+    },
     "/margin/quote": {
       "post": {
         "tags": [
@@ -9480,6 +9546,10 @@
           },
           "slippage": {
             "$ref": "#/components/schemas/slippageTolerance"
+          },
+          "bridgeProvider": {
+            "$ref": "#/components/schemas/BridgeProvider",
+            "description": "The vendor that built a bridge step's deposit transaction. Absent for Across bridge steps and for non-bridge steps."
           }
         },
         "required": [
@@ -10076,7 +10146,7 @@
           },
           "entryPrice": {
             "type": "string",
-            "description": "Cost basis, from the position store, weighted over the position's buys. In the same terms as `oraclePrice`: counter per exposure, 1e18-scaled, reciprocated on a SHORT. Absent when the store has not indexed the position or it recorded no buy."
+            "description": "Cost basis, from the position store: the average fill of the exposure bought and still held. A sale or partial liquidation takes what it sold at that average and a withdrawal of the owner's own equity takes nothing, so none of them moves it; a later buy averages in with what is still held. In the same terms as `oraclePrice`: counter per exposure, 1e18-scaled, reciprocated on a SHORT. Absent when the store has not indexed the position or it recorded no buy."
           },
           "openedAt": {
             "type": "integer",
@@ -10165,12 +10235,9 @@
             "type": "string",
             "description": "Raw collateral-token units held right after the open. Absent when the store did not record it."
           },
-          "decreases": {
-            "type": "array",
-            "description": "Partial decreases, oldest first, the newest 50.",
-            "items": {
-              "$ref": "#/components/schemas/MarginDecreaseActivity"
-            }
+          "activityId": {
+            "type": "string",
+            "description": "The lifecycle `GET /margin/positions/activity` serves every event of. Absent for a position the store has not indexed, or indexed before it kept lifecycles."
           },
           "costBasisInDebt": {
             "type": "string",
@@ -10182,34 +10249,99 @@
           }
         }
       },
-      "MarginDecreaseActivity": {
+      "MarginActivityKind": {
+        "type": "string",
+        "description": "`MARGIN_ACTIVITY_KIND_LIQUIDATION` is a liquidation, partial or full; a full one also ends the lifecycle. `MARGIN_ACTIVITY_KIND_CLOSE` is the end of the lifecycle by any other means, or, after a liquidation that left nothing, the end that liquidation caused, found at the reopen. `MARGIN_ACTIVITY_KIND_ADJUSTMENT` is a move the store could not attribute, such as an owner action outside the router or a re-anchor to the chain: it carries no amounts, only the position it left.",
+        "enum": [
+          "MARGIN_ACTIVITY_KIND_OPEN",
+          "MARGIN_ACTIVITY_KIND_INCREASE",
+          "MARGIN_ACTIVITY_KIND_DECREASE",
+          "MARGIN_ACTIVITY_KIND_ADD_EQUITY",
+          "MARGIN_ACTIVITY_KIND_WITHDRAW_EQUITY",
+          "MARGIN_ACTIVITY_KIND_LIQUIDATION",
+          "MARGIN_ACTIVITY_KIND_CLOSE",
+          "MARGIN_ACTIVITY_KIND_ADJUSTMENT"
+        ]
+      },
+      "MarginActivity": {
         "type": "object",
         "required": [
+          "kind",
           "txHash",
           "at",
-          "debtRepaid",
-          "collateralSold"
+          "collateralAfter",
+          "debtAfter"
         ],
         "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/MarginActivityKind"
+          },
           "txHash": {
             "type": "string"
           },
           "at": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Epoch milliseconds."
-          },
-          "debtRepaid": {
             "type": "string",
-            "description": "Raw debt-token units."
+            "format": "int64",
+            "description": "Epoch milliseconds, as a decimal string: proto3 JSON writes int64 as a string."
+          },
+          "collateralBought": {
+            "type": "string",
+            "description": "Raw collateral-token units bought."
+          },
+          "debtDrawn": {
+            "type": "string",
+            "description": "Raw debt-token units drawn for `collateralBought`."
           },
           "collateralSold": {
             "type": "string",
-            "description": "Raw collateral-token units."
+            "description": "A partial decrease: raw collateral-token units sold."
           },
-          "exitPrice": {
+          "debtRepaid": {
             "type": "string",
-            "description": "In the same terms as the row's `entryPrice`. Absent when nothing was sold."
+            "description": "A partial decrease: raw debt-token units repaid."
+          },
+          "equityDeposited": {
+            "type": "string",
+            "description": "Raw collateral-token units the owner put in, as the row's `depositedEquity` counts them: a deposit of the debt token at the venue's mark."
+          },
+          "equityWithdrawn": {
+            "type": "string",
+            "description": "Raw collateral-token units returned to the owner, counted the same way."
+          },
+          "price": {
+            "type": "string",
+            "description": "The fill of the event's buy, sale, close or full liquidation, in the same terms as the row's `entryPrice`. Absent when the event has none."
+          },
+          "collateralAfter": {
+            "type": "string",
+            "description": "Raw collateral-token units the event left on the position."
+          },
+          "debtAfter": {
+            "type": "string",
+            "description": "Raw debt-token units the event left owed."
+          },
+          "entryPrice": {
+            "type": "string",
+            "description": "The position's entry price as the event left it, in the same terms as the row's `entryPrice`. Absent until the lifecycle has bought."
+          }
+        }
+      },
+      "MarginPositionActivityResponse": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string"
+          },
+          "activity": {
+            "type": "array",
+            "description": "Oldest first. Empty for an `activityId` the store holds nothing for.",
+            "items": {
+              "$ref": "#/components/schemas/MarginActivity"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Absent on the last page, which is how a client knows to stop. Present means more entries may exist, never that the next page is non-empty."
           }
         }
       },

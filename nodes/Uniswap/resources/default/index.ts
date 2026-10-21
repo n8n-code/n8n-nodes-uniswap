@@ -37,6 +37,18 @@ export const defaultDescription: INodeProperties[] = [
 							"url": "=/margin/positions"
 						}
 					}
+				},
+				{
+					"name": "Margin Position Activity",
+					"value": "Margin Position Activity",
+					"action": "Every event of one margin position's lifecycle",
+					"description": "The history behind a row of `GET /margin/positions`: one entry per event the position store folded for the row's lifecycle (the open, each buy, sale, deposit, withdrawal and liquidation, and the close), oldest first. Ask with the row's `activityId`; a row without one has no history to serve.\n\nAmounts are raw token units the event moved. `price` and `entryPrice` are in the same terms as the row's `entryPrice`. `collateralAfter`, `debtAfter` and `entryPrice` are the position as the event left it, so a chart can draw each event at its fill and the entry line between them.\n\n**Always paginated**: `limit` (default and max 50) plus an opaque `cursor` in, `nextCursor` out.",
+					"routing": {
+						"request": {
+							"method": "GET",
+							"url": "=/margin/positions/activity"
+						}
+					}
 				}
 			],
 			"default": ""
@@ -698,6 +710,150 @@ export const defaultDescription: INodeProperties[] = [
 					],
 					"operation": [
 						"Margin Positions"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "GET /margin/positions/activity",
+			"name": "operation",
+			"type": "notice",
+			"typeOptions": {
+				"theme": "info"
+			},
+			"default": "",
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Position Activity"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Activity ID",
+			"name": "activityId",
+			"required": true,
+			"description": "A `MarginPositionRow.activityId`. Anything else, or none, is a 400 `RequestValidationError`; a well-formed id the store holds nothing for serves an empty `activity`.",
+			"default": "",
+			"type": "string",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "activityId",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Position Activity"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Cursor",
+			"name": "cursor",
+			"description": "Opaque. Echo `nextCursor` back verbatim with the same `activityId`. A cursor that is not base64 is a 400 `RequestValidationError`; one from another `activityId`, or that does not parse, is a 400 `MARGIN_INVALID_CURSOR`.",
+			"default": "",
+			"type": "string",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "cursor",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Position Activity"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Limit",
+			"name": "limit",
+			"description": "Entries per page. Defaults to 50 and caps at 50.",
+			"default": 0,
+			"type": "number",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "limit",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Position Activity"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "X Agent Info",
+			"name": "x-agent-info",
+			"description": "Optional attribution hint for AI-agent traffic; send it if an AI agent built or operates your integration. The value is a JSON object with up to three fields: `decision_origin` (required, exactly `autonomous` or `human_mediated`, case-sensitive), `integration_name` (optional string naming your integration, e.g. `my-trading-bot`), and `version` (optional string identifying your integration's version). Any other key is dropped, never rejected. The raw value must be at most 1024 bytes of printable US-ASCII (`0x20`-`0x7E`), so send non-ASCII text as JSON `\\u` escapes; `integration_name` and `version` are each limited to 256 UTF-16 code units and may not contain control characters, U+2028, U+2029, or U+FFFD. Send the header once: repeated header lines are joined with `, ` and the joined string is what gets parsed, so two complete objects fail as invalid JSON while a single object split across two lines still parses. The header is analytics-only and never affects the request: omitting it, sending it, or sending a value that fails these rules never changes the response status, body, or swap behavior. A value that fails to parse is dropped and reported by the `x-agent-info-status` response header. Never put a user ID, wallet address, email, session token, or API key in these fields.",
+			"default": "{\"decision_origin\":\"autonomous\",\"integration_name\":\"my-trading-bot\",\"version\":\"1.4.0\"}",
+			"type": "string",
+			"routing": {
+				"request": {
+					"headers": {
+						"x-agent-info": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Position Activity"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "API Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Position Activity"
 					]
 				}
 			}
