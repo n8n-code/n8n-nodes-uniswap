@@ -5028,6 +5028,14 @@
           "includeRouteCandidates": {
             "type": "boolean",
             "description": "When true, uniroute-backed classic quotes include routeCandidates — the top alternative routes considered, each with its whole-route amounts."
+          },
+          "bridgeProviders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BridgeProvider"
+            },
+            "minItems": 1,
+            "description": "The bridge vendors allowed to serve this request's bridge routes, whether a direct bridge or a leg of a chained quote. Omit to allow every vendor; an empty array is rejected. A FASTEST chained quote is estimated on Across, so it needs ACROSS in the list."
           }
         },
         "required": [
@@ -10200,7 +10208,7 @@
           },
           "maxWithdrawable": {
             "type": "string",
-            "description": "Collateral that can be withdrawn while staying under the BUFFERED ceiling, the lower of the liquidation LTV less the LTV cliff buffer and the LTV the venue lends at, with headroom for the interest and price drift before the withdraw lands, so withdrawing all of it does not revert. A position with no debt can withdraw all of it. Absent when an Aave v3 venue's reserve LTV did not read. Do not recompute it from `lltv`."
+            "description": "Collateral that can be withdrawn while staying under the BUFFERED ceiling, the lower of the liquidation LTV less the LTV cliff buffer and the LTV the venue lends at, with headroom for the interest and price drift before the withdraw lands, so withdrawing all of it does not revert. A `withdrawEquity` quote still takes this amount after interest has accrued since it was read; a price move against the position since the read can refuse it with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX`, so read it again then. A position with no debt can withdraw all of it. Absent when an Aave v3 venue's reserve LTV did not read. Do not recompute it from `lltv`."
           },
           "closedAt": {
             "type": "integer",

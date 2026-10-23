@@ -1699,6 +1699,31 @@ export const swappingDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Bridge Providers",
+			"name": "bridgeProviders",
+			"type": "json",
+			"default": "[\n  null\n]",
+			"description": "The bridge vendors allowed to serve this request's bridge routes, whether a direct bridge or a leg of a chained quote. Omit to allow every vendor; an empty array is rejected. A FASTEST chained quote is estimated on Across, so it needs ACROSS in the list.",
+			"routing": {
+				"send": {
+					"property": "bridgeProviders",
+					"propertyInDotNotation": false,
+					"type": "body",
+					"value": "={{ JSON.parse($value) }}"
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Swapping"
+					],
+					"operation": [
+						"Aggregator Quote"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "API Key (Header)",
 			"name": "security_apikey",
 			"type": "string",
