@@ -119,9 +119,10 @@ That's it. No configuration files. No code. It just works.
 </details>
 
 <details>
-<summary><b>Default</b> (3 operations)</summary>
+<summary><b>Default</b> (4 operations)</summary>
 
 - Get Discover the margin markets a chain can trade
+- Get List the token pairs a chain can trade on margin
 - Get A wallet s margin positions on a chain
 - Get Every event of one margin position s lifecycle
 

@@ -27,6 +27,18 @@ export const defaultDescription: INodeProperties[] = [
 					}
 				},
 				{
+					"name": "Margin Assets",
+					"value": "Margin Assets",
+					"action": "List the token pairs a chain can trade on margin",
+					"description": "The asset pickers' feed: every pair the margin market catalogue serves on the chain, read the same way as `GET /margin/markets` and gated by the same switch.\n\nEach catalogue market yields one entry in `longs` (exposure is the collateral, counter the debt) and one in `shorts` (exposure is the debt, counter the collateral), with the venues whose adapter supports it in the catalogue. A listed venue can still be refused on live reserve or router state (paused, frozen, inactive, borrowing disabled, a cap reached, nothing lent against the collateral, or an adapter the router does not allow), so a pair can come back from `GET /margin/markets` without that venue or without a row; that endpoint and `POST /margin/quote` are authoritative for what opens. Both lists are ordered by `exposureToken` address, then `counterToken` address, and addresses are lowercase.\n\nNo economics: leverage ceilings, rates and liquidity are read per pair from `GET /margin/markets`. A chain whose catalogue supports no market answers 200 with both lists empty, while a failed catalogue read is a 503 `MARGIN_MARKET_READ_UNAVAILABLE`.",
+					"routing": {
+						"request": {
+							"method": "GET",
+							"url": "=/margin/assets"
+						}
+					}
+				},
+				{
 					"name": "Margin Positions",
 					"value": "Margin Positions",
 					"action": "A wallet's margin positions on a chain",
@@ -342,7 +354,7 @@ export const defaultDescription: INodeProperties[] = [
 		{
 			"displayName": "Limit",
 			"name": "limit",
-			"description": "Rows per page. Defaults to 20 and caps at 20, matching `GET /orders` and `GET /plans`, so a client that already pages those needs no second set of rules. **Every** response is bounded whether or not a caller asks: nothing about this endpoint limits its own size, and the row count grows whenever governance allows a market.",
+			"description": "Rows per page. Defaults to 20 and caps at 20, matching `GET /orders` and `GET /plans`, so a client that already pages those needs no second set of rules. **Every** response is bounded whether or not a caller asks: nothing about this endpoint limits its own size, and the row count grows whenever the service starts serving a market.",
 			"default": 20,
 			"type": "number",
 			"routing": {
@@ -409,6 +421,206 @@ export const defaultDescription: INodeProperties[] = [
 					],
 					"operation": [
 						"Margin Markets"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "GET /margin/assets",
+			"name": "operation",
+			"type": "notice",
+			"typeOptions": {
+				"theme": "info"
+			},
+			"default": "",
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Assets"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "Chain ID",
+			"name": "chainId",
+			"required": true,
+			"description": "The chain the pairs live on.",
+			"default": 1,
+			"type": "options",
+			"options": [
+				{
+					"name": "1",
+					"value": 1
+				},
+				{
+					"name": "10",
+					"value": 10
+				},
+				{
+					"name": "56",
+					"value": 56
+				},
+				{
+					"name": "130",
+					"value": 130
+				},
+				{
+					"name": "137",
+					"value": 137
+				},
+				{
+					"name": "143",
+					"value": 143
+				},
+				{
+					"name": "196",
+					"value": 196
+				},
+				{
+					"name": "324",
+					"value": 324
+				},
+				{
+					"name": "480",
+					"value": 480
+				},
+				{
+					"name": "1868",
+					"value": 1868
+				},
+				{
+					"name": "4217",
+					"value": 4217
+				},
+				{
+					"name": "4326",
+					"value": 4326
+				},
+				{
+					"name": "4663",
+					"value": 4663
+				},
+				{
+					"name": "5042",
+					"value": 5042
+				},
+				{
+					"name": "8453",
+					"value": 8453
+				},
+				{
+					"name": "10143",
+					"value": 10143
+				},
+				{
+					"name": "42161",
+					"value": 42161
+				},
+				{
+					"name": "42220",
+					"value": 42220
+				},
+				{
+					"name": "43114",
+					"value": 43114
+				},
+				{
+					"name": "57073",
+					"value": 57073
+				},
+				{
+					"name": "59144",
+					"value": 59144
+				},
+				{
+					"name": "81457",
+					"value": 81457
+				},
+				{
+					"name": "7777777",
+					"value": 7777777
+				},
+				{
+					"name": "1301",
+					"value": 1301
+				},
+				{
+					"name": "84532",
+					"value": 84532
+				},
+				{
+					"name": "11155111",
+					"value": 11155111
+				}
+			],
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "chainId",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Assets"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "X Agent Info",
+			"name": "x-agent-info",
+			"description": "Optional attribution hint for AI-agent traffic; send it if an AI agent built or operates your integration. The value is a JSON object with up to three fields: `decision_origin` (required, exactly `autonomous` or `human_mediated`, case-sensitive), `integration_name` (optional string naming your integration, e.g. `my-trading-bot`), and `version` (optional string identifying your integration's version). Any other key is dropped, never rejected. The raw value must be at most 1024 bytes of printable US-ASCII (`0x20`-`0x7E`), so send non-ASCII text as JSON `\\u` escapes; `integration_name` and `version` are each limited to 256 UTF-16 code units and may not contain control characters, U+2028, U+2029, or U+FFFD. Send the header once: repeated header lines are joined with `, ` and the joined string is what gets parsed, so two complete objects fail as invalid JSON while a single object split across two lines still parses. The header is analytics-only and never affects the request: omitting it, sending it, or sending a value that fails these rules never changes the response status, body, or swap behavior. A value that fails to parse is dropped and reported by the `x-agent-info-status` response header. Never put a user ID, wallet address, email, session token, or API key in these fields.",
+			"default": "{\"decision_origin\":\"autonomous\",\"integration_name\":\"my-trading-bot\",\"version\":\"1.4.0\"}",
+			"type": "string",
+			"routing": {
+				"request": {
+					"headers": {
+						"x-agent-info": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Assets"
+					]
+				}
+			}
+		},
+		{
+			"displayName": "API Key (Header)",
+			"name": "security_apikey",
+			"type": "string",
+			"default": "",
+			"description": "API key for apiKey (header: x-api-key)",
+			"required": false,
+			"routing": {
+				"request": {
+					"headers": {
+						"x-api-key": "={{ $value }}"
+					}
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Assets"
 					]
 				}
 			}
