@@ -2242,7 +2242,7 @@
       "get": {
         "operationId": "MarginAssets",
         "summary": "List the token pairs a chain can trade on margin",
-        "description": "The asset pickers' feed: every pair the margin market catalogue serves on the chain, read the same way as `GET /margin/markets` and gated by the same switch.\n\nEach catalogue market yields one entry in `longs` (exposure is the collateral, counter the debt) and one in `shorts` (exposure is the debt, counter the collateral), with the venues whose adapter supports it in the catalogue. A listed venue can still be refused on live reserve or router state (paused, frozen, inactive, borrowing disabled, a cap reached, nothing lent against the collateral, or an adapter the router does not allow), so a pair can come back from `GET /margin/markets` without that venue or without a row; that endpoint and `POST /margin/quote` are authoritative for what opens. Both lists are ordered by `exposureToken` address, then `counterToken` address, and addresses are lowercase.\n\nNo economics: leverage ceilings, rates and liquidity are read per pair from `GET /margin/markets`. A chain whose catalogue supports no market answers 200 with both lists empty, while a failed catalogue read is a 503 `MARGIN_MARKET_READ_UNAVAILABLE`.",
+        "description": "The asset pickers' feed: every pair the margin market catalogue opens on the chain, read the same way as `GET /margin/markets` and gated by the same switch.\n\nEach catalogue market yields one entry in `longs` (exposure is the collateral, counter the debt) and one in `shorts` (exposure is the debt, counter the collateral), with the venues the catalogue opens it on. A venue whose market is close-only, hard-triggered or stale is left off, and a pair no venue opens is not listed. A listed venue can still be refused on live reserve or router state (paused, frozen, inactive, borrowing disabled, a cap reached, nothing lent against the collateral, or an adapter the router does not allow), so a pair can come back from `GET /margin/markets` without that venue or without a row; that endpoint and `POST /margin/quote` are authoritative for what opens. Both lists are ordered by `exposureToken` address, then `counterToken` address, and addresses are lowercase.\n\nNo economics: leverage ceilings, rates and liquidity are read per pair from `GET /margin/markets`. A chain whose catalogue opens no market answers 200 with both lists empty, while a failed catalogue read is a 503 `MARGIN_MARKET_READ_UNAVAILABLE`.",
         "parameters": [
           {
             "name": "chainId",
@@ -7367,6 +7367,11 @@
             "x-internal": true,
             "type": "number",
             "description": "The expected value lost versus frictionless execution at current prices, as a percent between -100 and 100. Negative values indicate price improvement. For classic swaps this equals priceImpact, the pool-based impact reported by routing."
+          },
+          "gasLimit": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$",
+            "description": "The minimum gas limit for the swap transaction, in gas units, as a positive decimal integer string. Only present when the route goes through a pool whose swap needs more gas available than it uses (for example, a hook that checks `gasleft()`). When the response includes `permitData`, it already includes the gas for that Permit2 permit; it does NOT include the gas for an ERC-20 approval transaction. Pass the quote back to `/swap` unchanged: the swap transaction's gas limit is at least this value. A quote whose `gasLimit` is not a positive decimal integer string is rejected with a 400 `RequestValidationError`."
           }
         }
       },
@@ -10235,7 +10240,7 @@
             "items": {
               "$ref": "#/components/schemas/MarginVenue"
             },
-            "description": "The venues whose adapter supports the pair in the catalogue, never empty. A listed venue can still be refused on live reserve or router state, so `GET /margin/markets` and `POST /margin/quote` are authoritative for what opens."
+            "description": "The venues the catalogue opens the pair on, never empty. A venue whose market is close-only, hard-triggered or stale is left off, and a pair no venue opens is not listed. A listed venue can still be refused on live reserve or router state, so `GET /margin/markets` and `POST /margin/quote` are authoritative for what opens."
           }
         }
       },
@@ -10334,16 +10339,20 @@
           },
           "equity": {
             "type": "string",
-            "description": "Collateral net of debt, the debt valued at the venue mark, in COLLATERAL-token base units: the exposure token on a LONG, the counter token on a SHORT, so scale it by that token's decimals. Absent when a leg's mark could not be read."
+            "description": "Collateral net of debt, the debt valued at `currentPrice`, or at the venue mark when `currentPrice` is absent, in COLLATERAL-token base units: the exposure token on a LONG, the counter token on a SHORT, so scale it by that token's decimals. `leverage`, `unrealizedPnl`, `roe` and `unrealizedPnlInDebt` are valued at the same price. Absent when no price could be read."
           },
           "leverage": {
             "type": "string",
-            "description": "Collateral over equity, as a decimal string (`\"1.83\"`): the encoding `POST /margin/quote` serves as `display.leverage` and reads back as a leverage target, never a raw WAD integer. Absent when the position is underwater: with no equity there is no finite leverage, and `healthFactor` is below 1e18.",
+            "description": "Collateral over equity, as a decimal string (`\"1.83\"`): the encoding `POST /margin/quote` serves as `display.leverage` and reads back as a leverage target, never a raw WAD integer. Valued at the same price as `equity`. Absent when `equity` is zero at that price, as there is no finite leverage, or when `equity` is absent and the LTV is at or above 1. Absent leverage does not mean liquidatable: `healthFactor` is measured at `oraclePrice` and can still be above 1e18 when `currentPrice` alone leaves no equity.",
             "pattern": "^[0-9]+(\\.[0-9]+)?$"
           },
           "oraclePrice": {
             "type": "string",
             "description": "The position's VENUE mark, in trader terms. This is the price risk is measured against, and it is not the price a swap would fill at."
+          },
+          "currentPrice": {
+            "type": "string",
+            "description": "ACTIVE only. The market price the position is marked at: `equity`, `leverage`, `unrealizedPnl`, `roe` and `unrealizedPnlInDebt` are valued at it. It can differ from `oraclePrice`, which risk is measured against. Counter per exposure, 1e18-scaled, in the same trader terms as `oraclePrice`. Unlike `oraclePrice` and the risk fields, it can be served from a short-lived cache. Absent when none was read; those fields are then valued at `oraclePrice`."
           },
           "liquidationPrice": {
             "type": "string",
