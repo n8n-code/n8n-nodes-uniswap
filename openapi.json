@@ -41,7 +41,7 @@
               },
               "example": {
                 "chainId": 1,
-                "urgency": "urgent",
+                "urgency": "URGENT",
                 "includeGasInfo": true,
                 "walletAddress": "0xC9bebBA9f481b12cE6f3EA54c4B182c9636ec421",
                 "token": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
@@ -178,7 +178,7 @@
                 "autoSlippage": "DEFAULT",
                 "routingPreference": "BEST_PRICE",
                 "spreadOptimization": "EXECUTION",
-                "urgency": "normal",
+                "urgency": "NORMAL",
                 "permitAmount": "FULL",
                 "amount": "2516",
                 "tokenIn": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
@@ -504,7 +504,7 @@
                 "simulateTransaction": true,
                 "refreshGasPrice": true,
                 "safetyMode": "SAFE",
-                "urgency": "normal"
+                "urgency": "NORMAL"
               }
             }
           }
@@ -1519,7 +1519,7 @@
                     "sigDeadline": "1776873180"
                   }
                 },
-                "urgency": "normal"
+                "urgency": "NORMAL"
               }
             }
           }
@@ -5257,16 +5257,27 @@
           {
             "type": "string",
             "enum": [
+              "NORMAL",
+              "FAST",
+              "URGENT"
+            ],
+            "description": "The canonical urgency level."
+          },
+          {
+            "type": "string",
+            "enum": [
               "normal",
               "fast",
               "urgent"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated lowercase spelling. Still accepted so existing integrations keep working, and scheduled for removal. Use the uppercase form."
           },
           {
             "$ref": "#/components/schemas/UrgencyWithOverrides"
           }
         ],
-        "description": "The urgency impacts the estimated gas price of the transaction. The higher the urgency, the higher the gas price, and the faster the transaction is likely to be selected from the mempool. Send the bare string form (e.g. `\"normal\"`) for the common case, or the object form `{ level, overrides }` to supply caller caps for `maxPriorityFeePerGas`, `maxFeePerGas`, and `gasLimit`."
+        "description": "The urgency impacts the estimated gas price of the transaction. The higher the urgency, the higher the gas price, and the faster the transaction is likely to be selected from the mempool. Send the bare string form (e.g. `\"URGENT\"`) for the common case, or the object form `{ level, overrides }` to supply caller caps for `maxPriorityFeePerGas`, `maxFeePerGas`, and `gasLimit`. `NORMAL`, `FAST`, and `URGENT` are the canonical spellings and match `GasUrgency` on the liquidity endpoints. Mixed case such as `Normal` is rejected."
       },
       "UrgencyOverrides": {
         "type": "object",
@@ -5293,10 +5304,11 @@
           "level": {
             "type": "string",
             "enum": [
-              "normal",
-              "fast",
-              "urgent"
-            ]
+              "NORMAL",
+              "FAST",
+              "URGENT"
+            ],
+            "description": "The urgency level. `NORMAL`, `FAST`, and `URGENT` are canonical. The lowercase spellings are deprecated and scheduled for removal. They are not listed here, but are still accepted."
           },
           "overrides": {
             "$ref": "#/components/schemas/UrgencyOverrides"
@@ -6861,7 +6873,7 @@
           "FAST",
           "URGENT"
         ],
-        "description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided."
+        "description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided. This is the same concept as `Urgency` on the swap endpoints, which accepts these uppercase values as its canonical spelling."
       },
       "V2PoolParameters": {
         "type": "object",

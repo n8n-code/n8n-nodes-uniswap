@@ -183,7 +183,7 @@ export const chainedSwappingDescription: INodeProperties[] = [
 			"name": "urgency",
 			"type": "string",
 			"default": "",
-			"description": "The urgency impacts the estimated gas price of the transaction. The higher the urgency, the higher the gas price, and the faster the transaction is likely to be selected from the mempool. Send the bare string form (e.g. `\"normal\"`) for the common case, or the object form `{ level, overrides }` to supply caller caps for `maxPriorityFeePerGas`, `maxFeePerGas`, and `gasLimit`.",
+			"description": "The urgency impacts the estimated gas price of the transaction. The higher the urgency, the higher the gas price, and the faster the transaction is likely to be selected from the mempool. Send the bare string form (e.g. `\"URGENT\"`) for the common case, or the object form `{ level, overrides }` to supply caller caps for `maxPriorityFeePerGas`, `maxFeePerGas`, and `gasLimit`. `NORMAL`, `FAST`, and `URGENT` are the canonical spellings and match `GasUrgency` on the liquidity endpoints. Mixed case such as `Normal` is rejected.",
 			"routing": {
 				"send": {
 					"property": "urgency",

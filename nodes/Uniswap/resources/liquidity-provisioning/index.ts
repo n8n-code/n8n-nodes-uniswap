@@ -479,7 +479,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"name": "urgency",
 			"type": "options",
 			"default": "NORMAL",
-			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided.",
+			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided. This is the same concept as `Urgency` on the swap endpoints, which accepts these uppercase values as its canonical spelling.",
 			"options": [
 				{
 					"name": "NORMAL",
@@ -1034,7 +1034,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"name": "urgency",
 			"type": "options",
 			"default": "NORMAL",
-			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided.",
+			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided. This is the same concept as `Urgency` on the swap endpoints, which accepts these uppercase values as its canonical spelling.",
 			"options": [
 				{
 					"name": "NORMAL",
@@ -1639,7 +1639,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"name": "urgency",
 			"type": "options",
 			"default": "NORMAL",
-			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided.",
+			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided. This is the same concept as `Urgency` on the swap endpoints, which accepts these uppercase values as its canonical spelling.",
 			"options": [
 				{
 					"name": "NORMAL",
@@ -2144,7 +2144,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"name": "urgency",
 			"type": "options",
 			"default": "NORMAL",
-			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided.",
+			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided. This is the same concept as `Urgency` on the swap endpoints, which accepts these uppercase values as its canonical spelling.",
 			"options": [
 				{
 					"name": "NORMAL",
@@ -2769,7 +2769,7 @@ export const liquidityProvisioningDescription: INodeProperties[] = [
 			"name": "urgency",
 			"type": "options",
 			"default": "NORMAL",
-			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided.",
+			"description": "The urgency level for gas price estimation. Higher urgency results in higher gas price and faster transaction inclusion. Defaults to URGENT if not provided. This is the same concept as `Urgency` on the swap endpoints, which accepts these uppercase values as its canonical spelling.",
 			"options": [
 				{
 					"name": "NORMAL",
