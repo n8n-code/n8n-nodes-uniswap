@@ -202,7 +202,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -403,7 +403,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			"required": true,
 			"default": 1,
 			"type": "options",
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -738,7 +738,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			"name": "chainId",
 			"default": 1,
 			"type": "options",
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -1050,7 +1050,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -1469,7 +1469,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",

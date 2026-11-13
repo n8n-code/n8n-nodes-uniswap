@@ -4010,12 +4010,12 @@
       },
       "inputToken": {
         "type": "string",
-        "description": "The token which will be sent, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+        "description": "The token which will be sent, specified by its token address.",
         "pattern": "^(0x)?[0-9a-fA-F]{40}$"
       },
       "outputToken": {
         "type": "string",
-        "description": "The token which will be received, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+        "description": "The token which will be received, specified by its token address.",
         "pattern": "^(0x)?[0-9a-fA-F]{40}$"
       },
       "tokenAmount": {
@@ -4033,7 +4033,7 @@
         "description": "Indicates whether you want to receive a permit2 transaction to sign and submit onchain, or a permit message to sign. When set to `true`, the quote response returns the Permit2 as a calldata which the user signs and broadcasts. When set to `false` (the default), the quote response returns the Permit2 as a message which the user signs but does not need to broadcast. When using a 7702-delegated wallet, set this field to `true`. Except for this scenario, it is recommended that this field is set to false. Note that a Permit2 calldata (e.g. `true`), will provide indefinite permission for Permit2 to spend a token, in contrast to a Permit2 message (e.g. `false`) which is only valid for 30 days. Further, a Permit2 calldata (e.g. `true`) requires the user to pay gas to submit the transaction, whereas the Permit2 message (e.g. `false` ) does not require the user to submit a transaction and requires no gas."
       },
       "slippageTolerance": {
-        "description": "The slippage tolerance as a percentage up to a maximum of two decimal places, between 0 and 100 (a value outside that range is rejected). This is the maximum acceptable output loss as a percentage: for exact-input trades, the minimum received is expectedOut × (1 - slippageTolerance); for exact-output trades, the maximum input is expectedIn × (1 + slippageTolerance).\n\nWhen submitting a quote, note that slippage tolerance works differently in UniswapX swaps where it does not set a limit on the Spread in an order. See [here](https://api-docs.uniswap.org/guides/faqs#why-do-uniswapx-quotes-have-more-slippage-than-the-tolerance-i-set) for more information.\n\nNote that if the trade type is `EXACT_INPUT`, then the slippage is in terms of the output token. If the trade type is `EXACT_OUTPUT`, then the slippage is in terms of the input token.\n\nWhen submitting a request, `slippageTolerance` may not be set when `autoSlippage` is defined. One of `slippageTolerance` or `autoSlippage` must be defined.",
+        "description": "The slippage tolerance as a percentage up to a maximum of two decimal places, between 0 and 100 (a value outside that range is rejected). This is the maximum acceptable output loss as a percentage: for exact-input trades, the minimum received is expectedOut × (1 - slippageTolerance); for exact-output trades, the maximum input is expectedIn × (1 + slippageTolerance).\n\nWhen submitting a quote, note that slippage tolerance works differently in UniswapX swaps where it does not set a limit on the Spread in an order.\n\nNote that if the trade type is `EXACT_INPUT`, then the slippage is in terms of the output token. If the trade type is `EXACT_OUTPUT`, then the slippage is in terms of the input token.\n\nWhen submitting a request, `slippageTolerance` may not be set when `autoSlippage` is defined. One of `slippageTolerance` or `autoSlippage` must be defined.",
         "type": "number",
         "minimum": 0,
         "maximum": 100,
@@ -5488,7 +5488,7 @@
         }
       },
       "ChainId": {
-        "description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+        "description": "The unique ID of the blockchain.",
         "type": "number",
         "enum": [
           1,
@@ -10174,11 +10174,11 @@
           },
           "headlineVenue": {
             "$ref": "#/components/schemas/MarginVenue",
-            "description": "The venue of the headline market, the one behind `maxLeverage`. Several `venueMarkets` entries can share it, so it does not name the market."
+            "description": "The venue of the headline market, the most liquid one. Several `venueMarkets` entries can share it, so it does not name the market."
           },
           "headlineMarketId": {
             "$ref": "#/components/schemas/marginMarketId",
-            "description": "The `marketId` of the headline market, the one behind `maxLeverage`: always the `marketId` of one of the row's `venueMarkets` entries. A quote opens on the market its `open.marketId` names, which need not be this one."
+            "description": "The `marketId` of the headline market, the most liquid one: always the `marketId` of one of the row's `venueMarkets` entries, and not necessarily the one behind `maxLeverage`. A quote opens on the market its `open.marketId` names, which need not be this one."
           },
           "maxLeverage": {
             "type": "string"
@@ -10194,7 +10194,7 @@
       },
       "MarginVenueMarket": {
         "type": "object",
-        "description": "One market serving the pair, for the advanced breakdown. A venue can list several, each its own entry under its own `marketId`. The row's `maxLeverage` is the HEADLINE market's: the `venueMarkets` entry with the greatest `maxLeverage`, the first listed on a tie. `headlineMarketId` names it, and `headlineVenue` names only its venue, which several entries can share.",
+        "description": "One market serving the pair, for the advanced breakdown. A venue can list several, each its own entry under its own `marketId`. The HEADLINE market is the `venueMarkets` entry with the most `availableBorrowLiquidity`, whatever its venue: an entry whose liquidity is absent ranks below any that reads, a tie goes to the greater `maxLeverage`, then to the first listed. `headlineMarketId` names it, and `headlineVenue` names only its venue, which several entries can share.",
         "properties": {
           "venue": {
             "$ref": "#/components/schemas/MarginVenue"
@@ -10395,6 +10395,10 @@
           "maxWithdrawable": {
             "type": "string",
             "description": "Collateral that can be withdrawn while staying under the BUFFERED ceiling, the lower of the liquidation LTV less the LTV cliff buffer and the LTV the venue lends at, with headroom for the interest and price drift before the withdraw lands, so withdrawing all of it does not revert. A `withdrawEquity` quote still takes this amount after interest has accrued since it was read; a price move against the position since the read can refuse it with a 422 `MARGIN_LEVERAGE_EXCEEDS_MAX`, so read it again then. A position with no debt can withdraw all of it. It is also held to what the venue pays out at the block read: `0` while the collateral reserve is paused or no longer active (or, on Aave v4, while the hub halts the spoke), and never more than the collateral the venue holds unlent. Absent when an Aave v3 venue's reserve LTV did not read. Do not recompute it from `lltv`."
+          },
+          "exitLimited": {
+            "type": "boolean",
+            "description": "Active only. `true` when the venue would refuse closing the whole position at the block read, the same check a close quote makes: the collateral reserve is paused or no longer active, it holds less unlent collateral than the position's, or the debt reserve is paused while the position owes debt. Show the insufficient-liquidity warning on it. Always `false` on Morpho, which never lends collateral out. Absent when the venue's state did not read, which is not the same as `false`."
           },
           "closedAt": {
             "type": "integer",

@@ -224,7 +224,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "token",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be sent, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be sent, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "token",
@@ -276,7 +276,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -457,7 +457,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOut",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be received, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be received, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "tokenOut",
@@ -482,7 +482,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOutChainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -906,7 +906,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenInChainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -1038,7 +1038,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOutChainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -1170,7 +1170,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenIn",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be sent, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be sent, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "tokenIn",
@@ -1196,7 +1196,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOut",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be received, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be received, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "tokenOut",
@@ -1272,7 +1272,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "slippageTolerance",
 			"type": "number",
 			"default": 0,
-			"description": "The slippage tolerance as a percentage up to a maximum of two decimal places, between 0 and 100 (a value outside that range is rejected). This is the maximum acceptable output loss as a percentage: for exact-input trades, the minimum received is expectedOut × (1 - slippageTolerance); for exact-output trades, the maximum input is expectedIn × (1 + slippageTolerance).\n\nWhen submitting a quote, note that slippage tolerance works differently in UniswapX swaps where it does not set a limit on the Spread in an order. See [here](https://api-docs.uniswap.org/guides/faqs#why-do-uniswapx-quotes-have-more-slippage-than-the-tolerance-i-set) for more information.\n\nNote that if the trade type is `EXACT_INPUT`, then the slippage is in terms of the output token. If the trade type is `EXACT_OUTPUT`, then the slippage is in terms of the input token.\n\nWhen submitting a request, `slippageTolerance` may not be set when `autoSlippage` is defined. One of `slippageTolerance` or `autoSlippage` must be defined.",
+			"description": "The slippage tolerance as a percentage up to a maximum of two decimal places, between 0 and 100 (a value outside that range is rejected). This is the maximum acceptable output loss as a percentage: for exact-input trades, the minimum received is expectedOut × (1 - slippageTolerance); for exact-output trades, the maximum input is expectedIn × (1 + slippageTolerance).\n\nWhen submitting a quote, note that slippage tolerance works differently in UniswapX swaps where it does not set a limit on the Spread in an order.\n\nNote that if the trade type is `EXACT_INPUT`, then the slippage is in terms of the output token. If the trade type is `EXACT_OUTPUT`, then the slippage is in terms of the input token.\n\nWhen submitting a request, `slippageTolerance` may not be set when `autoSlippage` is defined. One of `slippageTolerance` or `autoSlippage` must be defined.",
 			"routing": {
 				"send": {
 					"property": "slippageTolerance",
@@ -2832,7 +2832,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "chainId",
 			"default": 1,
 			"type": "options",
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -3217,7 +3217,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenIn",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be sent, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be sent, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "tokenIn",
@@ -3243,7 +3243,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOut",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be received, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be received, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "tokenOut",
@@ -3269,7 +3269,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenInChainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -3401,7 +3401,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOutChainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -3888,7 +3888,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "token",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be sent, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be sent, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "token",
@@ -3940,7 +3940,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "chainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
@@ -4096,7 +4096,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOut",
 			"type": "string",
 			"default": "",
-			"description": "The token which will be received, specified by its token address. For a list of supported tokens, see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The token which will be received, specified by its token address.",
 			"routing": {
 				"send": {
 					"property": "tokenOut",
@@ -4121,7 +4121,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "tokenOutChainId",
 			"type": "options",
 			"default": 1,
-			"description": "The unique ID of the blockchain. For a list of supported chains see the [FAQ](https://api-docs.uniswap.org/guides/faqs).",
+			"description": "The unique ID of the blockchain.",
 			"options": [
 				{
 					"name": "1",
