@@ -58,7 +58,10 @@
             "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
-            "$ref": "#/components/responses/ApprovalUnauthorized401"
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
           },
           "404": {
             "$ref": "#/components/responses/ApprovalNotFound404"
@@ -204,6 +207,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
+          },
           "404": {
             "$ref": "#/components/responses/QuoteNotFound404"
           },
@@ -258,6 +264,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
           },
           "429": {
             "$ref": "#/components/responses/RateLimitedErr429"
@@ -518,6 +527,9 @@
           },
           "401": {
             "$ref": "#/components/responses/SwapUnauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
           },
           "404": {
             "$ref": "#/components/responses/SwapNotFound404"
@@ -1542,6 +1554,9 @@
           "401": {
             "$ref": "#/components/responses/SwapUnauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
+          },
           "404": {
             "$ref": "#/components/responses/SwapNotFound404"
           },
@@ -1716,6 +1731,9 @@
           "401": {
             "$ref": "#/components/responses/SwapUnauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
+          },
           "404": {
             "$ref": "#/components/responses/SwapNotFound404"
           },
@@ -1786,6 +1804,9 @@
           "401": {
             "$ref": "#/components/responses/SwapUnauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
+          },
           "404": {
             "$ref": "#/components/responses/SwapNotFound404"
           },
@@ -1846,6 +1867,9 @@
           "401": {
             "$ref": "#/components/responses/SwapUnauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/ComplianceForbidden403"
+          },
           "404": {
             "$ref": "#/components/responses/SwapNotFound404"
           },
@@ -1900,7 +1924,7 @@
             "$ref": "#/components/responses/Unauthorized401"
           },
           "403": {
-            "$ref": "#/components/responses/MarginDisabled403"
+            "$ref": "#/components/responses/CreatePlanForbidden403"
           },
           "404": {
             "$ref": "#/components/responses/ResourceNotFound404"
@@ -3381,7 +3405,7 @@
         }
       },
       "Unauthorized401": {
-        "description": "UnauthorizedError eg. Account is blocked.",
+        "description": "UnauthorizedError: the request's credentials were missing or not accepted.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -3495,7 +3519,7 @@
         }
       },
       "SwapUnauthorized401": {
-        "description": "UnauthorizedError eg. Account is blocked or  Fee is not enabled.",
+        "description": "UnauthorizedError: the request's credentials were missing or not accepted, or the fee in the request is not enabled for this caller.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -3972,7 +3996,37 @@
         }
       },
       "PlanForbidden403": {
-        "description": "The plan exists but cannot be served to this caller. Either it was created by another caller: `errorCode` is `ForbiddenError` and `detail` is `Caller is not the owner of this plan`, since only the caller that created a plan (the same session or API key) can read, refresh or update it. Or it is a margin plan and margin trading is switched off in this environment: `errorCode` is `Forbidden` and `detail` is `MARGIN_TRADING_DISABLED`, as on `POST /margin/quote` and `POST /plan`. The switch is read per request, so while it is off a margin plan is neither served, refreshed nor updated, whatever its status, and none of its calldata is returned. A transaction already sent from it is recorded by re-sending its PATCH once the switch reopens, unless the plan has expired by then. Other plans never read the switch.",
+        "description": "The plan exists but cannot be served to this caller. Either it was created by another caller: `errorCode` is `ForbiddenError` and `detail` is `Caller is not the owner of this plan`, since only the caller that created a plan (the same session or API key) can read, refresh or update it. Or it is a margin plan and margin trading is switched off in this environment: `errorCode` is `Forbidden` and `detail` is `MARGIN_TRADING_DISABLED`, as on `POST /margin/quote` and `POST /plan`. The switch is read per request, so while it is off a margin plan is neither served, refreshed nor updated, whatever its status, and none of its calldata is returned. A transaction already sent from it is recorded by re-sending its PATCH once the switch reopens, unless the plan has expired by then. Other plans never read the switch. A third case is a compliance refusal: `errorCode` is `AccountBlockedError` and `detail` is `Account is blocked` when the plan's swapper or recipient fails the risk screen.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Err403"
+            }
+          }
+        }
+      },
+      "ComplianceForbidden403": {
+        "description": "A compliance check refused the request. Changing credentials cannot get it through. `detail` is the reason in prose, and `errorCode` tells the cases apart: `TokenBlockedError` (`Token is blocked`): a token in the request is on the compliance blocklist. `AccountBlockedError` (`Account is blocked`): the swapper or recipient wallet failed the risk screen. `RestrictedSecuritiesError`: the token is a restricted security this caller may not trade. `PermissionedTokenNotAllowlistedError`: the token is permissioned and the swapper is not on its allowlist.",
+        "headers": {
+          "x-agent-info-status": {
+            "$ref": "#/components/headers/agentInfoStatusHeader"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Err403"
+            }
+          }
+        }
+      },
+      "CreatePlanForbidden403": {
+        "description": "Either margin trading is switched off in this environment (`errorCode` `Forbidden`, `detail` `MARGIN_TRADING_DISABLED`, as on `POST /margin/quote`), or a compliance check refused the plan. Changing credentials cannot get it through. `detail` is the reason in prose, and `errorCode` tells the cases apart: `TokenBlockedError` (`Token is blocked`): a token in the request is on the compliance blocklist. `AccountBlockedError` (`Account is blocked`): the swapper or recipient wallet failed the risk screen. `RestrictedSecuritiesError`: the token is a restricted security this caller may not trade. `PermissionedTokenNotAllowlistedError`: the token is permissioned and the swapper is not on its allowlist.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -10192,6 +10246,15 @@
           "maxLeverage": {
             "type": "string"
           },
+          "effectiveRate": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "The headline market's `effectiveRate`, 18-decimal fixed point, signed. Absent when that market's is."
+          },
+          "safeMaxLeverage": {
+            "type": "string",
+            "description": "The furthest `safeMaxLeverage` of any of the row's `venueMarkets`."
+          },
           "venueMarkets": {
             "type": "array",
             "items": {
@@ -10219,6 +10282,10 @@
             "type": "string",
             "description": "Decimal string: the leverage of the lower of two ceilings, the venue's liquidation LTV (`lltv`) held back by the LTV cliff buffer, and the LTV the venue lends at held back by 1 bps. On Aave v3 the lending LTV is the reserve's own, which can sit well under `lltv`; on Morpho and Aave v4 it is the liquidation LTV itself, so the cliff-buffered side binds. A venue that lends nothing against the collateral is left off the row. Server-authored: a client must not compute this from `lltv`, or its ceiling and the quote's refusal disagree. The policy ceiling, not a guarantee: once its swap is priced, an `open` or `increaseLeverage` near it is served at the leverage its worst-case fill can reach, below this. Note the buffer SCALES the ceiling rather than subtracting from it, so 86% at 400bps is 82.56% and not 82%."
           },
+          "safeMaxLeverage": {
+            "type": "string",
+            "description": "Decimal string: the leverage at which health factor at open is 1.1, floored to 0.5x and capped at `maxLeverage`. Server-authored: a client must not compute this."
+          },
           "lltv": {
             "type": "string",
             "description": "The liquidation boundary itself, 18-decimal fixed point. One side of the ceiling `maxLeverage` comes from, never the borrow limit by itself."
@@ -10226,6 +10293,16 @@
           "borrowRate": {
             "type": "string",
             "description": "Annual borrow rate, 18-decimal fixed point. Read from chain through the same function `POST /margin/quote` reads it through. Absent when the venue's rate read failed, which is not a rate of zero."
+          },
+          "collateralRate": {
+            "type": "string",
+            "pattern": "^[0-9]+$",
+            "description": "Simple annual rate the venue pays on the collateral, 18-decimal fixed point, never negative: the collateral reserve's liquidity rate on `AAVE_V3`, the hub asset's supply rate on `AAVE_V4`, and `\"0\"` on `MORPHO`, which lends none of the collateral. Read with `borrowRate`. Absent when the read failed, which is not a rate of zero."
+          },
+          "effectiveRate": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "`borrowRate` - `collateralRate`: simple annual, 18-decimal fixed point, signed, independent of leverage. Negative when the collateral earns more than the debt costs. Absent when either is."
           },
           "availableBorrowLiquidity": {
             "type": "string",
@@ -10400,6 +10477,21 @@
           "borrowRate": {
             "type": "string",
             "description": "The venue's annual borrow rate, 1e18-scaled. Absent when the rate read failed, never zero."
+          },
+          "collateralRate": {
+            "type": "string",
+            "pattern": "^[0-9]+$",
+            "description": "ACTIVE only. The venue's simple annual rate on the collateral, 1e18-scaled, never negative: `\"0\"` on `MORPHO`. Absent when unread, which is not a rate of zero."
+          },
+          "leveragedRate": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. Net interest per unit of exposure at `leverage`, simple annual, 1e18-scaled, signed: `leveragedMarginRate` over `leverage` on a LONG and over `leverage` - 1 on a SHORT. Negative means the position earns. Absent with either rate or `leverage`, and on a SHORT at 1x."
+          },
+          "leveragedMarginRate": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. Net interest per unit of equity at `leverage`, simple annual, 1e18-scaled, signed: (`leverage` - 1) x `borrowRate` - `leverage` x `collateralRate`. Negative means the position earns. Absent with either rate or `leverage`."
           },
           "maxWithdrawable": {
             "type": "string",
@@ -11902,6 +11994,20 @@
           "borrowRate": {
             "$ref": "#/components/schemas/marginFixedPoint18",
             "description": "Annualized borrow rate on the debt, size-weighted across legs. Absent when the selected venue's rate read supplied none, and on `close`."
+          },
+          "collateralRate": {
+            "$ref": "#/components/schemas/marginFixedPoint18",
+            "description": "Simple annual rate the venue pays on the collateral: `\"0\"` on `MORPHO`. Absent when the selected venue's read supplied none, and on `close`."
+          },
+          "leveragedRate": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "Net interest per unit of exposure at `leverage`, simple annual, 18-decimal fixed point, signed: `leveragedMarginRate` over `leverage` on a LONG and over `leverage` - 1 on a SHORT, whose exposure is its debt. Negative means the position earns. Absent with either rate, on a SHORT at 1x, and on `close`."
+          },
+          "leveragedMarginRate": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "Net interest per unit of equity at `leverage`, simple annual, 18-decimal fixed point, signed: (`leverage` - 1) x `borrowRate` - `leverage` x `collateralRate`, on both directions. Negative means the position earns. Absent with either rate, and on `close`."
           },
           "oraclePrice": {
             "$ref": "#/components/schemas/marginFixedPoint18",
