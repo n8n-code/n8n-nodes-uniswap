@@ -2587,7 +2587,7 @@ export const swappingDescription: INodeProperties[] = [
 			"displayName": "Permit Data",
 			"name": "permitData",
 			"type": "json",
-			"default": "{}",
+			"default": "{\n  \"domain\": {}\n}",
 			"description": "the permit2 message object for the customer to sign to permit spending by the permit2 contract.",
 			"routing": {
 				"send": {

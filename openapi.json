@@ -5817,7 +5817,13 @@
         "type": "object",
         "properties": {
           "domain": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "chainId": {
+                "type": "number",
+                "description": "The chain ID of the EIP-712 domain, as a number."
+              }
+            }
           },
           "values": {
             "type": "object"
@@ -8704,6 +8710,9 @@
             "type": "string",
             "description": "The quantity of ETH tokens approved for spending by the transaction, denominated in wei. Note that by default Uniswap Labs sets this to the maximum approvable spend."
           },
+          "chainId": {
+            "$ref": "#/components/schemas/ChainId"
+          },
           "gasLimit": {
             "$ref": "#/components/schemas/gasLimit"
           },
@@ -10433,9 +10442,13 @@
             "format": "int64",
             "description": "Epoch milliseconds of the open, from the position store. Absent when the store has not indexed the position."
           },
-          "accruedInterest": {
+          "accruedBorrowInterest": {
             "type": "string",
             "description": "Interest accrued on the debt, in raw debt-token units. ACTIVE rows: interest up to the last position event plus live growth since. Terminal rows: lifetime interest. Absent when any leg predates interest tracking."
+          },
+          "accruedCollateralInterest": {
+            "type": "string",
+            "description": "Supply interest the collateral earned, in raw collateral-token units; `0` on a venue whose collateral earns none (Morpho). ACTIVE rows: interest up to the last position event plus live growth since, within the supply APR ceiling. Terminal rows: lifetime interest. Already inside `equity` and the PnL fields, so not to be added to them. Absent when the position was stored before the store tracked it."
           },
           "unrealizedPnl": {
             "type": "string",
@@ -10554,6 +10567,87 @@
           "realizedPnlToDateInDebt": {
             "type": "string",
             "description": "ACTIVE only. Raw debt-token units, signed: what withdrawals so far fetched above the basis they removed."
+          },
+          "pnl": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MarginPositionPnl"
+              }
+            ],
+            "description": "The position's PnL in the pair's quote asset, from the position store. Absent when the store does not track the row's PnL, and it tracks none."
+          }
+        }
+      },
+      "MarginPositionPnl": {
+        "type": "object",
+        "description": "Every amount is a signed base-10 integer in raw `quoteToken` units, and market values are at the price the row's `equity` is valued at.",
+        "properties": {
+          "quoteToken": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MarginTokenMetadata"
+              }
+            ],
+            "description": "The row's `counterToken`, on a LONG and a SHORT alike."
+          },
+          "equity": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. The row's `equity` in the quote token. Negative when the debt outweighs the collateral."
+          },
+          "invested": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "The owner's money in the position: deposits add and withdrawals subtract, each valued in the quote token at its event; size changes and liquidations leave it. Zero or negative once withdrawals exceed deposits. On a terminal row, its value at the close."
+          },
+          "total": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "`equity` - `invested`. On a terminal row, the PnL at the close."
+          },
+          "realized": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. What sales and liquidations locked in and left in the position, net of their fees, price impact and liquidation penalties."
+          },
+          "unrealized": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. `total` - `realized`."
+          },
+          "roi": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "`total` / `invested`, 1e18-scaled, signed: 1e18 is 100%. Absent when `invested` is zero or negative."
+          },
+          "breakEvenPrice": {
+            "type": "string",
+            "description": "ACTIVE only. The market price at which `total` is zero, in the same terms as the row's `entryPrice`. Absent with `roi`."
+          },
+          "priceMove": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. `unrealized` less `feesAndPriceImpact`, `borrowInterest` and `collateralInterest`: what the price moved. The four are the split of `unrealized`, present together or not at all: they add up to it, each signed as its part of it and each the share still in it, not a lifetime total, at the same price as `equity`."
+          },
+          "feesAndPriceImpact": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. The fees and price impact still in `unrealized`; part of its split (see `priceMove`)."
+          },
+          "borrowInterest": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. The interest owed on the debt still in `unrealized`; part of its split (see `priceMove`). Never positive."
+          },
+          "collateralInterest": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "ACTIVE only. The collateral's supply interest still in `unrealized`, valued in the quote token; part of its split (see `priceMove`). Not a lifetime total. Never negative."
+          },
+          "payout": {
+            "type": "string",
+            "pattern": "^[0-9]+$",
+            "description": "TERMINAL only. What the close paid the owner. Never negative."
           }
         }
       },
@@ -10631,6 +10725,19 @@
           "entryPrice": {
             "type": "string",
             "description": "The position's entry price as the event left it, in the same terms as the row's `entryPrice`. Absent until the lifecycle has bought."
+          },
+          "accruedBorrowInterest": {
+            "type": "string",
+            "description": "The position's borrow interest to date as the event left it, in raw debt-token units, like the row's `accruedBorrowInterest`. Absent on an event stored before the store tracked it."
+          },
+          "accruedCollateralInterest": {
+            "type": "string",
+            "description": "The supply interest the position's collateral had earned as the event left it, in raw collateral-token units, like the row's `accruedCollateralInterest`. Absent on an event stored before the store tracked it."
+          },
+          "realizedPnl": {
+            "type": "string",
+            "pattern": "^-?[0-9]+$",
+            "description": "Raw quote-token units (the row's `counterToken`), signed: the PnL the event realized. Absent on an event that realized nothing, and on a lifecycle whose PnL the store does not track, which is every lifecycle."
           }
         }
       },
@@ -10742,7 +10849,7 @@
       },
       "MarginEquityAction": {
         "type": "object",
-        "description": "`addEquity` and `withdrawEquity`. Size is held and leverage follows, so no leverage target.\n\n`amount` is denominated in `walletToken` on `addEquity` and in the COLLATERAL token on `withdrawEquity`. That asymmetry is deliberate: how much collateral can leave before health hits the floor is answerable from the position alone, so denominating a withdrawal in `walletToken` would make whether it is allowed move with the funding route. It also matches the on-chain primitive, which takes a collateral amount.",
+        "description": "`addEquity` and `withdrawEquity`. Only collateral moves: debt is held and leverage follows, so no leverage target. Size moves with the collateral on a LONG and is held on a SHORT, where it is the debt.\n\n`amount` is denominated in `walletToken` on `addEquity` and in the COLLATERAL token on `withdrawEquity`. That asymmetry is deliberate: how much collateral can leave before health hits the floor is answerable from the position alone, so denominating a withdrawal in `walletToken` would make whether it is allowed move with the funding route. It also matches the on-chain primitive, which takes a collateral amount.",
         "properties": {
           "positionId": {
             "$ref": "#/components/schemas/marginPositionId"
@@ -10999,7 +11106,7 @@
       },
       "MarginQuoteAddEquityRequest": {
         "type": "object",
-        "description": "Add equity and let leverage fall. Size is held, so there is no leverage swap to bound. Equity crosses the wallet boundary, so `walletToken`, `walletChainId` and `swapConfig` are required. Leverage is not targeted, so the top-level `slippageTolerance` is forbidden. The nine other action keys are forbidden, which is what makes EXACTLY ONE enforceable: the ten `oneOf` branches alone do not say it, because a pair drawn from two different peer-rule groups (say `open` with `increaseLeverage`) matches exactly one branch.",
+        "description": "Add equity and let leverage fall. Debt is held, so there is no leverage swap to bound. Equity crosses the wallet boundary, so `walletToken`, `walletChainId` and `swapConfig` are required. Leverage is not targeted, so the top-level `slippageTolerance` is forbidden. The nine other action keys are forbidden, which is what makes EXACTLY ONE enforceable: the ten `oneOf` branches alone do not say it, because a pair drawn from two different peer-rule groups (say `open` with `increaseLeverage`) matches exactly one branch.",
         "allOf": [
           {
             "$ref": "#/components/schemas/MarginQuoteRequestBase"
@@ -11616,7 +11723,7 @@
       },
       "MarginQuoteWithdrawEquityRequest": {
         "type": "object",
-        "description": "Withdraw equity and let leverage rise. Size is held, so there is no leverage swap to bound. `amount` here is denominated in the COLLATERAL token, not `walletToken`; the one place the \"amount is always walletToken\" rule breaks. Equity crosses the wallet boundary, so `walletToken`, `walletChainId` and `swapConfig` are required. Leverage is not targeted, so the top-level `slippageTolerance` is forbidden. The nine other action keys are forbidden, which is what makes EXACTLY ONE enforceable: the ten `oneOf` branches alone do not say it, because a pair drawn from two different peer-rule groups (say `open` with `increaseLeverage`) matches exactly one branch.",
+        "description": "Withdraw equity and let leverage rise. Debt is held, so there is no leverage swap to bound. `amount` here is denominated in the COLLATERAL token, not `walletToken`; the one place the \"amount is always walletToken\" rule breaks. Equity crosses the wallet boundary, so `walletToken`, `walletChainId` and `swapConfig` are required. Leverage is not targeted, so the top-level `slippageTolerance` is forbidden. The nine other action keys are forbidden, which is what makes EXACTLY ONE enforceable: the ten `oneOf` branches alone do not say it, because a pair drawn from two different peer-rule groups (say `open` with `increaseLeverage`) matches exactly one branch.",
         "allOf": [
           {
             "$ref": "#/components/schemas/MarginQuoteRequestBase"
@@ -12020,6 +12127,14 @@
           "debtRepaid": {
             "$ref": "#/components/schemas/tokenAmount",
             "description": "`close` only: the debt the position owed as read, which is what the close clears. Smaller than the operation's `debtToRepay`, whose excess the `SWEEP` returns."
+          },
+          "accruedBorrowInterest": {
+            "$ref": "#/components/schemas/tokenAmount",
+            "description": "`close` only: the position's borrow interest in raw debt-token units, as `GET /margin/positions` serves it on the ACTIVE row. Absent when the stored position cannot be read or predates interest tracking."
+          },
+          "accruedCollateralInterest": {
+            "$ref": "#/components/schemas/tokenAmount",
+            "description": "`close` only: the supply interest the position's collateral earned, in raw collateral-token units, as `GET /margin/positions` serves it on the ACTIVE row. Absent when the stored position cannot be read or was stored before the store tracked it."
           }
         },
         "required": []

@@ -1432,7 +1432,7 @@ export const utilitiesDescription: INodeProperties[] = [
 			"displayName": "Calls",
 			"name": "calls",
 			"type": "json",
-			"default": "[\n  {}\n]",
+			"default": "[\n  {\n    \"chainId\": 1\n  }\n]",
 			"description": "Batch of transactions to encode into the UserOperation.",
 			"routing": {
 				"send": {
