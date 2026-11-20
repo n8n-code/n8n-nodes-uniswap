@@ -1841,7 +1841,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "signature",
 			"type": "string",
 			"default": "",
-			"description": "The signed permit.",
+			"description": "The signed permit: a 65-byte hex signature (0x followed by 130 hex characters: r, s, v). 64-byte compact (EIP-2098) signatures and other lengths are not supported.",
 			"routing": {
 				"send": {
 					"property": "signature",

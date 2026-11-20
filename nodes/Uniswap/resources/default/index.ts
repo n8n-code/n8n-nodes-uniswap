@@ -381,6 +381,31 @@ export const defaultDescription: INodeProperties[] = [
 			}
 		},
 		{
+			"displayName": "Search Query",
+			"name": "searchQuery",
+			"description": "Free text or a token address, matched against either token of a row. Text matches when every word starts a word of the exposure or counter token's symbol or name, ignoring case and word order, so `eth usdc`, `usdc/weth` and `usd coin` all match WETH/USDC. A pasted address matches a row holding that token on either side, whatever its casing. Pages through `cursor` like an unsearched listing. A value with no letter or digit, or longer than 64 characters, is a 400. A text search whose token names cannot be read is a 503 `MARGIN_MARKET_SEARCH_UNAVAILABLE`, never a 200 with an empty page.",
+			"default": "",
+			"type": "string",
+			"routing": {
+				"send": {
+					"type": "query",
+					"property": "searchQuery",
+					"value": "={{ $value }}",
+					"propertyInDotNotation": false
+				}
+			},
+			"displayOptions": {
+				"show": {
+					"resource": [
+						"Default"
+					],
+					"operation": [
+						"Margin Markets"
+					]
+				}
+			}
+		},
+		{
 			"displayName": "X Agent Info",
 			"name": "x-agent-info",
 			"description": "Optional attribution hint for AI-agent traffic; send it if an AI agent built or operates your integration. The value is a JSON object with up to three fields: `decision_origin` (required, exactly `autonomous` or `human_mediated`, case-sensitive), `integration_name` (optional string naming your integration, e.g. `my-trading-bot`), and `version` (optional string identifying your integration's version). Any other key is dropped, never rejected. The raw value must be at most 1024 bytes of printable US-ASCII (`0x20`-`0x7E`), so send non-ASCII text as JSON `\\u` escapes; `integration_name` and `version` are each limited to 256 UTF-16 code units and may not contain control characters, U+2028, U+2029, or U+FFFD. Send the header once: repeated header lines are joined with `, ` and the joined string is what gets parsed, so two complete objects fail as invalid JSON while a single object split across two lines still parses. The header is analytics-only and never affects the request: omitting it, sending it, or sending a value that fails these rules never changes the response status, body, or swap behavior. A value that fails to parse is dropped and reported by the `x-agent-info-status` response header. Never put a user ID, wallet address, email, session token, or API key in these fields.",

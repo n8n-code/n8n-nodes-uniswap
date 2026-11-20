@@ -2230,6 +2230,17 @@
             }
           },
           {
+            "name": "searchQuery",
+            "in": "query",
+            "required": false,
+            "description": "Free text or a token address, matched against either token of a row. Text matches when every word starts a word of the exposure or counter token's symbol or name, ignoring case and word order, so `eth usdc`, `usdc/weth` and `usd coin` all match WETH/USDC. A pasted address matches a row holding that token on either side, whatever its casing. Pages through `cursor` like an unsearched listing. A value with no letter or digit, or longer than 64 characters, is a 400. A text search whose token names cannot be read is a 503 `MARGIN_MARKET_SEARCH_UNAVAILABLE`, never a 200 with an empty page.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          {
             "$ref": "#/components/parameters/agentInfoHeader"
           }
         ],
@@ -3684,7 +3695,7 @@
         }
       },
       "MarginUnavailable503": {
-        "description": "A venue's on-chain state could not be read, or a read that prices funding from another chain failed. `errorCode` is `ServiceUnavailable` and `detail` is `MARGIN_MARKET_READ_UNAVAILABLE` unless named below. Retryable. On `POST /margin/quote` with funding from another chain, `MARGIN_FUNDING_QUOTE_UNAVAILABLE` when a routing or bridge dependency timed out pricing the funding route, and `MARGIN_POSITION_CHAIN_READ_UNAVAILABLE` when the swapper's code on the position's chain, which decides whether Across pays a wrapped-native collateral as native and whether the wallet is a contract that must already permit the margin router, could not be read, or when a contract wallet's Permit2 allowance for the margin router could not be read. On `POST /margin/quote`: a market snapshot, a token's decimals, a quoter, pool-depth or v2 reserves read that routes and prices a leverage leg (an RPC failure, not a revert for want of a pool), the v4 PoolManager's balance of the leverage swap's input token or, on `close`, the borrow rate that sizes the accrual buffer was unavailable, or a venue's oracle answered a zero mark, so the mark and the risk numbers cannot be derived; an unavailable gas oracle does NOT produce this, since `gasEstimate` is indicative and is simply omitted. On `POST /margin/quote` with a swap from `walletToken` on the position's chain, `MARGIN_POSITION_CHAIN_READ_UNAVAILABLE` when the swapper's allowance of `walletToken` to Permit2, or its Permit2 allowance to the Universal Router, which decide the funding's approval steps, could not be read. On `GET /margin/markets`: a market-discovery read (router or adapter multicall) failed. On `POST /plan` with a `marginQuote`, a read that re-derives the margin step was unavailable, the PoolManager's balance included, and the plan was not created; with funding from another chain, `MARGIN_POSITION_CHAIN_READ_UNAVAILABLE` when the swapper's code on the position's chain, or a contract wallet's Permit2 allowance for the margin router, could not be read, and `MARGIN_FUNDING_QUOTE_UNAVAILABLE` when the bridge's re-price timed out; `MARGIN_PLAN_CREATE_BUDGET_EXCEEDED` when building the plan took longer than the server allows before saving it, so neither the plan nor its position id reservation was written. On the `POST /margin/quote` keys that name a `positionId`, this also answers when a venue that could hold the position reverted its position read and no market holding collateral for the account carries debt or is named by the owner's stored `ACTIVE` position, since the unreadable venue may hold the position beside another's donated collateral, or when the account holds collateral on more than one venue's market with no single one carrying debt and the stored positions that would settle it could not be read; a venue's revert never blocks a position that carries debt on another venue or that the owner's stored `ACTIVE` position names. On `GET /margin/positions`: an account or position probe failed at the RPC, a venue reverted its position read and no other venue holds a position, or a token's decimals could not be read; a venue whose position read reverts is otherwise skipped. On `GET /margin/assets`: the shared catalogue's market-discovery read or a venue's support-gate multicall failed, or discovery returned no markets.",
+        "description": "A venue's on-chain state could not be read, or a read that prices funding from another chain failed. `errorCode` is `ServiceUnavailable` and `detail` is `MARGIN_MARKET_READ_UNAVAILABLE` unless named below. Retryable. On `POST /margin/quote` with funding from another chain, `MARGIN_FUNDING_QUOTE_UNAVAILABLE` when a routing or bridge dependency timed out pricing the funding route, and `MARGIN_POSITION_CHAIN_READ_UNAVAILABLE` when the swapper's code on the position's chain, which decides whether Across pays a wrapped-native collateral as native and whether the wallet is a contract that must already permit the margin router, could not be read, or when a contract wallet's Permit2 allowance for the margin router could not be read. On `POST /margin/quote`: a market snapshot, a token's decimals, a quoter, pool-depth or v2 reserves read that routes and prices a leverage leg (an RPC failure, not a revert for want of a pool), the v4 PoolManager's balance of the leverage swap's input token or, on `close`, the borrow rate that sizes the accrual buffer was unavailable, or a venue's oracle answered a zero mark, so the mark and the risk numbers cannot be derived; an unavailable gas oracle does NOT produce this, since `gasEstimate` is indicative and is simply omitted. On `POST /margin/quote` with a swap from `walletToken` on the position's chain, `MARGIN_POSITION_CHAIN_READ_UNAVAILABLE` when the swapper's allowance of `walletToken` to Permit2, or its Permit2 allowance to the Universal Router, which decide the funding's approval steps, could not be read. On `GET /margin/markets`: a market-discovery read (router or adapter multicall) failed, or `MARGIN_MARKET_SEARCH_UNAVAILABLE` when a text `searchQuery` needed token names that could not be read. On `POST /plan` with a `marginQuote`, a read that re-derives the margin step was unavailable, the PoolManager's balance included, and the plan was not created; with funding from another chain, `MARGIN_POSITION_CHAIN_READ_UNAVAILABLE` when the swapper's code on the position's chain, or a contract wallet's Permit2 allowance for the margin router, could not be read, and `MARGIN_FUNDING_QUOTE_UNAVAILABLE` when the bridge's re-price timed out; `MARGIN_PLAN_CREATE_BUDGET_EXCEEDED` when building the plan took longer than the server allows before saving it, so neither the plan nor its position id reservation was written. On the `POST /margin/quote` keys that name a `positionId`, this also answers when a venue that could hold the position reverted its position read and no market holding collateral for the account carries debt or is named by the owner's stored `ACTIVE` position, since the unreadable venue may hold the position beside another's donated collateral, or when the account holds collateral on more than one venue's market with no single one carrying debt and the stored positions that would settle it could not be read; a venue's revert never blocks a position that carries debt on another venue or that the owner's stored `ACTIVE` position names. On `GET /margin/positions`: an account or position probe failed at the RPC, a venue reverted its position read and no other venue holds a position, or a token's decimals could not be read; a venue whose position read reverts is otherwise skipped. On `GET /margin/assets`: the shared catalogue's market-discovery read or a venue's support-gate multicall failed, or discovery returned no markets.",
         "headers": {
           "x-agent-info-status": {
             "$ref": "#/components/headers/agentInfoStatusHeader"
@@ -5296,7 +5307,8 @@
         "properties": {
           "signature": {
             "type": "string",
-            "description": "The signed permit."
+            "description": "The signed permit: a 65-byte hex signature (0x followed by 130 hex characters: r, s, v). 64-byte compact (EIP-2098) signatures and other lengths are not supported.",
+            "pattern": "^0x[a-fA-F0-9]{130}$"
           },
           "quote": {
             "oneOf": [
@@ -10233,7 +10245,7 @@
       },
       "MarginMarketRow": {
         "type": "object",
-        "description": "One row per (exposureToken, counterToken, direction). A venue market is a (collateral, debt) pair, read as a long of its collateral and a short of its debt except that a USD stablecoin is never the exposure unless both legs are one (served as the LONG of its collateral), so a market with one or two stablecoin legs produces one row, and shorting a token is only ever expressible as a market whose debt it is. Carries no `oraclePrice`: a mark belongs to a VENUE's oracle and two venues on one market need not agree, so a row-level price is a number no venue necessarily quoted. Carries no `feeBps` either: a pool fee tier is not a cost, since a 5bps pool with thin liquidity fills worse than a 30bps pool with depth. `effectivePrice` on a quote answers that, carrying the fee and the impact together.",
+        "description": "One row per (exposureToken, counterToken, direction). A venue market is a (collateral, debt) pair, read as a long of its collateral and a short of its debt except that a USD stablecoin is never the exposure unless both legs are one (served as the LONG of its collateral), so a market with one or two stablecoin legs produces one row, and shorting a token is only ever expressible as a market whose debt it is. A market of two volatile tokens is listed in both readings under the same `marketId`, and a quote names the reading in its own `direction`, `exposureToken` and `counterToken`. Carries no `oraclePrice`: a mark belongs to a VENUE's oracle and two venues on one market need not agree, so a row-level price is a number no venue necessarily quoted. Carries no `feeBps` either: a pool fee tier is not a cost, since a 5bps pool with thin liquidity fills worse than a 30bps pool with depth. `effectivePrice` on a quote answers that, carrying the fee and the impact together.",
         "properties": {
           "exposureToken": {
             "$ref": "#/components/schemas/MarginTokenMetadata"
@@ -10412,7 +10424,7 @@
           },
           "size": {
             "type": "string",
-            "description": "Exposure in exposure-token base units: held now on an ACTIVE row, held when it closed on a terminal one."
+            "description": "Exposure in exposure-token base units, the collateral on a `LONG` and the debt on a `SHORT`: held now on an ACTIVE row. On a terminal `LONG`, the collateral held when it closed; on a terminal `SHORT`, the debt owed when it closed, interest included, or, when its debt was repaid before its collateral left, the debt that repay cleared. Without that debt on record, as for a `SHORT` closed before it was kept, it is the debt drawn over the position's life, before interest (`0` when none was seen drawn), more than it closed with after a leverage decrease or partial liquidation. A row is a `SHORT` when its collateral is a USD stablecoin the chain's margin config lists and its debt is not. A pair of two volatile tokens is the same account read either way, so it is served in the reading the app opened it in, and as a `LONG` of its collateral when that reading is not known (see `framingInferred`). Every other row is a `LONG` of its collateral."
           },
           "subId": {
             "type": "string",
@@ -10574,7 +10586,11 @@
                 "$ref": "#/components/schemas/MarginPositionPnl"
               }
             ],
-            "description": "The position's PnL in the pair's quote asset, from the position store. Absent when the store does not track the row's PnL, and it tracks none."
+            "description": "The position's PnL in the pair's quote asset, from the position store. Absent on a SHORT row, whose quote asset is not the debt token the store books its PnL in, and when the store does not track the row's PnL."
+          },
+          "framingInferred": {
+            "type": "boolean",
+            "description": "`true` when the row is a pair of two volatile tokens whose opening reading is not known for this response, so `direction` is the default `LONG` of its collateral. That covers a position opened outside the app or before readings were recorded, one opened by a plan whose call has not been proven landed, and a response served while the reading could not be read, which a later response can serve in its recorded reading. Label the row as a default reading, not as a position opened outside the app. Absent otherwise."
           }
         }
       },
@@ -10618,11 +10634,11 @@
           "roi": {
             "type": "string",
             "pattern": "^-?[0-9]+$",
-            "description": "`total` / `invested`, 1e18-scaled, signed: 1e18 is 100%. Absent when `invested` is zero or negative."
+            "description": "`total` / `invested`, 1e18-scaled, signed: 1e18 is 100%, and never below -1e18. Absent when `invested` is zero or negative, or under 5% of the deposits."
           },
           "breakEvenPrice": {
             "type": "string",
-            "description": "ACTIVE only. The market price at which `total` is zero, in the same terms as the row's `entryPrice`. Absent with `roi`."
+            "description": "ACTIVE only. The market price at which `total` is zero, in the same terms as the row's `entryPrice`. Absent with `roi`, and when the row holds no collateral."
           },
           "priceMove": {
             "type": "string",
@@ -10737,7 +10753,7 @@
           "realizedPnl": {
             "type": "string",
             "pattern": "^-?[0-9]+$",
-            "description": "Raw quote-token units (the row's `counterToken`), signed: the PnL the event realized. Absent on an event that realized nothing, and on a lifecycle whose PnL the store does not track, which is every lifecycle."
+            "description": "Raw quote-token units (the row's `counterToken`), signed: what the event's sale or close realized against the position's cost basis (its debt, invested margin and realized PnL to date), `0` when it fetched exactly its share of that basis. Absent on an event that sold nothing (an open, an increase, a margin move, an adjustment), and on every event of a lifecycle the store does not track realized PnL for: one opened before the store tracked it or on a market that reads only as a short, and, from that event on, one whose flows went untracked or whose sale or deposit the store could not price."
           }
         }
       },
