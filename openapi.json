@@ -2325,7 +2325,7 @@
       "get": {
         "operationId": "MarginPositions",
         "summary": "A wallet's margin positions on a chain",
-        "description": "The positions tab's feed. One row per position: a margin account (`swapper`, `subId`) on one venue and market. Each open allocates its own `subId`, so a wallet's positions in the same pair are separate rows, each with its own risk and its own actions.\n\n**Balances and risk are read on chain, per request.** Position accounts are a pure CREATE2 function of `(swapper, subId)`, so the addresses are known offchain for free and the only question the chain answers is which of them hold anything. That is what makes the feed correct from a device that has never seen this wallet before, and correct in the same block an open lands. A health factor is the one number a caller must not act on stale, which is why none of this is cached.\n\n**Markets walked:** the served catalogue plus the market of each `ACTIVE` position the store indexed for this wallet, so an indexed position stays listed after its pair leaves the catalogue. A position on a pair its venue's adapter no longer supports is not listed. **A venue whose position read reverts is skipped, not fatal:** the page serves every other venue's rows and omits that venue's until it reads again. When no readable venue holds a position, the page answers 503 rather than an empty list, and an RPC failure still answers 503.\n\n**Risk is in TRADER terms.** `oraclePrice` and `liquidationPrice` are both reciprocated on a SHORT, so the price distance to liquidation equals `healthFactor` in either direction: `oraclePrice / liquidationPrice` on a LONG, `liquidationPrice / oraclePrice` on a SHORT. A row that mixed frames would still satisfy every type check and be wrong by a factor of the price.\n\n**`maxWithdrawable` is bounded by the BUFFERED ceiling, not the raw LLTV.** The withdraw plan asserts that ceiling on chain, and this figure sits just inside it so a withdraw of the full amount still clears it when it lands. Never recompute it client-side from `lltv`.\n\n**Always paginated**, oldest `subId` first: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out.\n\nCost-basis fields (`entryPrice`, `openedAt`, and the PnL fields) come from the position store and are ABSENT rather than zero for a position the store has not indexed: a zero PnL is a claim, an absent one is not. Finished `statuses` are served from the store, newest first, on one opaque `cursor` over the whole requested set; echo `nextCursor` back with the same `statuses` to page. Use a cursor only with the `statuses` that returned it.",
+        "description": "The positions tab's feed. One row per position: a margin account (`swapper`, `subId`) on one venue and market. Each open allocates its own `subId`, so a wallet's positions in the same pair are separate rows, each with its own risk and its own actions.\n\n**Balances and risk are read on chain, per request.** Position accounts are a pure CREATE2 function of `(swapper, subId)`, so the addresses are known offchain for free and the only question the chain answers is which of them hold anything. That is what makes the feed correct from a device that has never seen this wallet before, and correct in the same block an open lands. A health factor is the one number a caller must not act on stale, which is why none of this is cached.\n\n**Markets walked:** the served catalogue plus the market of each `ACTIVE` position the store indexed for this wallet, so an indexed position stays listed after its pair leaves the catalogue. A position on a pair its venue's adapter no longer supports is not listed. **A venue whose position read reverts is skipped, not fatal:** the page serves every other venue's rows and omits that venue's until it reads again. When no readable venue holds a position, the page answers 503 rather than an empty list, and an RPC failure still answers 503.\n\n**Risk is in TRADER terms.** `oraclePrice` and `liquidationPrice` are both reciprocated on a SHORT, so the price distance to liquidation equals `healthFactor` in either direction: `oraclePrice / liquidationPrice` on a LONG, `liquidationPrice / oraclePrice` on a SHORT. A row that mixed frames would still satisfy every type check and be wrong by a factor of the price.\n\n**`maxWithdrawable` is bounded by the BUFFERED ceiling, not the raw LLTV.** The withdraw plan asserts that ceiling on chain, and this figure sits just inside it so a withdraw of the full amount still clears it when it lands. Never recompute it client-side from `lltv`.\n\n**Always paginated**, oldest `subId` first: `limit` (default and max 20) plus an opaque `cursor` in, `nextCursor` out.\n\nCost-basis fields (`entryPrice`, `openedAt`, and `pnl`) come from the position store and are ABSENT rather than zero for a position the store has not indexed: a zero PnL is a claim, an absent one is not. Finished `statuses` are served from the store, newest first, on one opaque `cursor` over the whole requested set; echo `nextCursor` back with the same `statuses` to page. Use a cursor only with the `statuses` that returned it.",
         "parameters": [
           {
             "name": "swapper",
@@ -10404,7 +10404,7 @@
           "LIQUIDATED",
           "PARTIALLY_LIQUIDATED"
         ],
-        "description": "`ACTIVE`: still open on chain, including a position that survived a partial liquidation. `COMPLETED`: the owner closed it, and it was never liquidated in that epoch. `PARTIALLY_LIQUIDATED`: the owner closed it after a partial liquidation earlier in the same epoch. `LIQUIDATED`: a liquidation cleared its debt; any collateral it left on the account is counted as returned, in `size` and `realizedPnl`."
+        "description": "`ACTIVE`: still open on chain, including a position that survived a partial liquidation. `COMPLETED`: the owner closed it, and it was never liquidated in that epoch. `PARTIALLY_LIQUIDATED`: the owner closed it after a partial liquidation earlier in the same epoch. `LIQUIDATED`: a liquidation cleared its debt; any collateral it left on the account is counted as returned, in `size` and `pnl`."
       },
       "MarginPositionRow": {
         "type": "object",
@@ -10441,10 +10441,6 @@
             "type": "string",
             "description": "ACTIVE only. Raw debt-token units owed now."
           },
-          "depositedEquity": {
-            "type": "string",
-            "description": "Raw collateral-token units deposited over the position's life. Absent when the store has not indexed the position or its flows went untracked."
-          },
           "entryPrice": {
             "type": "string",
             "description": "Cost basis, from the position store: the average fill of the exposure bought and still held. A sale or partial liquidation takes what it sold at that average and a withdrawal of the owner's own equity takes nothing, so none of them moves it; a later buy averages in with what is still held. In the same terms as `oraclePrice`: counter per exposure, 1e18-scaled, reciprocated on a SHORT. Absent when the store has not indexed the position or it recorded no buy."
@@ -10460,19 +10456,11 @@
           },
           "accruedCollateralInterest": {
             "type": "string",
-            "description": "Supply interest the collateral earned, in raw collateral-token units; `0` on a venue whose collateral earns none (Morpho). ACTIVE rows: interest up to the last position event plus live growth since, within the supply APR ceiling. Terminal rows: lifetime interest. Already inside `equity` and the PnL fields, so not to be added to them. Absent when the position was stored before the store tracked it."
-          },
-          "unrealizedPnl": {
-            "type": "string",
-            "description": "ACTIVE only. Raw collateral-token units: current equity plus collateral already returned, minus collateral deposited. Absent when the store has not indexed the position or it has no recorded deposit."
-          },
-          "roe": {
-            "type": "string",
-            "description": "ACTIVE only. `unrealizedPnl` / `depositedEquity`, 1e18-scaled, signed. Absent when either is."
+            "description": "Supply interest the collateral earned, in raw collateral-token units; `0` on a venue whose collateral earns none (Morpho). ACTIVE rows: interest up to the last position event plus live growth since, within the supply APR ceiling. Terminal rows: lifetime interest. Already inside `equity` and `pnl`, so not to be added to them. Absent when the position was stored before the store tracked it."
           },
           "equity": {
             "type": "string",
-            "description": "Collateral net of debt, the debt valued at `currentPrice`, or at the venue mark when `currentPrice` is absent, in COLLATERAL-token base units: the exposure token on a LONG, the counter token on a SHORT, so scale it by that token's decimals. `leverage`, `unrealizedPnl`, `roe` and `unrealizedPnlInDebt` are valued at the same price. Absent when no price could be read."
+            "description": "Collateral net of debt, the debt valued at `currentPrice`, or at the venue mark when `currentPrice` is absent, in COLLATERAL-token base units: the exposure token on a LONG, the counter token on a SHORT, so scale it by that token's decimals. `leverage` and `pnl` are valued at the same price. Absent when no price could be read."
           },
           "leverage": {
             "type": "string",
@@ -10485,7 +10473,7 @@
           },
           "currentPrice": {
             "type": "string",
-            "description": "ACTIVE only. The pair's market price, which `equity`, `leverage`, `unrealizedPnl`, `roe` and `unrealizedPnlInDebt` are valued at: the midpoint between what a small fixed sale of the collateral for the debt fills at and what a buy of about the same amount of collateral costs, each on its cheapest single route, so the pool fee largely cancels out of it. Shared by every position on the pair and up to 30 seconds old, so unlike `oraclePrice` and the risk fields it can be served from a cache. It leaves out the position's own size and the pool fee, so a close realizes less than this values it at, by that close's fee and price impact. It can differ from `oraclePrice`, which risk is measured against. Counter per exposure, 1e18-scaled, in the same trader terms as `oraclePrice`. Absent when none was read; those fields are then valued at `oraclePrice`."
+            "description": "ACTIVE only. The pair's market price, which `equity`, `leverage` and `pnl` are valued at: the midpoint between what a small fixed sale of the collateral for the debt fills at and what a buy of about the same amount of collateral costs, each on its cheapest single route, so the pool fee largely cancels out of it. Shared by every position on the pair and up to 30 seconds old, so unlike `oraclePrice` and the risk fields it can be served from a cache. It leaves out the position's own size and the pool fee, so a close realizes less than this values it at, by that close's fee and price impact. It can differ from `oraclePrice`, which risk is measured against. Counter per exposure, 1e18-scaled, in the same trader terms as `oraclePrice`. Absent when none was read; those fields are then valued at `oraclePrice`."
           },
           "liquidationPrice": {
             "type": "string",
@@ -10535,18 +10523,6 @@
             "type": "string",
             "description": "Terminal only. The close's swap price, or the liquidation's, in the same terms as `entryPrice`. Absent when nothing was sold."
           },
-          "realizedPnl": {
-            "type": "string",
-            "description": "Terminal only. Raw collateral-token units: collateral returned over the position's life minus collateral deposited. On a liquidation, collateral left on the account after the seizure counts as returned. Absent for positions closed outside the router, and for liquidations whose collateral was not tracked."
-          },
-          "unrealizedPnlInDebt": {
-            "type": "string",
-            "description": "ACTIVE only. `unrealizedPnl` in raw debt-token units, with each deposit and return valued at the venue's oracle mark at its event; `entryPrice` and `exitPrice` are the swap fills. The dollar PnL on a LONG against a stablecoin. Absent when any deposit or return could not be priced."
-          },
-          "realizedPnlInDebt": {
-            "type": "string",
-            "description": "Terminal only. `realizedPnl` in raw debt-token units, valued the same way, with a liquidation's leftover at the liquidation's price. Absent when any deposit or return could not be priced."
-          },
           "openTxHash": {
             "type": "string",
             "description": "The tx that opened the position."
@@ -10571,14 +10547,6 @@
           "activityId": {
             "type": "string",
             "description": "The lifecycle `GET /margin/positions/activity` serves every event of. Absent for a position the store has not indexed, or indexed before it kept lifecycles."
-          },
-          "costBasisInDebt": {
-            "type": "string",
-            "description": "ACTIVE only. Raw debt-token units: the basis of the equity still in the position, each deposit valued at the venue's oracle mark at its event. Each withdrawal removes the share of the basis it takes of the equity, both at the withdrawal's price. Absent like `unrealizedPnlInDebt`."
-          },
-          "realizedPnlToDateInDebt": {
-            "type": "string",
-            "description": "ACTIVE only. Raw debt-token units, signed: what withdrawals so far fetched above the basis they removed."
           },
           "pnl": {
             "allOf": [
@@ -10720,7 +10688,7 @@
           },
           "equityDeposited": {
             "type": "string",
-            "description": "Raw collateral-token units the owner put in, as the row's `depositedEquity` counts them: a deposit of the debt token at the venue's mark."
+            "description": "Raw collateral-token units the owner put in, a deposit of the debt token counted at the venue's mark."
           },
           "equityWithdrawn": {
             "type": "string",
