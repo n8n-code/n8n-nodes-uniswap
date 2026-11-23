@@ -12090,6 +12090,10 @@
             "$ref": "#/components/schemas/marginFixedPoint18",
             "description": "The oracle price at which LTV reaches LLTV, from the same worst fill as `leverage`. Multi-leg: the nearest leg's, because legs liquidate independently. Absent on `close`. In TRADER terms (counter per exposure), the same frame as `oraclePrice` and `effectivePrice`."
           },
+          "liquidationBonus": {
+            "$ref": "#/components/schemas/marginFixedPoint18",
+            "description": "The extra fraction of collateral a liquidator receives when the position is liquidated, as a WAD fraction (`\"50000000000000000\"` is 5%). The penalty on the collateral seized is this times the debt repaid, valued at `oraclePrice`. The market the quote opens on; legs liquidate independently, as with `liquidationPrice`. `AAVE`: the reserve's bonus, or the e-mode category's when the account is in one that lists the collateral. `MORPHO`: the market's liquidation incentive factor less one. `AAVE_V4`: the bonus at a health factor just below 1, the lowest it pays, because it grows as the health factor falls. Absent when the venue states none or the read failed, which is not zero. Absent on `close`."
+          },
           "healthFactor": {
             "$ref": "#/components/schemas/marginFixedPoint18",
             "description": "collateral x LLTV / debt, at the same worst fill as `leverage`; liquidatable below 1, that is below `\"1000000000000000000\"`. Nearest leg. The one risk number that normalizes across venues, so it is what a client bands into Healthy / Caution / Risky; the band thresholds are a product call and stay client-side. Absent on `close`."
