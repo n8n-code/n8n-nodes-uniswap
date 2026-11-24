@@ -1723,7 +1723,7 @@ export const swappingDescription: INodeProperties[] = [
 			"name": "bridgeProviders",
 			"type": "json",
 			"default": "[\n  null\n]",
-			"description": "The bridge vendors allowed to serve this request's bridge routes, whether a direct bridge or a leg of a chained quote. Omit to get ACROSS only: other vendors such as RELAY compete only when listed. An empty array is rejected. A FASTEST chained quote is estimated on Across, so it needs ACROSS in the list.",
+			"description": "The bridge vendors allowed to serve this request's bridge routes, whether a direct bridge or a leg of a chained quote. Omit to get ACROSS only: other vendors such as RELAY compete only when listed. An empty array is rejected. A FASTEST chained quote is estimated on Across, so it needs ACROSS in the list. When you list another vendor, approve a direct `BRIDGE` quote only after quoting, because the winning vendor decides the spender: pass the quote to `/check_approval` as `quote`, or approve its `approvalSpender`.",
 			"routing": {
 				"send": {
 					"property": "bridgeProviders",
